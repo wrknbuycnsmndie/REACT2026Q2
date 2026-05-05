@@ -7,6 +7,7 @@ import { ResultsSection } from '../ResultsSection/ResultsSection';
 import { SearchSection } from '../SearchSection/SearchSection';
 
 type PokemonSearchState = {
+    isLoading: boolean;
     items: SearchResultItem[];
     searchTerm: string;
     submittedSearchTerm: string;
@@ -14,6 +15,7 @@ type PokemonSearchState = {
 
 export class PokemonSearch extends Component<object, PokemonSearchState> {
     public state: PokemonSearchState = {
+        isLoading: false,
         items: [],
         searchTerm: getStoredSearchTerm(),
         submittedSearchTerm: getStoredSearchTerm().trim(),
@@ -24,12 +26,20 @@ export class PokemonSearch extends Component<object, PokemonSearchState> {
     }
 
     private async loadInitialResults() {
+        this.setState({ isLoading: true });
+
         try {
             const items = await fetchPokemonResults(this.state.searchTerm);
 
-            this.setState({ items });
+            this.setState({
+                isLoading: false,
+                items,
+            });
         } catch {
-            this.setState({ items: [] });
+            this.setState({
+                isLoading: false,
+                items: [],
+            });
         }
     }
 
@@ -48,17 +58,20 @@ export class PokemonSearch extends Component<object, PokemonSearchState> {
         }
 
         setStoredSearchTerm(trimmedSearchTerm);
+        this.setState({ isLoading: true });
 
         try {
             const items = await fetchPokemonResults(trimmedSearchTerm);
 
             this.setState({
+                isLoading: false,
                 items,
                 searchTerm: trimmedSearchTerm,
                 submittedSearchTerm: trimmedSearchTerm,
             });
         } catch {
             this.setState({
+                isLoading: false,
                 items: [],
                 searchTerm: trimmedSearchTerm,
                 submittedSearchTerm: trimmedSearchTerm,
@@ -67,7 +80,7 @@ export class PokemonSearch extends Component<object, PokemonSearchState> {
     };
 
     public render() {
-        const { items, searchTerm } = this.state;
+        const { isLoading, items, searchTerm } = this.state;
 
         return (
             <>
@@ -76,7 +89,7 @@ export class PokemonSearch extends Component<object, PokemonSearchState> {
                     onSearchTermChange={this.handleSearchTermChange}
                     onSubmit={this.handleSearchSubmit}
                 />
-                <ResultsSection items={items} />
+                <ResultsSection isLoading={isLoading} items={items} />
             </>
         );
     }

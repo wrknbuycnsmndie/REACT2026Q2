@@ -1,16 +1,37 @@
 import { Component } from 'react';
+import type { ReactNode } from 'react';
 import { ResultRow } from './ResultRow';
+import { ResultsLoader } from './ResultsLoader';
 import type { SearchResultItem } from '../../types/search';
 import './ResultsSection.css';
 
 type ResultsSectionProps = {
+    isLoading: boolean;
     items: SearchResultItem[];
 };
 
 export class ResultsSection extends Component<ResultsSectionProps> {
-    public render() {
-        const { items } = this.props;
+    private renderContent(): ReactNode {
+        const { isLoading, items } = this.props;
 
+        if (isLoading) {
+            return <ResultsLoader />;
+        }
+
+        if (items.length > 0) {
+            return (
+                <ul className="results-section__list">
+                    {items.map((item) => (
+                        <ResultRow key={item.id} item={item} />
+                    ))}
+                </ul>
+            );
+        }
+
+        return <p className="results-section__empty">No results to display yet.</p>;
+    }
+
+    public render() {
         return (
             <section className="results-section" aria-labelledby="results-title">
                 <div className="results-section__header">
@@ -28,15 +49,7 @@ export class ResultsSection extends Component<ResultsSectionProps> {
                         <span className="results-section__details">Item Description</span>
                     </div>
 
-                    {items.length > 0 ? (
-                        <ul className="results-section__list">
-                            {items.map((item) => (
-                                <ResultRow key={item.id} item={item} />
-                            ))}
-                        </ul>
-                    ) : (
-                        <p className="results-section__empty">No results to display yet.</p>
-                    )}
+                    {this.renderContent()}
                 </div>
             </section>
         );
