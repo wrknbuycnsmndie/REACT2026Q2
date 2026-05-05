@@ -1,31 +1,15 @@
 import { Component } from 'react';
 import type { ChangeEvent } from 'react';
-import { getStoredSearchTerm } from '../../services/localStorageService';
 import './SearchSection.css';
 
-type SearchSectionState = {
+type SearchSectionProps = {
+    onSearchTermChange: (event: ChangeEvent<HTMLInputElement>) => void;
     searchTerm: string;
 };
 
-export class SearchSection extends Component<object, SearchSectionState> {
-    public state: SearchSectionState = {
-        searchTerm: '',
-    };
-
-    public componentDidMount() {
-        const savedSearchTerm = getStoredSearchTerm();
-
-        if (savedSearchTerm !== '') {
-            this.setState({ searchTerm: savedSearchTerm });
-        }
-    }
-
-    private handleSearchTermChange = (event: ChangeEvent<HTMLInputElement>) => {
-        this.setState({ searchTerm: event.target.value });
-    };
-
+export class SearchSection extends Component<SearchSectionProps> {
     public render() {
-        const { searchTerm } = this.state;
+        const { onSearchTermChange, searchTerm } = this.props;
 
         return (
             <section className="search-section" aria-labelledby="search-title">
@@ -34,7 +18,7 @@ export class SearchSection extends Component<object, SearchSectionState> {
                         Search
                     </h2>
                     <p className="search-section__description">
-                        The search input restores the last saved term when the component loads.
+                        The search input restores the last saved term and drives the initial request.
                     </p>
                 </div>
 
@@ -45,7 +29,7 @@ export class SearchSection extends Component<object, SearchSectionState> {
                         placeholder="pikachu"
                         aria-label="Pokemon name"
                         value={searchTerm}
-                        onChange={this.handleSearchTermChange}
+                        onChange={onSearchTermChange}
                     />
                     <button className="search-section__button" type="button" disabled>
                         Search
