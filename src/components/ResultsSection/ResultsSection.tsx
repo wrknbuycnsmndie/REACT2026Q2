@@ -1,8 +1,16 @@
 import { Component } from 'react';
+import { ResultRow } from './ResultRow';
+import type { SearchResultItem } from '../../types/search';
 import './ResultsSection.css';
 
-export class ResultsSection extends Component {
+type ResultsSectionProps = {
+    items: SearchResultItem[];
+};
+
+export class ResultsSection extends Component<ResultsSectionProps> {
     public render() {
+        const { items } = this.props;
+
         return (
             <section className="results-section" aria-labelledby="results-title">
                 <div className="results-section__header">
@@ -15,12 +23,20 @@ export class ResultsSection extends Component {
                 </div>
 
                 <div className="results-section__table">
-                    <div className="results-section__row">
+                    <div className="results-section__row results-section__row--head">
                         <span className="results-section__name">Item Name</span>
                         <span className="results-section__details">Item Description</span>
                     </div>
 
-                    <p className="results-section__empty">No data loaded yet.</p>
+                    {items.length > 0 ? (
+                        <ul className="results-section__list">
+                            {items.map((item) => (
+                                <ResultRow key={item.id} item={item} />
+                            ))}
+                        </ul>
+                    ) : (
+                        <p className="results-section__empty">No results to display yet.</p>
+                    )}
                 </div>
             </section>
         );
