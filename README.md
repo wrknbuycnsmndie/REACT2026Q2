@@ -1,73 +1,100 @@
-# React + TypeScript + Vite
+# Pokemon Search
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Class-based React application built with Vite and TypeScript.
 
-Currently, two official plugins are available:
+The project uses the [PokeAPI](https://pokeapi.co/) to load Pokemon species data and display readable search results with names and descriptions. The interface is styled in a bold brutalist direction with shared global design tokens for colors, borders, spacing, and surface treatment.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Stack
 
-## React Compiler
+- React 19
+- TypeScript
+- Vite
+- ESLint
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Design Approach
 
-## Expanding the ESLint configuration
+The UI uses a small set of brutalist design tokens defined in [src/index.css](./src/index.css):
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- `--bg` and `--surface` for the warm paper-like background and card surfaces
+- `--text` and `--muted` for strong foreground contrast and secondary copy
+- `--border` for hard-edged framing
+- `--accent` and `--accent-soft` for the loud orange/yellow interactive palette
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+These tokens are reused across the header, search section, results section, loader, error state, and fallback UI so the app keeps one consistent visual language.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## Data Source
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+The app uses the `pokemon-species` endpoints from PokeAPI:
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+- list requests for the first page of available items
+- exact species requests for a specific search term
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+This endpoint was chosen because the task requires both:
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- item name
+- item description
+
+The species resource includes flavor text entries that can be mapped into readable descriptions.
+
+## Implemented Features
+
+### 1. Application Layout Structure
+
+The page is split into two clearly separated main sections:
+
+- a smaller search area at the top
+- a larger results area below
+
+### 2. Search Functionality with Local Storage
+
+The search input restores the previously saved term from local storage when the app loads.
+
+### 3. Search Results Display
+
+Results are rendered in a structured list with:
+
+- Pokemon name
+- Pokemon description
+
+### 4. Initial Data Load
+
+On startup, the app requests:
+
+- the first page of Pokemon when the input is empty
+- the matching Pokemon when a saved search term exists
+
+### 5. Search Execution
+
+Submitting the search form:
+
+- trims whitespace
+- avoids duplicate requests when the submitted term did not change
+- fetches the first result set for the new term
+
+### 6. Search Term Persistence
+
+Changed search terms are saved back to local storage after submission.
+
+### 7. Loading State Indication
+
+The results area shows a centered loader while API requests are in progress.
+
+### 8. Error Handling
+
+Failed requests are converted into human-readable messages and displayed in the results area without uncaught runtime noise.
+
+### 9. Application Error Boundary
+
+The app is wrapped in a class-based error boundary with:
+
+- console logging through `componentDidCatch`
+- a fallback UI
+- a test button to trigger an application error
+- a reset button to remove the triggered error state
+
+## Scripts
+
+- `npm run dev` — start the development server
+- `npm run build` — run TypeScript build and create a production bundle
+- `npm run lint` — run ESLint
+- `npm run preview` — preview the production build
