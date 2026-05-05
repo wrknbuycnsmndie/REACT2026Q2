@@ -1,8 +1,32 @@
 import { Component } from 'react';
+import type { ChangeEvent } from 'react';
+import { getStoredSearchTerm } from '../../services/localStorageService';
 import './SearchSection.css';
 
-export class SearchSection extends Component {
+type SearchSectionState = {
+    searchTerm: string;
+};
+
+export class SearchSection extends Component<object, SearchSectionState> {
+    public state: SearchSectionState = {
+        searchTerm: '',
+    };
+
+    public componentDidMount() {
+        const savedSearchTerm = getStoredSearchTerm();
+
+        if (savedSearchTerm !== '') {
+            this.setState({ searchTerm: savedSearchTerm });
+        }
+    }
+
+    private handleSearchTermChange = (event: ChangeEvent<HTMLInputElement>) => {
+        this.setState({ searchTerm: event.target.value });
+    };
+
     public render() {
+        const { searchTerm } = this.state;
+
         return (
             <section className="search-section" aria-labelledby="search-title">
                 <div className="search-section__header">
@@ -10,7 +34,7 @@ export class SearchSection extends Component {
                         Search
                     </h2>
                     <p className="search-section__description">
-                        The search controls will be wired in the next features.
+                        The search input restores the last saved term when the component loads.
                     </p>
                 </div>
 
@@ -20,7 +44,8 @@ export class SearchSection extends Component {
                         type="search"
                         placeholder="pikachu"
                         aria-label="Pokemon name"
-                        disabled
+                        value={searchTerm}
+                        onChange={this.handleSearchTermChange}
                     />
                     <button className="search-section__button" type="button" disabled>
                         Search
