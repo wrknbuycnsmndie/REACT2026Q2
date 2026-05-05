@@ -1,15 +1,16 @@
 import { Component } from 'react';
-import type { ChangeEvent } from 'react';
+import type { ChangeEvent, SyntheticEvent } from 'react';
 import './SearchSection.css';
 
 type SearchSectionProps = {
     onSearchTermChange: (event: ChangeEvent<HTMLInputElement>) => void;
+    onSubmit: (event: SyntheticEvent<HTMLFormElement>) => void;
     searchTerm: string;
 };
 
 export class SearchSection extends Component<SearchSectionProps> {
     public render() {
-        const { onSearchTermChange, searchTerm } = this.props;
+        const { onSearchTermChange, onSubmit, searchTerm } = this.props;
 
         return (
             <section className="search-section" aria-labelledby="search-title">
@@ -22,7 +23,7 @@ export class SearchSection extends Component<SearchSectionProps> {
                     </p>
                 </div>
 
-                <div className="search-section__form">
+                <form className="search-section__form" onSubmit={onSubmit}>
                     <input
                         className="search-section__input"
                         type="search"
@@ -31,10 +32,10 @@ export class SearchSection extends Component<SearchSectionProps> {
                         value={searchTerm}
                         onChange={onSearchTermChange}
                     />
-                    <button className="search-section__button" type="button" disabled>
+                    <button className="search-section__button" type="submit">
                         Search
                     </button>
-                </div>
+                </form>
             </section>
         );
     }
