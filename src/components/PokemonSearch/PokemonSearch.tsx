@@ -1,6 +1,6 @@
 import { Component } from 'react';
 import type { ChangeEvent, SyntheticEvent } from 'react';
-import { getStoredSearchTerm } from '../../services/localStorageService';
+import { getStoredSearchTerm, setStoredSearchTerm } from '../../services/localStorageService';
 import { fetchPokemonResults } from '../../services/pokemon';
 import type { SearchResultItem } from '../../types/search';
 import { ResultsSection } from '../ResultsSection/ResultsSection';
@@ -46,6 +46,8 @@ export class PokemonSearch extends Component<object, PokemonSearchState> {
             this.setState({ searchTerm: trimmedSearchTerm });
             return;
         }
+
+        setStoredSearchTerm(trimmedSearchTerm);
 
         try {
             const items = await fetchPokemonResults(trimmedSearchTerm);
