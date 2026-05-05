@@ -1,21 +1,27 @@
 import { Component } from 'react';
 import type { ReactNode } from 'react';
+import { ResultsError } from './ResultsError';
 import { ResultRow } from './ResultRow';
 import { ResultsLoader } from './ResultsLoader';
 import type { SearchResultItem } from '../../types/search';
 import './ResultsSection.css';
 
 type ResultsSectionProps = {
+    errorMessage: string;
     isLoading: boolean;
     items: SearchResultItem[];
 };
 
 export class ResultsSection extends Component<ResultsSectionProps> {
     private renderContent(): ReactNode {
-        const { isLoading, items } = this.props;
+        const { errorMessage, isLoading, items } = this.props;
 
         if (isLoading) {
             return <ResultsLoader />;
+        }
+
+        if (errorMessage !== '') {
+            return <ResultsError message={errorMessage} />;
         }
 
         if (items.length > 0) {

@@ -7,6 +7,7 @@ import { ResultsSection } from '../ResultsSection/ResultsSection';
 import { SearchSection } from '../SearchSection/SearchSection';
 
 type PokemonSearchState = {
+    errorMessage: string;
     isLoading: boolean;
     items: SearchResultItem[];
     searchTerm: string;
@@ -15,6 +16,7 @@ type PokemonSearchState = {
 
 export class PokemonSearch extends Component<object, PokemonSearchState> {
     public state: PokemonSearchState = {
+        errorMessage: '',
         isLoading: false,
         items: [],
         searchTerm: getStoredSearchTerm(),
@@ -26,17 +28,22 @@ export class PokemonSearch extends Component<object, PokemonSearchState> {
     }
 
     private async loadInitialResults() {
-        this.setState({ isLoading: true });
+        this.setState({
+            errorMessage: '',
+            isLoading: true,
+        });
 
         try {
             const items = await fetchPokemonResults(this.state.searchTerm);
 
             this.setState({
+                errorMessage: '',
                 isLoading: false,
                 items,
             });
-        } catch {
+        } catch (error) {
             this.setState({
+                errorMessage: this.getErrorMessage(error),
                 isLoading: false,
                 items: [],
             });
@@ -58,19 +65,24 @@ export class PokemonSearch extends Component<object, PokemonSearchState> {
         }
 
         setStoredSearchTerm(trimmedSearchTerm);
-        this.setState({ isLoading: true });
+        this.setState({
+            errorMessage: '',
+            isLoading: true,
+        });
 
         try {
             const items = await fetchPokemonResults(trimmedSearchTerm);
 
             this.setState({
+                errorMessage: '',
                 isLoading: false,
                 items,
                 searchTerm: trimmedSearchTerm,
                 submittedSearchTerm: trimmedSearchTerm,
             });
-        } catch {
+        } catch (error) {
             this.setState({
+                errorMessage: this.getErrorMessage(error),
                 isLoading: false,
                 items: [],
                 searchTerm: trimmedSearchTerm,
@@ -79,8 +91,16 @@ export class PokemonSearch extends Component<object, PokemonSearchState> {
         }
     };
 
+    private getErrorMessage(error: unknown): string {
+        if (error instanceof Error) {
+            return error.message;
+        }
+
+        return 'Something went wrong while loading Pokemon data.';
+    }
+
     public render() {
-        const { isLoading, items, searchTerm } = this.state;
+        const { errorMessage, isLoading, items, searchTerm } = this.state;
 
         return (
             <>
@@ -89,7 +109,7 @@ export class PokemonSearch extends Component<object, PokemonSearchState> {
                     onSearchTermChange={this.handleSearchTermChange}
                     onSubmit={this.handleSearchSubmit}
                 />
-                <ResultsSection isLoading={isLoading} items={items} />
+                <ResultsSection errorMessage={errorMessage} isLoading={isLoading} items={items} />
             </>
         );
     }

@@ -1,3 +1,4 @@
+import { PokemonRequestError } from './pokemonRequestError';
 import type { SearchResultItem } from '../types/search';
 
 const POKEMON_SPECIES_API_URL = 'https://pokeapi.co/api/v2/pokemon-species';
@@ -48,7 +49,7 @@ async function requestJson<TResponse>(url: string): Promise<TResponse> {
     const response = await fetch(url);
 
     if (!response.ok) {
-        throw new Error(`Request failed with status ${response.status}`);
+        throw new Error(PokemonRequestError.getMessage(response.status));
     }
 
     return (await response.json()) as TResponse;
