@@ -50,6 +50,19 @@
     background: var(--accent);
 }
 
+.search-section__error-button {
+    margin-top: 16px;
+    margin-left: auto;
+    display: block;
+    min-height: 42px;
+    padding: 0 18px;
+    color: var(--text);
+    font-weight: 700;
+    text-transform: uppercase;
+    background: var(--accent-soft);
+    border: 3px solid var(--border);
+}
+
 @media (max-width: 640px) {
     .search-section {
         box-shadow: 4px 4px 0 var(--border);
@@ -57,5 +70,10 @@
 
     .search-section__form {
         grid-template-columns: 1fr;
+    }
+
+    .search-section__error-button {
+        width: 100%;
+        margin-left: 0;
     }
 }

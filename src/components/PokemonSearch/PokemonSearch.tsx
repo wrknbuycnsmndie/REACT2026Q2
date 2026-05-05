@@ -6,6 +6,11 @@ import type { SearchResultItem } from '../../types/search';
 import { ResultsSection } from '../ResultsSection/ResultsSection';
 import { SearchSection } from '../SearchSection/SearchSection';
 
+type PokemonSearchProps = {
+    onTestError: () => void;
+    shouldThrowError: boolean;
+};
+
 type PokemonSearchState = {
     errorMessage: string;
     isLoading: boolean;
@@ -14,7 +19,7 @@ type PokemonSearchState = {
     submittedSearchTerm: string;
 };
 
-export class PokemonSearch extends Component<object, PokemonSearchState> {
+export class PokemonSearch extends Component<PokemonSearchProps, PokemonSearchState> {
     public state: PokemonSearchState = {
         errorMessage: '',
         isLoading: false,
@@ -100,11 +105,17 @@ export class PokemonSearch extends Component<object, PokemonSearchState> {
     }
 
     public render() {
+        const { onTestError, shouldThrowError } = this.props;
         const { errorMessage, isLoading, items, searchTerm } = this.state;
+
+        if (shouldThrowError) {
+            throw new Error('Test error boundary triggered.');
+        }
 
         return (
             <>
                 <SearchSection
+                    onTestError={onTestError}
                     searchTerm={searchTerm}
                     onSearchTermChange={this.handleSearchTermChange}
                     onSubmit={this.handleSearchSubmit}

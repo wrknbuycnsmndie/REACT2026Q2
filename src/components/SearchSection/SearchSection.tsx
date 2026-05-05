@@ -5,12 +5,13 @@ import './SearchSection.css';
 type SearchSectionProps = {
     onSearchTermChange: (event: ChangeEvent<HTMLInputElement>) => void;
     onSubmit: (event: SyntheticEvent<HTMLFormElement>) => void;
+    onTestError: () => void;
     searchTerm: string;
 };
 
 export class SearchSection extends Component<SearchSectionProps> {
     public render() {
-        const { onSearchTermChange, onSubmit, searchTerm } = this.props;
+        const { onSearchTermChange, onSubmit, onTestError, searchTerm } = this.props;
 
         return (
             <section className="search-section" aria-labelledby="search-title">
@@ -36,6 +37,14 @@ export class SearchSection extends Component<SearchSectionProps> {
                         Search
                     </button>
                 </form>
+
+                <button
+                    className="search-section__error-button"
+                    type="button"
+                    onClick={onTestError}
+                >
+                    Trigger Error
+                </button>
             </section>
         );
     }
