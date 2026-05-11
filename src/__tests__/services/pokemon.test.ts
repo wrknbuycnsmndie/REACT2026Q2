@@ -6,7 +6,7 @@ describe('fetchPokemonResults', () => {
     });
 
     it('requests a single species by trimmed lowercased search term', async () => {
-        const fetchSpy = vi.spyOn(global, 'fetch').mockResolvedValue({
+        const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue({
             ok: true,
             json: async () => ({
                 id: 25,
@@ -33,7 +33,7 @@ describe('fetchPokemonResults', () => {
 
     it('loads the default species list and maps each detailed response', async () => {
         const fetchSpy = vi
-            .spyOn(global, 'fetch')
+            .spyOn(globalThis, 'fetch')
             .mockResolvedValueOnce({
                 ok: true,
                 json: async () => ({
@@ -70,7 +70,7 @@ describe('fetchPokemonResults', () => {
     });
 
     it('returns a fallback description when no english entry exists', async () => {
-        vi.spyOn(global, 'fetch').mockResolvedValue({
+        vi.spyOn(globalThis, 'fetch').mockResolvedValue({
             ok: true,
             json: async () => ({
                 id: 150,
@@ -94,7 +94,7 @@ describe('fetchPokemonResults', () => {
     });
 
     it('throws the mapped not found message for a 404 response', async () => {
-        vi.spyOn(global, 'fetch').mockResolvedValue({
+        vi.spyOn(globalThis, 'fetch').mockResolvedValue({
             ok: false,
             status: 404,
         } as Response);
@@ -105,7 +105,7 @@ describe('fetchPokemonResults', () => {
     });
 
     it('throws the mapped service unavailable message for a 5xx response', async () => {
-        vi.spyOn(global, 'fetch').mockResolvedValue({
+        vi.spyOn(globalThis, 'fetch').mockResolvedValue({
             ok: false,
             status: 503,
         } as Response);
