@@ -96,4 +96,28 @@ describe('PokemonSearch', () => {
         expect(screen.getByText('Request failed')).toBeInTheDocument();
     });
 
+    it('does not call the API again when submitting the same trimmed term', async () => {
+        const user = userEvent.setup();
+
+        mockedGetStoredSearchTerm.mockReturnValue('mew');
+        mockedFetchPokemonResults.mockResolvedValue([
+            {
+                id: '151',
+                name: 'mew',
+                description: 'So rare that it is still said to be a mirage.',
+            },
+        ]);
+
+        render(<PokemonSearch onTestError={vi.fn()} shouldThrowError={false} />);
+
+        await screen.findByLabelText('mew');
+
+        await user.clear(screen.getByRole('searchbox', { name: 'Pokemon name' }));
+        await user.type(screen.getByRole('searchbox', { name: 'Pokemon name' }), '  mew  ');
+        await user.click(screen.getByRole('button', { name: 'Search' }));
+
+        expect(mockedFetchPokemonResults).toHaveBeenCalledTimes(1);
+        expect(screen.getByRole('searchbox', { name: 'Pokemon name' })).toHaveValue('mew');
+    });
+
 });
