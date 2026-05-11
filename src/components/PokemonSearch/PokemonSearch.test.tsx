@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { vi } from 'vitest';
 import { PokemonSearch } from './PokemonSearch';
 import { fetchPokemonResults } from '../../services/pokemon';
-import { getStoredSearchTerm } from '../../services/localStorageService';
+import { getStoredSearchTerm, setStoredSearchTerm } from '../../services/localStorageService';
 
 vi.mock('../../services/pokemon', () => ({
     fetchPokemonResults: vi.fn(),
@@ -16,6 +16,7 @@ vi.mock('../../services/localStorageService', () => ({
 
 const mockedFetchPokemonResults = vi.mocked(fetchPokemonResults);
 const mockedGetStoredSearchTerm = vi.mocked(getStoredSearchTerm);
+const mockedSetStoredSearchTerm = vi.mocked(setStoredSearchTerm);
 
 describe('PokemonSearch', () => {
     beforeEach(() => {
@@ -79,6 +80,23 @@ describe('PokemonSearch', () => {
         expect(screen.getByText('Its genetic code is irregular.')).toBeInTheDocument();
     });
 
+    it('restores the stored search term on mount and uses it for the initial request', async () => {
+        mockedGetStoredSearchTerm.mockReturnValue('snorlax');
+        mockedFetchPokemonResults.mockResolvedValue([
+            {
+                id: '143',
+                name: 'snorlax',
+                description: 'Very lazy. Just eats and sleeps.',
+            },
+        ]);
+
+        render(<PokemonSearch onTestError={vi.fn()} shouldThrowError={false} />);
+
+        expect(screen.getByRole('searchbox', { name: 'Pokemon name' })).toHaveValue('snorlax');
+        expect(mockedFetchPokemonResults).toHaveBeenCalledWith('snorlax');
+        expect(await screen.findByLabelText('snorlax')).toBeInTheDocument();
+    });
+
     it('renders a mocked error response after a submitted search fails', async () => {
         const user = userEvent.setup();
 
@@ -118,6 +136,34 @@ describe('PokemonSearch', () => {
 
         expect(mockedFetchPokemonResults).toHaveBeenCalledTimes(1);
         expect(screen.getByRole('searchbox', { name: 'Pokemon name' })).toHaveValue('mew');
+    });
+
+    it('stores the trimmed search term after a successful user search', async () => {
+        const user = userEvent.setup();
+
+        mockedFetchPokemonResults
+            .mockResolvedValueOnce([])
+            .mockResolvedValueOnce([
+                {
+                    id: '150',
+                    name: 'mewtwo',
+                    description:
+                        'It was created by a scientist after years of horrific gene splicing.',
+                },
+            ]);
+
+        render(<PokemonSearch onTestError={vi.fn()} shouldThrowError={false} />);
+
+        await screen.findByText('No results to display yet.');
+
+        await user.type(screen.getByRole('searchbox', { name: 'Pokemon name' }), '  mewtwo ');
+        await user.click(screen.getByRole('button', { name: 'Search' }));
+
+        await waitFor(() => {
+            expect(mockedSetStoredSearchTerm).toHaveBeenCalledWith('mewtwo');
+        });
+
+        expect(await screen.findByLabelText('mewtwo')).toBeInTheDocument();
     });
 
 });
