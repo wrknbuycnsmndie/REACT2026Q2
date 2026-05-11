@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Component } from 'react';
 import { vi } from 'vitest';
-import { ErrorBoundary } from './ErrorBoundary';
+import { ErrorBoundary } from '../../../components/ErrorBoundary/ErrorBoundary';
 
 class ThrowingChild extends Component<{ shouldThrow: boolean }> {
     public render() {

@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { ResultsSection } from './ResultsSection';
+import { ResultsSection } from '../../../components/ResultsSection/ResultsSection';
 
 describe('ResultsSection', () => {
     it('renders the empty state when there are no results', () => {

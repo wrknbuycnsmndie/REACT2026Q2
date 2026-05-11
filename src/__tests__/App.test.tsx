@@ -1,15 +1,15 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi } from 'vitest';
-import App from './App';
-import { fetchPokemonResults } from './services/pokemon';
-import { getStoredSearchTerm } from './services/localStorageService';
+import App from '../App';
+import { fetchPokemonResults } from '../services/pokemon';
+import { getStoredSearchTerm } from '../services/localStorageService';
 
-vi.mock('./services/pokemon', () => ({
+vi.mock('../services/pokemon', () => ({
     fetchPokemonResults: vi.fn(),
 }));
 
-vi.mock('./services/localStorageService', () => ({
+vi.mock('../services/localStorageService', () => ({
     getStoredSearchTerm: vi.fn(),
     setStoredSearchTerm: vi.fn(),
 }));

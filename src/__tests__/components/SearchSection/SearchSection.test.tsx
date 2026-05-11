@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi } from 'vitest';
-import { SearchSection } from './SearchSection';
+import { SearchSection } from '../../../components/SearchSection/SearchSection';
 
 describe('SearchSection', () => {
     it('renders the search input, submit button, and error trigger', () => {

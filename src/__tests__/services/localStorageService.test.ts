@@ -1,5 +1,5 @@
-import { SEARCH_TERM_STORAGE_KEY } from '../constants/storage';
-import { getStoredSearchTerm, setStoredSearchTerm } from './localStorageService';
+import { SEARCH_TERM_STORAGE_KEY } from '../../constants/storage';
+import { getStoredSearchTerm, setStoredSearchTerm } from '../../services/localStorageService';
 
 describe('localStorageService', () => {
     const originalLocalStorage = window.localStorage;

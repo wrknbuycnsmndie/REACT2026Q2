@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { ResultRow } from './ResultRow';
+import { ResultRow } from '../../../components/ResultsSection/ResultRow';
 
 describe('ResultRow', () => {
     it('renders the item name and description', () => {

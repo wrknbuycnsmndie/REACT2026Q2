@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { ResultsError } from './ResultsError';
+import { ResultsError } from '../../../components/ResultsSection/ResultsError';
 
 describe('ResultsError', () => {
     it('renders the request failure label and message', () => {

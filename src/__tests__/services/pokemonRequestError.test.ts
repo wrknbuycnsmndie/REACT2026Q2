@@ -1,4 +1,4 @@
-import { PokemonRequestError } from './pokemonRequestError';
+import { PokemonRequestError } from '../../services/pokemonRequestError';
 
 describe('PokemonRequestError', () => {
     it('returns the not found message for 404', () => {

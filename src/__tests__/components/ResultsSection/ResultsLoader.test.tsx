@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { ResultsLoader } from './ResultsLoader';
+import { ResultsLoader } from '../../../components/ResultsSection/ResultsLoader';
 
 describe('ResultsLoader', () => {
     it('renders the loading indicator text in a polite live region', () => {

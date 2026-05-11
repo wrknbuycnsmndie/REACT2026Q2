@@ -1,4 +1,4 @@
-import { fetchPokemonResults } from './pokemon';
+import { fetchPokemonResults } from '../../services/pokemon';
 
 describe('fetchPokemonResults', () => {
     beforeEach(() => {
