@@ -2,8 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi } from 'vitest';
 import App from '../App';
-import { fetchPokemonResults } from '../services/pokemon';
-import { getStoredSearchTerm } from '../services/localStorageService';
+import { mockedFetchPokemonResults, resetPokemonSearchMocks } from './testUtils/pokemonSearchMocks';
 
 vi.mock('../services/pokemon', () => ({
     fetchPokemonResults: vi.fn(),
@@ -14,13 +13,9 @@ vi.mock('../services/localStorageService', () => ({
     setStoredSearchTerm: vi.fn(),
 }));
 
-const mockedFetchPokemonResults = vi.mocked(fetchPokemonResults);
-const mockedGetStoredSearchTerm = vi.mocked(getStoredSearchTerm);
-
 describe('App', () => {
     beforeEach(() => {
-        vi.clearAllMocks();
-        mockedGetStoredSearchTerm.mockReturnValue('');
+        resetPokemonSearchMocks();
         mockedFetchPokemonResults.mockResolvedValue([]);
     });
 

@@ -4,6 +4,17 @@ import { getStoredSearchTerm, setStoredSearchTerm } from '../../services/localSt
 describe('localStorageService', () => {
     const originalLocalStorage = window.localStorage;
 
+    const setMockLocalStorage = (overrides: Partial<Storage>) => {
+        Object.defineProperty(window, 'localStorage', {
+            configurable: true,
+            value: {
+                getItem: vi.fn(),
+                setItem: vi.fn(),
+                ...overrides,
+            },
+        });
+    };
+
     afterEach(() => {
         Object.defineProperty(window, 'localStorage', {
             configurable: true,
@@ -14,10 +25,7 @@ describe('localStorageService', () => {
     it('returns an empty string when no search term is stored', () => {
         const getItem = vi.fn(() => null);
 
-        Object.defineProperty(window, 'localStorage', {
-            configurable: true,
-            value: { getItem, setItem: vi.fn() },
-        });
+        setMockLocalStorage({ getItem });
 
         expect(getStoredSearchTerm()).toBe('');
 
@@ -27,10 +35,7 @@ describe('localStorageService', () => {
     it('returns the stored search term when present', () => {
         const getItem = vi.fn(() => 'pikachu');
 
-        Object.defineProperty(window, 'localStorage', {
-            configurable: true,
-            value: { getItem, setItem: vi.fn() },
-        });
+        setMockLocalStorage({ getItem });
 
         expect(getStoredSearchTerm()).toBe('pikachu');
 
@@ -40,10 +45,7 @@ describe('localStorageService', () => {
     it('stores the provided search term under the expected key', () => {
         const setItem = vi.fn();
 
-        Object.defineProperty(window, 'localStorage', {
-            configurable: true,
-            value: { getItem: vi.fn(), setItem },
-        });
+        setMockLocalStorage({ setItem });
 
         setStoredSearchTerm('mewtwo');
 

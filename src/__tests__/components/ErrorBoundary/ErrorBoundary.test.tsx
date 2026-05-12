@@ -24,11 +24,11 @@ describe('ErrorBoundary', () => {
             </ErrorBoundary>,
         );
 
-        expect(screen.getByText('Application error')).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Remove Error' })).toBeInTheDocument();
         expect(
             screen.getByRole('heading', {
                 level: 2,
-                name: 'Something went wrong.',
+                name: /something went wrong/i,
             }),
         ).toBeInTheDocument();
         expect(consoleErrorSpy).toHaveBeenCalled();

@@ -2,8 +2,12 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi } from 'vitest';
 import { PokemonSearch } from '../../../components/PokemonSearch/PokemonSearch';
-import { fetchPokemonResults } from '../../../services/pokemon';
-import { getStoredSearchTerm, setStoredSearchTerm } from '../../../services/localStorageService';
+import {
+    mockedFetchPokemonResults,
+    mockedGetStoredSearchTerm,
+    mockedSetStoredSearchTerm,
+    resetPokemonSearchMocks,
+} from '../../testUtils/pokemonSearchMocks';
 
 vi.mock('../../../services/pokemon', () => ({
     fetchPokemonResults: vi.fn(),
@@ -14,14 +18,9 @@ vi.mock('../../../services/localStorageService', () => ({
     setStoredSearchTerm: vi.fn(),
 }));
 
-const mockedFetchPokemonResults = vi.mocked(fetchPokemonResults);
-const mockedGetStoredSearchTerm = vi.mocked(getStoredSearchTerm);
-const mockedSetStoredSearchTerm = vi.mocked(setStoredSearchTerm);
-
 describe('PokemonSearch', () => {
     beforeEach(() => {
-        vi.clearAllMocks();
-        mockedGetStoredSearchTerm.mockReturnValue('');
+        resetPokemonSearchMocks();
     });
 
     it('loads initial mocked results on mount', async () => {
@@ -165,5 +164,4 @@ describe('PokemonSearch', () => {
 
         expect(await screen.findByLabelText('mewtwo')).toBeInTheDocument();
     });
-
 });

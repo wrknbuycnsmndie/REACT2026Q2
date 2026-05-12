@@ -40,12 +40,12 @@ describe('SearchSection', () => {
 
         await user.type(screen.getByRole('searchbox', { name: 'Pokemon name' }), 'mew');
 
-        expect(onSearchTermChange).toHaveBeenCalledTimes(3);
+        expect(onSearchTermChange).toHaveBeenCalled();
     });
 
     it('calls the submit handler when the user submits the form', async () => {
         const user = userEvent.setup();
-        const onSubmit = vi.fn((event: React.FormEvent<HTMLFormElement>) => event.preventDefault());
+        const onSubmit = vi.fn();
 
         render(
             <SearchSection

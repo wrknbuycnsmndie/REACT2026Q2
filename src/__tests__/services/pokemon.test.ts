@@ -5,8 +5,10 @@ describe('fetchPokemonResults', () => {
         vi.restoreAllMocks();
     });
 
+    const mockFetch = () => vi.spyOn(globalThis, 'fetch');
+
     it('requests a single species by trimmed lowercased search term', async () => {
-        const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue({
+        const fetchSpy = mockFetch().mockResolvedValue({
             ok: true,
             json: async () => ({
                 id: 25,
@@ -32,8 +34,7 @@ describe('fetchPokemonResults', () => {
     });
 
     it('loads the default species list and maps each detailed response', async () => {
-        const fetchSpy = vi
-            .spyOn(globalThis, 'fetch')
+        const fetchSpy = mockFetch()
             .mockResolvedValueOnce({
                 ok: true,
                 json: async () => ({
@@ -70,7 +71,7 @@ describe('fetchPokemonResults', () => {
     });
 
     it('returns a fallback description when no english entry exists', async () => {
-        vi.spyOn(globalThis, 'fetch').mockResolvedValue({
+        const fetchSpy = mockFetch().mockResolvedValue({
             ok: true,
             json: async () => ({
                 id: 150,
@@ -91,10 +92,12 @@ describe('fetchPokemonResults', () => {
                 description: 'No description available.',
             },
         ]);
+
+        expect(fetchSpy).toHaveBeenCalledWith('https://pokeapi.co/api/v2/pokemon-species/mewtwo');
     });
 
     it('throws the mapped not found message for a 404 response', async () => {
-        vi.spyOn(globalThis, 'fetch').mockResolvedValue({
+        const fetchSpy = mockFetch().mockResolvedValue({
             ok: false,
             status: 404,
         } as Response);
@@ -102,10 +105,12 @@ describe('fetchPokemonResults', () => {
         await expect(fetchPokemonResults('missingno')).rejects.toThrow(
             'No Pokemon matched that search term.',
         );
+
+        expect(fetchSpy).toHaveBeenCalledWith('https://pokeapi.co/api/v2/pokemon-species/missingno');
     });
 
     it('throws the mapped service unavailable message for a 5xx response', async () => {
-        vi.spyOn(globalThis, 'fetch').mockResolvedValue({
+        const fetchSpy = mockFetch().mockResolvedValue({
             ok: false,
             status: 503,
         } as Response);
@@ -113,5 +118,7 @@ describe('fetchPokemonResults', () => {
         await expect(fetchPokemonResults('pikachu')).rejects.toThrow(
             'The Pokemon service is unavailable right now. Please try again.',
         );
+
+        expect(fetchSpy).toHaveBeenCalledWith('https://pokeapi.co/api/v2/pokemon-species/pikachu');
     });
 });
