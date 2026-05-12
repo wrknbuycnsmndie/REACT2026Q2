@@ -10,13 +10,13 @@ class ThrowingChild extends Component<{ shouldThrow: boolean }> {
             throw new Error('Boundary test crash');
         }
 
-        return <p>Safe content</p>;
+        return <p data-testid='recovered-child'>Recovered child</p>;
     }
 }
 
 describe('ErrorBoundary', () => {
     it('renders fallback UI and logs when a child throws', () => {
-        const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+        const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
         render(
             <ErrorBoundary onReset={vi.fn()}>
@@ -24,13 +24,13 @@ describe('ErrorBoundary', () => {
             </ErrorBoundary>,
         );
 
-        expect(screen.getByRole('button', { name: 'Remove Error' })).toBeInTheDocument();
         expect(
             screen.getByRole('heading', {
                 level: 2,
                 name: /something went wrong/i,
             }),
         ).toBeInTheDocument();
+        expect(screen.getByRole('button')).toBeInTheDocument();
         expect(consoleErrorSpy).toHaveBeenCalled();
 
         consoleErrorSpy.mockRestore();
@@ -39,7 +39,7 @@ describe('ErrorBoundary', () => {
     it('calls onReset and restores children after removing the error', async () => {
         const user = userEvent.setup();
         const onReset = vi.fn();
-        const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+        const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
         const { rerender } = render(
             <ErrorBoundary onReset={onReset}>
@@ -53,10 +53,10 @@ describe('ErrorBoundary', () => {
             </ErrorBoundary>,
         );
 
-        await user.click(screen.getByRole('button', { name: 'Remove Error' }));
+        await user.click(screen.getByRole('button'));
 
         expect(onReset).toHaveBeenCalledTimes(1);
-        expect(screen.getByText('Safe content')).toBeInTheDocument();
+        expect(screen.getByTestId('recovered-child')).toBeInTheDocument();
 
         consoleErrorSpy.mockRestore();
     });

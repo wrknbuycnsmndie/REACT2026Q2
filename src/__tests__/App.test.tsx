@@ -21,7 +21,7 @@ describe('App', () => {
 
     it('shows the error boundary fallback after triggering a test error and recovers on reset', async () => {
         const user = userEvent.setup();
-        const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+        const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
         render(<App />);
 
