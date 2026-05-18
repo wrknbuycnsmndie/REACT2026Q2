@@ -1,18 +1,31 @@
 import { SEARCH_TERM_STORAGE_KEY } from '../../constants/storage';
-import { getStoredSearchTerm, setStoredSearchTerm } from '../../services/localStorageService';
+import {
+    getStoredSearchTerm,
+    setStoredSearchTerm,
+} from '../../services/localStorageService';
+
+
 
 describe('localStorageService', () => {
     const originalLocalStorage = window.localStorage;
 
-    const setMockLocalStorage = (overrides: Partial<Storage>) => {
+    const mockLocalStorage = (options?: {
+        storedValue?: string | null;
+        getItem?: ReturnType<typeof vi.fn>;
+        setItem?: ReturnType<typeof vi.fn>;
+    }) => {
+        const getItem = options?.getItem ?? vi.fn(() => options?.storedValue ?? null);
+        const setItem = options?.setItem ?? vi.fn();
+
         Object.defineProperty(window, 'localStorage', {
             configurable: true,
             value: {
-                getItem: vi.fn(),
-                setItem: vi.fn(),
-                ...overrides,
+                getItem,
+                setItem,
             },
         });
+
+        return { getItem, setItem };
     };
 
     afterEach(() => {
@@ -23,29 +36,21 @@ describe('localStorageService', () => {
     });
 
     it('returns an empty string when no search term is stored', () => {
-        const getItem = vi.fn(() => null);
-
-        setMockLocalStorage({ getItem });
+        const { getItem } = mockLocalStorage({ storedValue: null });
 
         expect(getStoredSearchTerm()).toBe('');
-
         expect(getItem).toHaveBeenCalledWith(SEARCH_TERM_STORAGE_KEY);
     });
 
     it('returns the stored search term when present', () => {
-        const getItem = vi.fn(() => 'pikachu');
-
-        setMockLocalStorage({ getItem });
+        const { getItem } = mockLocalStorage({ storedValue: 'pikachu' });
 
         expect(getStoredSearchTerm()).toBe('pikachu');
-
         expect(getItem).toHaveBeenCalledWith(SEARCH_TERM_STORAGE_KEY);
     });
 
     it('stores the provided search term under the expected key', () => {
-        const setItem = vi.fn();
-
-        setMockLocalStorage({ setItem });
+        const { setItem } = mockLocalStorage();
 
         setStoredSearchTerm('mewtwo');
 
