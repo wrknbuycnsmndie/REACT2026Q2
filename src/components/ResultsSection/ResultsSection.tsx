@@ -1,5 +1,5 @@
-import { Component } from 'react';
 import type { ReactNode } from 'react';
+import { Pagination } from '../Pagination/Pagination';
 import { ResultsError } from './ResultsError';
 import { ResultRow } from './ResultRow';
 import { ResultsLoader } from './ResultsLoader';
@@ -7,57 +7,87 @@ import type { SearchResultItem } from '../../types/search';
 import './ResultsSection.css';
 
 type ResultsSectionProps = {
+    currentPage: number;
     errorMessage: string;
     isLoading: boolean;
     items: SearchResultItem[];
+    onItemSelect: (detailsId: string) => void;
+    onPageChange: (page: number) => void;
+    selectedPokemonId: string | null;
+    totalPages: number;
 };
 
-export class ResultsSection extends Component<ResultsSectionProps> {
-    private renderContent(): ReactNode {
-        const { errorMessage, isLoading, items } = this.props;
+export function ResultsSection({
+    currentPage,
+    errorMessage,
+    isLoading,
+    items,
+    onItemSelect,
+    onPageChange,
+    selectedPokemonId,
+    totalPages,
+}: ResultsSectionProps) {
+    const showPagination = !isLoading && errorMessage === '' && items.length > 0 && totalPages > 1;
 
-        if (isLoading) {
-            return <ResultsLoader />;
-        }
+    return (
+        <section className="results-section" aria-labelledby="results-title">
+            <div className="results-section__header">
+                <h2 id="results-title" className="results-section__title">
+                    Results
+                </h2>
+                <p className="results-section__description">
+                    Search results will appear here once the data layer is implemented.
+                </p>
+            </div>
 
-        if (errorMessage !== '') {
-            return <ResultsError message={errorMessage} />;
-        }
+            <div className="results-section__table">
+                <div className="results-section__row results-section__row--head">
+                    <span className="results-section__name">Pokemon Name</span>
+                </div>
 
-        if (items.length > 0) {
-            return (
-                <ul className="results-section__list">
-                    {items.map((item) => (
-                        <ResultRow key={item.id} item={item} />
-                    ))}
-                </ul>
-            );
-        }
+                {renderContent(errorMessage, isLoading, items, onItemSelect, selectedPokemonId)}
+            </div>
 
-        return <p className="results-section__empty">No results to display yet.</p>;
+            {showPagination ? (
+                <Pagination
+                    currentPage={currentPage}
+                    onPageChange={onPageChange}
+                    totalPages={totalPages}
+                />
+            ) : null}
+        </section>
+    );
+}
+
+function renderContent(
+    errorMessage: string,
+    isLoading: boolean,
+    items: SearchResultItem[],
+    onItemSelect: (detailsId: string) => void,
+    selectedPokemonId: string | null,
+): ReactNode {
+    if (isLoading) {
+        return <ResultsLoader />;
     }
 
-    public render() {
+    if (errorMessage !== '') {
+        return <ResultsError message={errorMessage} />;
+    }
+
+    if (items.length > 0) {
         return (
-            <section className="results-section" aria-labelledby="results-title">
-                <div className="results-section__header">
-                    <h2 id="results-title" className="results-section__title">
-                        Results
-                    </h2>
-                    <p className="results-section__description">
-                        Search results will appear here once the data layer is implemented.
-                    </p>
-                </div>
-
-                <div className="results-section__table">
-                    <div className="results-section__row results-section__row--head">
-                        <span className="results-section__name">Item Name</span>
-                        <span className="results-section__details">Item Description</span>
-                    </div>
-
-                    {this.renderContent()}
-                </div>
-            </section>
+            <ul className="results-section__list">
+                {items.map((item) => (
+                    <ResultRow
+                        key={item.id}
+                        item={item}
+                        isSelected={item.id === selectedPokemonId}
+                        onSelect={onItemSelect}
+                    />
+                ))}
+            </ul>
         );
     }
+
+    return <p className="results-section__empty">No results to display yet.</p>;
 }

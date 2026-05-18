@@ -1,0 +1,32 @@
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 18px;
+}
+
+.pagination__button {
+    border: 3px solid var(--border);
+    background: var(--accent-soft);
+    padding: 10px 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.pagination__button:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.pagination__status {
+    margin: 0;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+@media (max-width: 640px) {
+    .pagination {
+        flex-direction: column;
+    }
+}

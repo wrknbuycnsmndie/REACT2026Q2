@@ -8,11 +8,6 @@
     margin: 0 auto;
 }
 
-.app__content {
-    display: grid;
-    gap: 24px;
-}
-
 @media (max-width: 640px) {
     .app {
         padding: 20px 12px;

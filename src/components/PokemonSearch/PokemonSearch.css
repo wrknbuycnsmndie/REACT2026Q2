@@ -1,0 +1,6 @@
+.pokemon-search {
+  display: grid;
+  gap: 24px;
+  min-width: 0;
+  align-content: start;
+}

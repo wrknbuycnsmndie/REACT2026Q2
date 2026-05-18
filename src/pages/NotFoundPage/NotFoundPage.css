@@ -1,0 +1,107 @@
+.not-found-page {
+    display: grid;
+    grid-template-columns: minmax(220px, 320px) minmax(0, 1fr);
+    gap: 24px;
+    align-items: center;
+    width: 100%;
+    min-height: 100vh;
+    margin: 0;
+    background: var(--surface);
+    border: 3px solid var(--border);
+    box-shadow: 6px 6px 0 var(--border);
+}
+
+.not-found-page__art {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-height: 100%;
+    padding: 24px;
+    background:
+        radial-gradient(circle at top, rgb(255 216 77 / 45%), transparent 62%),
+        linear-gradient(180deg, #fff4ba 0%, #fff1a8 100%);
+    border-right: 3px solid var(--border);
+}
+
+.not-found-page__badge {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    padding: 6px 12px;
+    color: var(--surface);
+    font-size: 1.1rem;
+    font-weight: 800;
+    line-height: 1;
+    background: var(--text);
+    box-shadow: 4px 4px 0 var(--accent);
+}
+
+.not-found-page__pikachu {
+    width: min(100%, 220px);
+    object-fit: contain;
+    filter: drop-shadow(6px 6px 0 rgb(17 17 17 / 16%));
+}
+
+.not-found-page__content {
+    padding: 24px 24px 24px 0;
+}
+
+.not-found-page__eyebrow {
+    display: inline-block;
+    margin: 0 0 12px;
+    padding: 6px 10px;
+    color: var(--surface);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: var(--danger);
+}
+
+.not-found-page__title {
+    margin: 0;
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    line-height: 0.95;
+    text-transform: uppercase;
+}
+
+.not-found-page__text {
+    max-width: 48ch;
+    margin: 16px 0 0;
+    color: var(--muted);
+    line-height: 1.6;
+}
+
+.not-found-page__link {
+    display: inline-block;
+    margin-top: 24px;
+    padding: 12px 16px;
+    color: var(--text);
+    font-weight: 700;
+    text-decoration: none;
+    background: var(--surface);
+    border: 3px solid var(--border);
+    box-shadow: 4px 4px 0 var(--border);
+}
+
+.not-found-page__link:hover,
+.not-found-page__link:focus-visible {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 var(--border);
+}
+
+@media (max-width: 640px) {
+    .not-found-page {
+        grid-template-columns: 1fr;
+        box-shadow: 4px 4px 0 var(--border);
+    }
+
+    .not-found-page__art {
+        border-right: 0;
+        border-bottom: 3px solid var(--border);
+    }
+
+    .not-found-page__content {
+        padding: 0 24px 24px;
+    }
+}
