@@ -13,16 +13,19 @@ export function PokemonSearch({
   shouldThrowError,
 }: PokemonSearchProps) {
   const {
+    currentPage,
     errorMessage,
+    goToPage,
+    handleSearchTermChange,
     isLoading,
     items,
     searchTerm,
-    setSearchTerm,
     submitSearch,
+    totalPages,
   } = usePokemonSearch();
 
-  const handleSearchTermChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(event.target.value);
+  const handleSearchInputChange = (event: ChangeEvent<HTMLInputElement>) => {
+    handleSearchTermChange(event.target.value);
   };
 
   const handleSearchSubmit = (event: SyntheticEvent<HTMLFormElement>) => {
@@ -39,13 +42,16 @@ export function PokemonSearch({
       <SearchSection
         onTestError={onTestError}
         searchTerm={searchTerm}
-        onSearchTermChange={handleSearchTermChange}
+        onSearchTermChange={handleSearchInputChange}
         onSubmit={handleSearchSubmit}
       />
       <ResultsSection
+        currentPage={currentPage}
         errorMessage={errorMessage}
         isLoading={isLoading}
         items={items}
+        onPageChange={goToPage}
+        totalPages={totalPages}
       />
     </>
   );

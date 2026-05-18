@@ -1,16 +1,20 @@
-import { useEffect, useState } from 'react';
-import { getRequestErrorMessage } from '../helpers/getRequestErrorMessage';
-import { fetchPokemonResults } from '../services/pokemon';
+import { useState } from 'react';
+import { DEFAULT_PAGE } from '../constants/pagination';
 import type { SearchResultItem } from '../types/search';
+import { usePokemonPageParam } from './usePokemonPageParam';
+import { usePokemonResults } from './usePokemonResults';
 import { useStoredSearchTerm } from './useStoredSearchTerm';
 
 type UsePokemonSearchResult = {
+  currentPage: number;
   errorMessage: string;
+  goToPage: (page: number) => void;
+  handleSearchTermChange: (value: string) => void;
   isLoading: boolean;
   items: SearchResultItem[];
   searchTerm: string;
-  setSearchTerm: (value: string) => void;
   submitSearch: () => Promise<void>;
+  totalPages: number;
 };
 
 export function usePokemonSearch(): UsePokemonSearchResult {
@@ -20,58 +24,46 @@ export function usePokemonSearch(): UsePokemonSearchResult {
     searchTerm,
     setSearchTerm,
   } = useStoredSearchTerm();
-  const [errorMessage, setErrorMessage] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
-  const [items, setItems] = useState<SearchResultItem[]>([]);
-  const [lastLoadedSearchTerm, setLastLoadedSearchTerm] = useState(
+  const { currentPage, goToPage, resetPage } = usePokemonPageParam();
+  const [submittedSearchTerm, setSubmittedSearchTerm] = useState(
     initialStoredSearchTerm.trim(),
   );
+  const { errorMessage, isLoading, items, totalPages } = usePokemonResults(
+    submittedSearchTerm,
+    currentPage,
+  );
 
-  const runSearch = async (term: string) => {
-    try {
-      const nextItems = await fetchPokemonResults(term);
-
-      setItems(nextItems);
-      setErrorMessage('');
-      setLastLoadedSearchTerm(term);
-    } catch (error) {
-      setItems([]);
-      setErrorMessage(getRequestErrorMessage(error));
-      setLastLoadedSearchTerm(term);
-    } finally {
-      setIsLoading(false);
-    }
+  const handleSearchTermChange = (value: string) => {
+    setSearchTerm(value);
   };
-
-  useEffect(() => {
-    async function loadInitialResults() {
-      await runSearch(initialStoredSearchTerm);
-    }
-
-    void loadInitialResults();
-  }, [initialStoredSearchTerm]);
 
   const submitSearch = async () => {
     const trimmedSearchTerm = searchTerm.trim();
 
-    if (trimmedSearchTerm === lastLoadedSearchTerm) {
+    if (trimmedSearchTerm === submittedSearchTerm && currentPage === DEFAULT_PAGE) {
       setSearchTerm(trimmedSearchTerm);
       return;
     }
 
     const persistedSearchTerm = persistSubmittedSearchTerm(trimmedSearchTerm);
-    setErrorMessage('');
-    setIsLoading(true);
-    await runSearch(persistedSearchTerm);
+
     setSearchTerm(persistedSearchTerm);
+    setSubmittedSearchTerm(persistedSearchTerm);
+
+    if (currentPage !== DEFAULT_PAGE) {
+      resetPage();
+    }
   };
 
   return {
+    currentPage,
     errorMessage,
+    goToPage,
+    handleSearchTermChange,
     isLoading,
     items,
     searchTerm,
-    setSearchTerm,
     submitSearch,
+    totalPages,
   };
 }

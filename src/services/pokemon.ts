@@ -1,48 +1,53 @@
 import { PokemonRequestError } from './pokemonRequestError';
-import type { SearchResultItem } from '../types/search';
+import { DEFAULT_PAGE, POKEMON_RESULTS_PAGE_SIZE } from '../constants/pagination';
+import type { SearchResultItem, SearchResultsPage } from '../types/search';
 
-const POKEMON_SPECIES_API_URL = 'https://pokeapi.co/api/v2/pokemon-species';
-const INITIAL_RESULTS_LIMIT = 10;
+const POKEMON_API_URL = 'https://pokeapi.co/api/v2/pokemon';
 
-type PokemonSpeciesListEntry = {
+type PokemonListEntry = {
+    name: string;
     url: string;
 };
 
-type PokemonSpeciesListResponse = {
-    results: PokemonSpeciesListEntry[];
+type PokemonListResponse = {
+    count: number;
+    results: PokemonListEntry[];
 };
 
-type PokemonSpeciesResponse = {
-    flavor_text_entries: Array<{
-        flavor_text: string;
-        language: {
-            name: string;
-        };
-    }>;
+type PokemonResponse = {
     id: number;
     name: string;
 };
 
-export async function fetchPokemonResults(searchTerm: string): Promise<SearchResultItem[]> {
+export async function fetchPokemonResults(searchTerm: string, page = 1): Promise<SearchResultsPage> {
     const trimmedSearchTerm = searchTerm.trim().toLowerCase();
 
     if (trimmedSearchTerm.length > 0) {
-        const species = await requestJson<PokemonSpeciesResponse>(
-            `${POKEMON_SPECIES_API_URL}/${trimmedSearchTerm}`,
-        );
+        const pokemon = await requestJson<PokemonResponse>(`${POKEMON_API_URL}/${trimmedSearchTerm}`);
 
-        return [toSearchResultItem(species)];
+        return {
+            items: [
+                {
+                    id: String(pokemon.id),
+                    name: pokemon.name,
+                },
+            ],
+            page: DEFAULT_PAGE,
+            totalPages: DEFAULT_PAGE,
+        };
     }
 
-    const response = await requestJson<PokemonSpeciesListResponse>(
-        `${POKEMON_SPECIES_API_URL}?limit=${INITIAL_RESULTS_LIMIT}&offset=0`,
+    const currentPage = Math.max(DEFAULT_PAGE, page);
+    const offset = (currentPage - DEFAULT_PAGE) * POKEMON_RESULTS_PAGE_SIZE;
+    const response = await requestJson<PokemonListResponse>(
+        `${POKEMON_API_URL}?limit=${POKEMON_RESULTS_PAGE_SIZE}&offset=${offset}`,
     );
 
-    const speciesList = await Promise.all(
-        response.results.map((entry) => requestJson<PokemonSpeciesResponse>(entry.url)),
-    );
-
-    return speciesList.map(toSearchResultItem);
+    return {
+        items: response.results.map(toSearchResultItem),
+        page: currentPage,
+        totalPages: Math.max(DEFAULT_PAGE, Math.ceil(response.count / POKEMON_RESULTS_PAGE_SIZE)),
+    };
 }
 
 async function requestJson<TResponse>(url: string): Promise<TResponse> {
@@ -55,22 +60,15 @@ async function requestJson<TResponse>(url: string): Promise<TResponse> {
     return (await response.json()) as TResponse;
 }
 
-function toSearchResultItem(species: PokemonSpeciesResponse): SearchResultItem {
+function toSearchResultItem(pokemon: PokemonListEntry): SearchResultItem {
     return {
-        id: String(species.id),
-        name: species.name,
-        description: getEnglishDescription(species),
+        id: getPokemonIdFromUrl(pokemon.url),
+        name: pokemon.name,
+        url: pokemon.url,
     };
 }
 
-function getEnglishDescription(species: PokemonSpeciesResponse): string {
-    const englishEntry = species.flavor_text_entries.find((entry) => {
-        return entry.language.name === 'en';
-    });
-
-    if (!englishEntry) {
-        return 'No description available.';
-    }
-
-    return englishEntry.flavor_text.replace(/\s+/g, ' ').trim();
+function getPokemonIdFromUrl(url: string): string {
+    const segments = url.split('/').filter(Boolean);
+    return segments.at(-1) ?? '';
 }
