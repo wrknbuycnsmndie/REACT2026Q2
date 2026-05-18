@@ -1,4 +1,4 @@
-import { fetchPokemonResults } from '../../services/pokemon';
+import { fetchPokemonDetails, fetchPokemonResults } from '../../services/pokemon';
 
 describe('fetchPokemonResults', () => {
     beforeEach(() => {
@@ -80,5 +80,121 @@ describe('fetchPokemonResults', () => {
         );
 
         expect(fetchSpy).toHaveBeenCalledWith('https://pokeapi.co/api/v2/pokemon/pikachu');
+    });
+});
+
+describe('fetchPokemonDetails', () => {
+    beforeEach(() => {
+        vi.restoreAllMocks();
+    });
+
+    const mockFetch = () => vi.spyOn(globalThis, 'fetch');
+
+    it('loads pokemon details and normalizes the english description', async () => {
+        const fetchSpy = mockFetch()
+            .mockResolvedValueOnce({
+                ok: true,
+                json: async () => ({
+                    height: 4,
+                    id: 25,
+                    name: 'pikachu',
+                    sprites: {
+                        front_default: 'https://example.com/pikachu.png',
+                    },
+                    types: [{ type: { name: 'electric' } }],
+                    weight: 60,
+                }),
+            } as Response)
+            .mockResolvedValueOnce({
+                ok: true,
+                json: async () => ({
+                    flavor_text_entries: [
+                        {
+                            flavor_text: 'Ignored text',
+                            language: { name: 'ja' },
+                        },
+                        {
+                            flavor_text: 'Mouse\nPokemon\twith static cheeks.',
+                            language: { name: 'en' },
+                        },
+                    ],
+                }),
+            } as Response);
+
+        await expect(fetchPokemonDetails('25')).resolves.toEqual({
+            description: 'Mouse Pokemon with static cheeks.',
+            height: 4,
+            id: '25',
+            imageUrl: 'https://example.com/pikachu.png',
+            name: 'pikachu',
+            types: ['electric'],
+            weight: 60,
+        });
+
+        expect(fetchSpy).toHaveBeenNthCalledWith(1, 'https://pokeapi.co/api/v2/pokemon/25');
+        expect(fetchSpy).toHaveBeenNthCalledWith(2, 'https://pokeapi.co/api/v2/pokemon-species/25');
+    });
+
+    it('returns a fallback description when no english entry exists', async () => {
+        mockFetch()
+            .mockResolvedValueOnce({
+                ok: true,
+                json: async () => ({
+                    height: 7,
+                    id: 133,
+                    name: 'eevee',
+                    sprites: {
+                        front_default: null,
+                    },
+                    types: [{ type: { name: 'normal' } }],
+                    weight: 65,
+                }),
+            } as Response)
+            .mockResolvedValueOnce({
+                ok: true,
+                json: async () => ({
+                    flavor_text_entries: [
+                        {
+                            flavor_text: 'Texto',
+                            language: { name: 'es' },
+                        },
+                    ],
+                }),
+            } as Response);
+
+        await expect(fetchPokemonDetails('133')).resolves.toEqual({
+            description: 'No description available.',
+            height: 7,
+            id: '133',
+            imageUrl: null,
+            name: 'eevee',
+            types: ['normal'],
+            weight: 65,
+        });
+    });
+
+    it('throws a mapped error when one of the detail requests fails', async () => {
+        mockFetch()
+            .mockResolvedValueOnce({
+                ok: true,
+                json: async () => ({
+                    height: 7,
+                    id: 133,
+                    name: 'eevee',
+                    sprites: {
+                        front_default: null,
+                    },
+                    types: [{ type: { name: 'normal' } }],
+                    weight: 65,
+                }),
+            } as Response)
+            .mockResolvedValueOnce({
+                ok: false,
+                status: 500,
+            } as Response);
+
+        await expect(fetchPokemonDetails('133')).rejects.toThrow(
+            'The Pokemon service is unavailable right now. Please try again.',
+        );
     });
 });
