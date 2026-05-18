@@ -1,5 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { MemoryRouter } from 'react-router';
 import { vi } from 'vitest';
 import { PokemonSearch } from '../../../components/PokemonSearch/PokemonSearch';
 import {
@@ -10,6 +11,7 @@ import {
 } from '../../testUtils/pokemonSearchMocks';
 
 vi.mock('../../../services/pokemon', () => ({
+    fetchPokemonDetails: vi.fn(),
     fetchPokemonResults: vi.fn(),
 }));
 
@@ -19,33 +21,42 @@ vi.mock('../../../services/localStorageService', () => ({
 }));
 
 describe('PokemonSearch', () => {
+    const renderPokemonSearch = (initialEntries = ['/']) =>
+        render(
+            <MemoryRouter initialEntries={initialEntries}>
+                <PokemonSearch onTestError={vi.fn()} shouldThrowError={false} />
+            </MemoryRouter>,
+        );
+
     beforeEach(() => {
         resetPokemonSearchMocks();
     });
 
     it('loads initial mocked results on mount', async () => {
-        mockedFetchPokemonResults.mockResolvedValue([
-            {
-                id: '25',
-                name: 'pikachu',
-                description: 'Electric mouse Pokemon.',
-            },
-        ]);
+        mockedFetchPokemonResults.mockResolvedValue({
+            items: [
+                {
+                    id: '25',
+                    name: 'pikachu',
+                },
+            ],
+            page: 1,
+            totalPages: 1,
+        });
 
-        render(<PokemonSearch onTestError={vi.fn()} shouldThrowError={false} />);
+        renderPokemonSearch();
 
-        expect(mockedFetchPokemonResults).toHaveBeenCalledWith('');
+        expect(mockedFetchPokemonResults).toHaveBeenCalledWith('', 1);
 
         expect(await screen.findByLabelText('pikachu')).toBeInTheDocument();
-        expect(screen.getByText('Electric mouse Pokemon.')).toBeInTheDocument();
     });
 
     it('renders an error state when the mocked initial request fails', async () => {
         mockedFetchPokemonResults.mockRejectedValue(new Error('Mocked API failure'));
 
-        render(<PokemonSearch onTestError={vi.fn()} shouldThrowError={false} />);
+        renderPokemonSearch();
 
-        expect(mockedFetchPokemonResults).toHaveBeenCalledWith('');
+        expect(mockedFetchPokemonResults).toHaveBeenCalledWith('', 1);
 
         expect(await screen.findByText('Request failed')).toBeInTheDocument();
         expect(screen.getByText('Mocked API failure')).toBeInTheDocument();
@@ -55,16 +66,19 @@ describe('PokemonSearch', () => {
         const user = userEvent.setup();
 
         mockedFetchPokemonResults
-            .mockResolvedValueOnce([])
-            .mockResolvedValueOnce([
-                {
-                    id: '133',
-                    name: 'eevee',
-                    description: 'Its genetic code is irregular.',
-                },
-            ]);
+            .mockResolvedValueOnce({ items: [], page: 1, totalPages: 3 })
+            .mockResolvedValueOnce({
+                items: [
+                    {
+                        id: '133',
+                        name: 'eevee',
+                    },
+                ],
+                page: 1,
+                totalPages: 1,
+            });
 
-        render(<PokemonSearch onTestError={vi.fn()} shouldThrowError={false} />);
+        renderPokemonSearch();
 
         await screen.findByText('No results to display yet.');
 
@@ -72,37 +86,39 @@ describe('PokemonSearch', () => {
         await user.click(screen.getByRole('button', { name: 'Search' }));
 
         await waitFor(() => {
-            expect(mockedFetchPokemonResults).toHaveBeenNthCalledWith(2, 'Eevee');
+            expect(mockedFetchPokemonResults).toHaveBeenNthCalledWith(2, 'Eevee', 1);
         });
 
         expect(await screen.findByLabelText('eevee')).toBeInTheDocument();
-        expect(screen.getByText('Its genetic code is irregular.')).toBeInTheDocument();
     });
 
     it('restores the stored search term on mount and uses it for the initial request', async () => {
         mockedGetStoredSearchTerm.mockReturnValue('snorlax');
-        mockedFetchPokemonResults.mockResolvedValue([
-            {
-                id: '143',
-                name: 'snorlax',
-                description: 'Very lazy. Just eats and sleeps.',
-            },
-        ]);
+        mockedFetchPokemonResults.mockResolvedValue({
+            items: [
+                {
+                    id: '143',
+                    name: 'snorlax',
+                },
+            ],
+            page: 1,
+            totalPages: 1,
+        });
 
-        render(<PokemonSearch onTestError={vi.fn()} shouldThrowError={false} />);
+        renderPokemonSearch();
 
         expect(screen.getByRole('searchbox', { name: 'Pokemon name' })).toHaveValue('snorlax');
-        expect(mockedFetchPokemonResults).toHaveBeenCalledWith('snorlax');
+        expect(mockedFetchPokemonResults).toHaveBeenCalledWith('snorlax', 1);
         expect(await screen.findByLabelText('snorlax')).toBeInTheDocument();
     });
 
     it('renders a mocked error response after a submitted search fails', async () => {
         const user = userEvent.setup();
 
-        mockedFetchPokemonResults.mockResolvedValueOnce([]);
+        mockedFetchPokemonResults.mockResolvedValueOnce({ items: [], page: 1, totalPages: 3 });
         mockedFetchPokemonResults.mockRejectedValueOnce(new Error('Mocked submit failure'));
 
-        render(<PokemonSearch onTestError={vi.fn()} shouldThrowError={false} />);
+        renderPokemonSearch();
 
         await screen.findByText('No results to display yet.');
 
@@ -117,15 +133,18 @@ describe('PokemonSearch', () => {
         const user = userEvent.setup();
 
         mockedGetStoredSearchTerm.mockReturnValue('mew');
-        mockedFetchPokemonResults.mockResolvedValue([
-            {
-                id: '151',
-                name: 'mew',
-                description: 'So rare that it is still said to be a mirage.',
-            },
-        ]);
+        mockedFetchPokemonResults.mockResolvedValue({
+            items: [
+                {
+                    id: '151',
+                    name: 'mew',
+                },
+            ],
+            page: 1,
+            totalPages: 1,
+        });
 
-        render(<PokemonSearch onTestError={vi.fn()} shouldThrowError={false} />);
+        renderPokemonSearch();
 
         await screen.findByLabelText('mew');
 
@@ -141,17 +160,19 @@ describe('PokemonSearch', () => {
         const user = userEvent.setup();
 
         mockedFetchPokemonResults
-            .mockResolvedValueOnce([])
-            .mockResolvedValueOnce([
-                {
-                    id: '150',
-                    name: 'mewtwo',
-                    description:
-                        'It was created by a scientist after years of horrific gene splicing.',
-                },
-            ]);
+            .mockResolvedValueOnce({ items: [], page: 1, totalPages: 3 })
+            .mockResolvedValueOnce({
+                items: [
+                    {
+                        id: '150',
+                        name: 'mewtwo',
+                    },
+                ],
+                page: 1,
+                totalPages: 1,
+            });
 
-        render(<PokemonSearch onTestError={vi.fn()} shouldThrowError={false} />);
+        renderPokemonSearch();
 
         await screen.findByText('No results to display yet.');
 
@@ -163,5 +184,45 @@ describe('PokemonSearch', () => {
         });
 
         expect(await screen.findByLabelText('mewtwo')).toBeInTheDocument();
+    });
+
+    it('loads the page from the URL and updates results when navigating pages', async () => {
+        const user = userEvent.setup();
+
+        mockedFetchPokemonResults
+            .mockResolvedValueOnce({
+                items: [
+                    {
+                        id: '11',
+                        name: 'metapod',
+                    },
+                ],
+                page: 2,
+                totalPages: 3,
+            })
+            .mockResolvedValueOnce({
+                items: [
+                    {
+                        id: '21',
+                        name: 'spearow',
+                    },
+                ],
+                page: 3,
+                totalPages: 3,
+            });
+
+        renderPokemonSearch(['/?page=2']);
+
+        expect(await screen.findByLabelText('metapod')).toBeInTheDocument();
+        expect(screen.getByText('Page 2 of 3')).toBeInTheDocument();
+
+        await user.click(screen.getByRole('button', { name: 'Next page' }));
+
+        await waitFor(() => {
+            expect(mockedFetchPokemonResults).toHaveBeenNthCalledWith(2, '', 3);
+        });
+
+        expect(await screen.findByLabelText('spearow')).toBeInTheDocument();
+        expect(screen.getByText('Page 3 of 3')).toBeInTheDocument();
     });
 });

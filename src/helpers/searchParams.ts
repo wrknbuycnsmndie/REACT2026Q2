@@ -25,3 +25,29 @@ export function getSearchParamsWithPage(
 
     return nextSearchParams;
 }
+
+export function getCurrentDetailsId(searchParams: URLSearchParams): string | null {
+    const rawDetailsId = searchParams.get('details');
+
+    if (!rawDetailsId) {
+        return null;
+    }
+
+    return rawDetailsId;
+}
+
+export function getSearchParamsWithDetails(
+    searchParams: URLSearchParams,
+    detailsId: string | null,
+): URLSearchParams {
+    const nextSearchParams = new URLSearchParams(searchParams);
+
+    if (!detailsId) {
+        nextSearchParams.delete('details');
+        return nextSearchParams;
+    }
+
+    nextSearchParams.set('details', detailsId);
+
+    return nextSearchParams;
+}

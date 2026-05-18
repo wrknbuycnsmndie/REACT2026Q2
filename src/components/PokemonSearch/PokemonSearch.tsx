@@ -2,6 +2,7 @@ import type { ChangeEvent, SyntheticEvent } from 'react';
 import { usePokemonSearch } from '../../hooks/usePokemonSearch';
 import { ResultsSection } from '../ResultsSection/ResultsSection';
 import { SearchSection } from '../SearchSection/SearchSection';
+import './PokemonSearch.css';
 
 type PokemonSearchProps = {
   onTestError: () => void;
@@ -19,7 +20,9 @@ export function PokemonSearch({
     handleSearchTermChange,
     isLoading,
     items,
+    openDetails,
     searchTerm,
+    selectedPokemonId,
     submitSearch,
     totalPages,
   } = usePokemonSearch();
@@ -38,7 +41,7 @@ export function PokemonSearch({
   }
 
   return (
-    <>
+    <div className='pokemon-search'>
       <SearchSection
         onTestError={onTestError}
         searchTerm={searchTerm}
@@ -50,9 +53,11 @@ export function PokemonSearch({
         errorMessage={errorMessage}
         isLoading={isLoading}
         items={items}
+        onItemSelect={openDetails}
         onPageChange={goToPage}
+        selectedPokemonId={selectedPokemonId}
         totalPages={totalPages}
       />
-    </>
+    </div>
   );
 }

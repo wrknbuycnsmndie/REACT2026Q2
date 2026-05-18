@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { DEFAULT_PAGE } from '../constants/pagination';
 import type { SearchResultItem } from '../types/search';
+import { usePokemonDetailsParam } from './usePokemonDetailsParam';
 import { usePokemonPageParam } from './usePokemonPageParam';
 import { usePokemonResults } from './usePokemonResults';
 import { useStoredSearchTerm } from './useStoredSearchTerm';
@@ -12,7 +13,9 @@ type UsePokemonSearchResult = {
   handleSearchTermChange: (value: string) => void;
   isLoading: boolean;
   items: SearchResultItem[];
+  openDetails: (detailsId: string) => void;
   searchTerm: string;
+  selectedPokemonId: string | null;
   submitSearch: () => Promise<void>;
   totalPages: number;
 };
@@ -24,6 +27,7 @@ export function usePokemonSearch(): UsePokemonSearchResult {
     searchTerm,
     setSearchTerm,
   } = useStoredSearchTerm();
+  const { openDetails, selectedPokemonId } = usePokemonDetailsParam();
   const { currentPage, goToPage, resetPage } = usePokemonPageParam();
   const [submittedSearchTerm, setSubmittedSearchTerm] = useState(
     initialStoredSearchTerm.trim(),
@@ -62,7 +66,9 @@ export function usePokemonSearch(): UsePokemonSearchResult {
     handleSearchTermChange,
     isLoading,
     items,
+    openDetails,
     searchTerm,
+    selectedPokemonId,
     submitSearch,
     totalPages,
   };

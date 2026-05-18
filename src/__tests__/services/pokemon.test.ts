@@ -7,93 +7,53 @@ describe('fetchPokemonResults', () => {
 
     const mockFetch = () => vi.spyOn(globalThis, 'fetch');
 
-    it('requests a single species by trimmed lowercased search term', async () => {
+    it('requests a single pokemon by trimmed lowercased search term', async () => {
         const fetchSpy = mockFetch().mockResolvedValue({
             ok: true,
             json: async () => ({
                 id: 25,
                 name: 'pikachu',
-                flavor_text_entries: [
-                    {
-                        flavor_text: 'Electric   mouse\nPokemon.',
-                        language: { name: 'en' },
-                    },
-                ],
             }),
         } as Response);
 
-        await expect(fetchPokemonResults('  PiKaChu  ')).resolves.toEqual([
-            {
-                id: '25',
-                name: 'pikachu',
-                description: 'Electric mouse Pokemon.',
-            },
-        ]);
+        await expect(fetchPokemonResults('  PiKaChu  ')).resolves.toEqual({
+            items: [
+                {
+                    id: '25',
+                    name: 'pikachu',
+                },
+            ],
+            page: 1,
+            totalPages: 1,
+        });
 
-        expect(fetchSpy).toHaveBeenCalledWith('https://pokeapi.co/api/v2/pokemon-species/pikachu');
+        expect(fetchSpy).toHaveBeenCalledWith('https://pokeapi.co/api/v2/pokemon/pikachu');
     });
 
-    it('loads the default species list and maps each detailed response', async () => {
-        const fetchSpy = mockFetch()
-            .mockResolvedValueOnce({
-                ok: true,
-                json: async () => ({
-                    results: [{ url: 'https://pokeapi.co/api/v2/pokemon-species/1/' }],
-                }),
-            } as Response)
-            .mockResolvedValueOnce({
-                ok: true,
-                json: async () => ({
-                    id: 1,
-                    name: 'bulbasaur',
-                    flavor_text_entries: [
-                        {
-                            flavor_text: 'Seed Pokemon',
-                            language: { name: 'en' },
-                        },
-                    ],
-                }),
-            } as Response);
-
-        await expect(fetchPokemonResults('   ')).resolves.toEqual([
-            {
-                id: '1',
-                name: 'bulbasaur',
-                description: 'Seed Pokemon',
-            },
-        ]);
-
-        expect(fetchSpy).toHaveBeenNthCalledWith(
-            1,
-            'https://pokeapi.co/api/v2/pokemon-species?limit=10&offset=0',
-        );
-        expect(fetchSpy).toHaveBeenNthCalledWith(2, 'https://pokeapi.co/api/v2/pokemon-species/1/');
-    });
-
-    it('returns a fallback description when no english entry exists', async () => {
+    it('loads the paginated pokemon list for the requested page', async () => {
         const fetchSpy = mockFetch().mockResolvedValue({
             ok: true,
             json: async () => ({
-                id: 150,
-                name: 'mewtwo',
-                flavor_text_entries: [
-                    {
-                        flavor_text: 'Descripcion',
-                        language: { name: 'es' },
-                    },
-                ],
+                count: 25,
+                results: Array.from({ length: 10 }, (_, index) => ({
+                    name: `pokemon-${index + 11}`,
+                    url: `https://pokeapi.co/api/v2/pokemon/${index + 11}/`,
+                })),
             }),
         } as Response);
 
-        await expect(fetchPokemonResults('mewtwo')).resolves.toEqual([
-            {
-                id: '150',
-                name: 'mewtwo',
-                description: 'No description available.',
-            },
-        ]);
+        await expect(fetchPokemonResults('   ', 2)).resolves.toEqual({
+            items: Array.from({ length: 10 }, (_, index) => ({
+                id: String(index + 11),
+                name: `pokemon-${index + 11}`,
+                url: `https://pokeapi.co/api/v2/pokemon/${index + 11}/`,
+            })),
+            page: 2,
+            totalPages: 3,
+        });
 
-        expect(fetchSpy).toHaveBeenCalledWith('https://pokeapi.co/api/v2/pokemon-species/mewtwo');
+        expect(fetchSpy).toHaveBeenCalledWith('https://pokeapi.co/api/v2/pokemon?limit=10&offset=10');
+        expect(fetchSpy).toHaveBeenCalledTimes(1);
     });
 
     it('throws the mapped not found message for a 404 response', async () => {
@@ -106,7 +66,7 @@ describe('fetchPokemonResults', () => {
             'No Pokemon matched that search term.',
         );
 
-        expect(fetchSpy).toHaveBeenCalledWith('https://pokeapi.co/api/v2/pokemon-species/missingno');
+        expect(fetchSpy).toHaveBeenCalledWith('https://pokeapi.co/api/v2/pokemon/missingno');
     });
 
     it('throws the mapped service unavailable message for a 5xx response', async () => {
@@ -119,6 +79,6 @@ describe('fetchPokemonResults', () => {
             'The Pokemon service is unavailable right now. Please try again.',
         );
 
-        expect(fetchSpy).toHaveBeenCalledWith('https://pokeapi.co/api/v2/pokemon-species/pikachu');
+        expect(fetchSpy).toHaveBeenCalledWith('https://pokeapi.co/api/v2/pokemon/pikachu');
     });
 });

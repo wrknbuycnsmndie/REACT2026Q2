@@ -62,7 +62,20 @@
     border-top: 3px solid var(--border);
 }
 
+.results-section__result-button {
+    border: none;
+    background: transparent;
+    padding: 0;
+    text-align: left;
+}
+
+.results-section__result-button--selected,
+.results-section__result-button:hover {
+    background: var(--accent-soft);
+}
+
 .results-section__result-name {
+    display: block;
     padding: 14px 12px;
     font-weight: 700;
 }

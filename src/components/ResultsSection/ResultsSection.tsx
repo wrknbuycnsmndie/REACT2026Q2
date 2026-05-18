@@ -11,7 +11,9 @@ type ResultsSectionProps = {
     errorMessage: string;
     isLoading: boolean;
     items: SearchResultItem[];
+    onItemSelect: (detailsId: string) => void;
     onPageChange: (page: number) => void;
+    selectedPokemonId: string | null;
     totalPages: number;
 };
 
@@ -20,7 +22,9 @@ export function ResultsSection({
     errorMessage,
     isLoading,
     items,
+    onItemSelect,
     onPageChange,
+    selectedPokemonId,
     totalPages,
 }: ResultsSectionProps) {
     const showPagination = !isLoading && errorMessage === '' && items.length > 0 && totalPages > 1;
@@ -41,7 +45,7 @@ export function ResultsSection({
                     <span className="results-section__name">Pokemon Name</span>
                 </div>
 
-                {renderContent(errorMessage, isLoading, items)}
+                {renderContent(errorMessage, isLoading, items, onItemSelect, selectedPokemonId)}
             </div>
 
             {showPagination ? (
@@ -59,6 +63,8 @@ function renderContent(
     errorMessage: string,
     isLoading: boolean,
     items: SearchResultItem[],
+    onItemSelect: (detailsId: string) => void,
+    selectedPokemonId: string | null,
 ): ReactNode {
     if (isLoading) {
         return <ResultsLoader />;
@@ -72,7 +78,12 @@ function renderContent(
         return (
             <ul className="results-section__list">
                 {items.map((item) => (
-                    <ResultRow key={item.id} item={item} />
+                    <ResultRow
+                        key={item.id}
+                        item={item}
+                        isSelected={item.id === selectedPokemonId}
+                        onSelect={onItemSelect}
+                    />
                 ))}
             </ul>
         );

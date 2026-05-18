@@ -1,0 +1,19 @@
+.home-page__content {
+    display: grid;
+    gap: 24px;
+}
+
+.home-page__content--with-details {
+    grid-template-columns: minmax(0, 1.6fr) minmax(320px, 0.9fr);
+    align-items: start;
+}
+
+.home-page__content > * {
+    min-width: 0;
+}
+
+@media (max-width: 640px) {
+    .home-page__content {
+        grid-template-columns: 1fr;
+    }
+}

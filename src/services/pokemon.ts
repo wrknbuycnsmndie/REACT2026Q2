@@ -1,5 +1,6 @@
 import { PokemonRequestError } from './pokemonRequestError';
 import { DEFAULT_PAGE, POKEMON_RESULTS_PAGE_SIZE } from '../constants/pagination';
+import type { PokemonDetails } from '../types/pokemon';
 import type { SearchResultItem, SearchResultsPage } from '../types/search';
 
 const POKEMON_API_URL = 'https://pokeapi.co/api/v2/pokemon';
@@ -15,8 +16,27 @@ type PokemonListResponse = {
 };
 
 type PokemonResponse = {
+    height: number;
     id: number;
     name: string;
+    sprites: {
+        front_default: string | null;
+    };
+    types: Array<{
+        type: {
+            name: string;
+        };
+    }>;
+    weight: number;
+};
+
+type PokemonSpeciesResponse = {
+    flavor_text_entries: Array<{
+        flavor_text: string;
+        language: {
+            name: string;
+        };
+    }>;
 };
 
 export async function fetchPokemonResults(searchTerm: string, page = 1): Promise<SearchResultsPage> {
@@ -50,6 +70,23 @@ export async function fetchPokemonResults(searchTerm: string, page = 1): Promise
     };
 }
 
+export async function fetchPokemonDetails(id: string): Promise<PokemonDetails> {
+    const [pokemon, species] = await Promise.all([
+        requestJson<PokemonResponse>(`${POKEMON_API_URL}/${id}`),
+        requestJson<PokemonSpeciesResponse>(`${POKEMON_API_URL}-species/${id}`),
+    ]);
+
+    return {
+        description: getEnglishDescription(species),
+        height: pokemon.height,
+        id: String(pokemon.id),
+        imageUrl: pokemon.sprites.front_default,
+        name: pokemon.name,
+        types: pokemon.types.map((entry) => entry.type.name),
+        weight: pokemon.weight,
+    };
+}
+
 async function requestJson<TResponse>(url: string): Promise<TResponse> {
     const response = await fetch(url);
 
@@ -71,4 +108,16 @@ function toSearchResultItem(pokemon: PokemonListEntry): SearchResultItem {
 function getPokemonIdFromUrl(url: string): string {
     const segments = url.split('/').filter(Boolean);
     return segments.at(-1) ?? '';
+}
+
+function getEnglishDescription(species: PokemonSpeciesResponse): string {
+    const englishEntry = species.flavor_text_entries.find((entry) => {
+        return entry.language.name === 'en';
+    });
+
+    if (!englishEntry) {
+        return 'No description available.';
+    }
+
+    return englishEntry.flavor_text.replace(/\s+/g, ' ').trim();
 }
