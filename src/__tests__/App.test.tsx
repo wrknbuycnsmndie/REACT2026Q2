@@ -125,4 +125,30 @@ describe('App', () => {
 
         expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     });
+
+    it('opens the about page from the main navigation', async () => {
+        const user = userEvent.setup();
+
+        render(
+            <MemoryRouter initialEntries={['/']}>
+                <AppRouter />
+            </MemoryRouter>,
+        );
+
+        await user.click(screen.getByRole('link', { name: 'About' }));
+
+        expect(
+            await screen.findByRole('heading', {
+                level: 2,
+                name: 'Pokemon Search Workshop',
+            }),
+        ).toBeInTheDocument();
+        expect(
+            screen.getByRole('link', { name: 'RS School React Course' }),
+        ).toHaveAttribute('href', 'https://rs.school/courses/reactjs');
+        expect(screen.getByRole('link', { name: 'Anton Chapala' })).toHaveAttribute(
+            'href',
+            'https://github.com/wrknbuycnsmndie',
+        );
+    });
 });
