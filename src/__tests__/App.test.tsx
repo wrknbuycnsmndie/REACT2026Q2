@@ -151,4 +151,35 @@ describe('App', () => {
             'https://github.com/wrknbuycnsmndie',
         );
     });
+
+    it('shows a 404 page for unknown routes and provides a way back to the app', async () => {
+        const user = userEvent.setup();
+
+        render(
+            <MemoryRouter initialEntries={['/missing-page']}>
+                <AppRouter />
+            </MemoryRouter>,
+        );
+
+        expect(
+            await screen.findByRole('heading', {
+                level: 2,
+                name: 'Pikachu used Thunder Shock on this route',
+            }),
+        ).toBeInTheDocument();
+        expect(
+            screen.getByText(
+                'The page you requested vanished into the tall grass. Head back to the Pokedex and keep your search moving.',
+            ),
+        ).toBeInTheDocument();
+
+        await user.click(screen.getByRole('link', { name: 'Return to Pokemon Search' }));
+
+        expect(
+            await screen.findByRole('heading', {
+                level: 1,
+                name: 'Pokemon Search',
+            }),
+        ).toBeInTheDocument();
+    });
 });
