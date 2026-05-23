@@ -1,12 +1,16 @@
 import type { SearchResultItem } from '../../types/search';
 
-type ResultRowProps = {
+type ResultsTableRowProps = {
     isSelected: boolean;
     item: SearchResultItem;
     onSelect: (detailsId: string) => void;
 };
 
-export function ResultRow({ isSelected, item, onSelect }: ResultRowProps) {
+export function ResultsTableRow({
+    isSelected,
+    item,
+    onSelect,
+}: ResultsTableRowProps) {
     return (
         <li className="results-section__result" aria-label={item.name}>
             <button

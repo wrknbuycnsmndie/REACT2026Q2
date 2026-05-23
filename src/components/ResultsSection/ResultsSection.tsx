@@ -1,8 +1,9 @@
-import type { ReactNode } from 'react';
 import { Pagination } from '../Pagination/Pagination';
+import { ResultsEmptyState } from './ResultsEmptyState';
 import { ResultsError } from './ResultsError';
-import { ResultRow } from './ResultRow';
 import { ResultsLoader } from './ResultsLoader';
+import { ResultsTable } from './ResultsTable';
+import { ResultsTableBody } from './ResultsTableBody';
 import type { SearchResultItem } from '../../types/search';
 import './ResultsSection.css';
 
@@ -40,13 +41,20 @@ export function ResultsSection({
                 </p>
             </div>
 
-            <div className="results-section__table">
-                <div className="results-section__row results-section__row--head">
-                    <span className="results-section__name">Pokemon Name</span>
-                </div>
-
-                {renderContent(errorMessage, isLoading, items, onItemSelect, selectedPokemonId)}
-            </div>
+            <ResultsTable>
+                {isLoading ? <ResultsLoader /> : null}
+                {!isLoading && errorMessage !== '' ? <ResultsError message={errorMessage} /> : null}
+                {!isLoading && errorMessage === '' && items.length > 0 ? (
+                    <ResultsTableBody
+                        items={items}
+                        onItemSelect={onItemSelect}
+                        selectedPokemonId={selectedPokemonId}
+                    />
+                ) : null}
+                {!isLoading && errorMessage === '' && items.length === 0 ? (
+                    <ResultsEmptyState />
+                ) : null}
+            </ResultsTable>
 
             {showPagination ? (
                 <Pagination
@@ -57,37 +65,4 @@ export function ResultsSection({
             ) : null}
         </section>
     );
-}
-
-function renderContent(
-    errorMessage: string,
-    isLoading: boolean,
-    items: SearchResultItem[],
-    onItemSelect: (detailsId: string) => void,
-    selectedPokemonId: string | null,
-): ReactNode {
-    if (isLoading) {
-        return <ResultsLoader />;
-    }
-
-    if (errorMessage !== '') {
-        return <ResultsError message={errorMessage} />;
-    }
-
-    if (items.length > 0) {
-        return (
-            <ul className="results-section__list">
-                {items.map((item) => (
-                    <ResultRow
-                        key={item.id}
-                        item={item}
-                        isSelected={item.id === selectedPokemonId}
-                        onSelect={onItemSelect}
-                    />
-                ))}
-            </ul>
-        );
-    }
-
-    return <p className="results-section__empty">No results to display yet.</p>;
 }

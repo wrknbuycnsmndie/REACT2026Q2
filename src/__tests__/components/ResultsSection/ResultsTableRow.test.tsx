@@ -1,11 +1,11 @@
 import { render, screen } from '@testing-library/react';
 import { vi } from 'vitest';
-import { ResultRow } from '../../../components/ResultsSection/ResultRow';
+import { ResultsTableRow } from '../../../components/ResultsSection/ResultsTableRow';
 
-describe('ResultRow', () => {
+describe('ResultsTableRow', () => {
     it('renders the item name', () => {
         render(
-            <ResultRow
+            <ResultsTableRow
                 isSelected={false}
                 item={{
                     id: '25',
