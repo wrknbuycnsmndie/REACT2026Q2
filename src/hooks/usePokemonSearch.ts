@@ -1,10 +1,9 @@
-import { useState } from 'react';
 import { DEFAULT_PAGE } from '../constants/pagination';
+import { usePokemonSearchStore } from '../store/pokemonSearchStore';
 import type { SearchResultItem } from '../types/search';
 import { usePokemonDetailsParam } from './usePokemonDetailsParam';
 import { usePokemonPageParam } from './usePokemonPageParam';
 import { usePokemonResults } from './usePokemonResults';
-import { useStoredSearchTerm } from './useStoredSearchTerm';
 
 type UsePokemonSearchResult = {
   currentPage: number;
@@ -21,17 +20,14 @@ type UsePokemonSearchResult = {
 };
 
 export function usePokemonSearch(): UsePokemonSearchResult {
-  const {
-    initialStoredSearchTerm,
-    persistSubmittedSearchTerm,
-    searchTerm,
-    setSearchTerm,
-  } = useStoredSearchTerm();
+  const searchTerm = usePokemonSearchStore((state) => state.searchTerm);
+  const setSearchTerm = usePokemonSearchStore((state) => state.setSearchTerm);
+  const submitSearchTerm = usePokemonSearchStore((state) => state.submitSearchTerm);
+  const submittedSearchTerm = usePokemonSearchStore(
+    (state) => state.submittedSearchTerm,
+  );
   const { openDetails, selectedPokemonId } = usePokemonDetailsParam();
   const { currentPage, goToPage, resetPage } = usePokemonPageParam();
-  const [submittedSearchTerm, setSubmittedSearchTerm] = useState(
-    initialStoredSearchTerm.trim(),
-  );
   const { errorMessage, isLoading, items, totalPages } = usePokemonResults(
     submittedSearchTerm,
     currentPage,
@@ -49,10 +45,7 @@ export function usePokemonSearch(): UsePokemonSearchResult {
       return;
     }
 
-    const persistedSearchTerm = persistSubmittedSearchTerm(trimmedSearchTerm);
-
-    setSearchTerm(persistedSearchTerm);
-    setSubmittedSearchTerm(persistedSearchTerm);
+    submitSearchTerm(trimmedSearchTerm);
 
     if (currentPage !== DEFAULT_PAGE) {
       resetPage();
