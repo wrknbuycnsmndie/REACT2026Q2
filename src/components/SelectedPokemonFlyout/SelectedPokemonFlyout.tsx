@@ -1,4 +1,9 @@
-import { selectSelectedPokemonCount, useSelectedPokemonStore } from '../../store/selectedPokemonStore';
+import { downloadSelectedPokemonCsv } from '../../services/downloadSelectedPokemonCsv';
+import {
+  selectSelectedPokemonCount,
+  selectSelectedPokemonItems,
+  useSelectedPokemonStore,
+} from '../../store/selectedPokemonStore';
 import './SelectedPokemonFlyout.css';
 
 export function SelectedPokemonFlyout() {
@@ -10,6 +15,14 @@ export function SelectedPokemonFlyout() {
   if (selectedPokemonCount === 0) {
     return null;
   }
+
+  const handleDownload = () => {
+    const selectedPokemonItems = selectSelectedPokemonItems(
+      useSelectedPokemonStore.getState(),
+    );
+
+    downloadSelectedPokemonCsv(selectedPokemonItems);
+  };
 
   return (
     <aside className="selected-pokemon-flyout" aria-label="Selected Pokemon">
@@ -27,6 +40,7 @@ export function SelectedPokemonFlyout() {
         <button
           className="selected-pokemon-flyout__button selected-pokemon-flyout__button--accent"
           type="button"
+          onClick={handleDownload}
         >
           Download
         </button>

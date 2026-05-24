@@ -1,14 +1,21 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { vi } from 'vitest';
 import { SelectedPokemonFlyout } from '../../../components/SelectedPokemonFlyout/SelectedPokemonFlyout';
+import { downloadSelectedPokemonCsv } from '../../../services/downloadSelectedPokemonCsv';
 import {
   resetSelectedPokemonStore,
   useSelectedPokemonStore,
 } from '../../../store/selectedPokemonStore';
 
+vi.mock('../../../services/downloadSelectedPokemonCsv', () => ({
+  downloadSelectedPokemonCsv: vi.fn(),
+}));
+
 describe('SelectedPokemonFlyout', () => {
   beforeEach(() => {
     resetSelectedPokemonStore();
+    vi.mocked(downloadSelectedPokemonCsv).mockReset();
   });
 
   it('does not render when there are no selected items', () => {
@@ -44,7 +51,9 @@ describe('SelectedPokemonFlyout', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('renders a download button when items are selected', () => {
+  it('downloads the selected items when requested', async () => {
+    const user = userEvent.setup();
+
     useSelectedPokemonStore.getState().selectPokemon({
       id: '25',
       name: 'pikachu',
@@ -53,6 +62,15 @@ describe('SelectedPokemonFlyout', () => {
 
     render(<SelectedPokemonFlyout />);
 
-    expect(screen.getByRole('button', { name: 'Download' })).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Download' }));
+
+    expect(downloadSelectedPokemonCsv).toHaveBeenCalledWith([
+      {
+        detailsRoute: '/?page=1&details=25',
+        id: '25',
+        name: 'pikachu',
+        sourceUrl: 'https://pokeapi.co/api/v2/pokemon/25/',
+      },
+    ]);
   });
 });
