@@ -109,7 +109,12 @@
     }
 
     .results-section__row {
-        grid-template-columns: 56px 1fr;
+        grid-template-columns: 64px 1fr;
+    }
+
+    .results-section__select,
+    .results-section__checkbox {
+        padding-inline: 8px;
     }
 
 }

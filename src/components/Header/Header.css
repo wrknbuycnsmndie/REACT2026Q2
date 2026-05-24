@@ -124,20 +124,47 @@
 
 @media (max-width: 640px) {
     .header {
+        padding: 20px;
         box-shadow: 4px 4px 0 var(--border);
+        text-align: center;
+    }
+
+    .header__top-row {
+        gap: 12px;
     }
 
     .header__theme-panel {
         width: 100%;
+        margin-top: 4px;
+        margin-bottom: 14px;
         justify-items: stretch;
     }
 
     .header__theme-switcher {
         width: 100%;
+        gap: 4px;
+        padding: 4px;
         box-shadow: 3px 3px 0 var(--border);
     }
 
     .header__theme-button {
         flex: 1;
+        min-width: 0;
+        padding: 8px 10px;
+        font-size: 0.8rem;
+        letter-spacing: 0.03em;
+    }
+
+    .header__subtitle {
+        margin-inline: auto;
+    }
+
+    .header__nav {
+        gap: 10px;
+    }
+
+    .header__nav-link {
+        flex: 1 1 0;
+        text-align: center;
     }
 }
