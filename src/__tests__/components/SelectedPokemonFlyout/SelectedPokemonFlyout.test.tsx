@@ -29,16 +29,22 @@ describe('SelectedPokemonFlyout', () => {
   it('renders the selected count and clears all selected items', async () => {
     const user = userEvent.setup();
 
-    useSelectedPokemonStore.getState().selectPokemon({
-      id: '25',
-      name: 'pikachu',
-      url: 'https://pokeapi.co/api/v2/pokemon/25/',
-    });
-    useSelectedPokemonStore.getState().selectPokemon({
-      id: '133',
-      name: 'eevee',
-      url: 'https://pokeapi.co/api/v2/pokemon/133/',
-    });
+    useSelectedPokemonStore.getState().selectPokemon(
+      {
+        id: '25',
+        name: 'pikachu',
+        url: 'https://pokeapi.co/api/v2/pokemon/25/',
+      },
+      1,
+    );
+    useSelectedPokemonStore.getState().selectPokemon(
+      {
+        id: '133',
+        name: 'eevee',
+        url: 'https://pokeapi.co/api/v2/pokemon/133/',
+      },
+      2,
+    );
 
     render(<SelectedPokemonFlyout />);
 
@@ -54,11 +60,14 @@ describe('SelectedPokemonFlyout', () => {
   it('downloads the selected items when requested', async () => {
     const user = userEvent.setup();
 
-    useSelectedPokemonStore.getState().selectPokemon({
-      id: '25',
-      name: 'pikachu',
-      url: 'https://pokeapi.co/api/v2/pokemon/25/',
-    });
+    useSelectedPokemonStore.getState().selectPokemon(
+      {
+        id: '25',
+        name: 'pikachu',
+        url: 'https://pokeapi.co/api/v2/pokemon/25/',
+      },
+      4,
+    );
 
     render(<SelectedPokemonFlyout />);
 
@@ -66,7 +75,7 @@ describe('SelectedPokemonFlyout', () => {
 
     expect(downloadSelectedPokemonCsv).toHaveBeenCalledWith([
       {
-        detailsRoute: '/?page=1&details=25',
+        detailsRoute: '/?page=4&details=25',
         id: '25',
         name: 'pikachu',
         sourceUrl: 'https://pokeapi.co/api/v2/pokemon/25/',

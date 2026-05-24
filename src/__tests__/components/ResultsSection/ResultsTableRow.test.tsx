@@ -15,6 +15,7 @@ describe('ResultsTableRow', () => {
   it('renders the item name and selection checkbox', () => {
     render(
       <ResultsTableRow
+        currentPage={2}
         isActive={false}
         item={{
           id: '25',
@@ -36,6 +37,7 @@ describe('ResultsTableRow', () => {
 
     render(
       <ResultsTableRow
+        currentPage={3}
         isActive={false}
         item={{
           id: '25',
@@ -49,7 +51,9 @@ describe('ResultsTableRow', () => {
     await user.click(screen.getByRole('checkbox', { name: 'Select pikachu' }));
 
     expect(onSelect).not.toHaveBeenCalled();
-    expect(useSelectedPokemonStore.getState().selectedItemsById['25']).toBeDefined();
+    expect(useSelectedPokemonStore.getState().selectedItemsById['25']).toMatchObject({
+      detailsRoute: '/?page=3&details=25',
+    });
   });
 
   it('opens details without changing selection when the row button is clicked', async () => {
@@ -58,6 +62,7 @@ describe('ResultsTableRow', () => {
 
     render(
       <ResultsTableRow
+        currentPage={1}
         isActive={false}
         item={{
           id: '25',

@@ -3,12 +3,14 @@ import type { SearchResultItem } from '../../types/search';
 import { ResultsTableRowCheckbox } from './ResultsTableRowCheckbox';
 
 type ResultsTableRowProps = {
+  currentPage: number;
   isActive: boolean;
   item: SearchResultItem;
   onSelect: (detailsId: string) => void;
 };
 
 export function ResultsTableRow({
+  currentPage,
   isActive,
   item,
   onSelect,
@@ -24,7 +26,7 @@ export function ResultsTableRow({
         <ResultsTableRowCheckbox
           checked={isSelected}
           itemName={item.name}
-          onChange={() => togglePokemonSelection(item)}
+          onChange={() => togglePokemonSelection(item, currentPage)}
         />
         <button
           className={`results-section__result-button${isActive ? ' results-section__result-button--active' : ''}`}

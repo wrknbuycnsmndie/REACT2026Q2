@@ -46,6 +46,7 @@ export function ResultsSection({
                 {!isLoading && errorMessage !== '' ? <ResultsError message={errorMessage} /> : null}
                 {!isLoading && errorMessage === '' && items.length > 0 ? (
                     <ResultsTableBody
+                        currentPage={currentPage}
                         items={items}
                         onItemSelect={onItemSelect}
                         selectedPokemonId={selectedPokemonId}

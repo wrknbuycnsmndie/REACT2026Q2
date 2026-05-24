@@ -9,9 +9,9 @@ export type SelectedPokemonStoreState = {
 
 export type SelectedPokemonStoreActions = {
   clearSelectedPokemon: () => void;
-  selectPokemon: (item: SearchResultItem) => void;
+  selectPokemon: (item: SearchResultItem, currentPage: number) => void;
   syncSelectedPokemonDetails: (details: PokemonDetails) => void;
-  togglePokemonSelection: (item: SearchResultItem) => void;
+  togglePokemonSelection: (item: SearchResultItem, currentPage: number) => void;
   unselectPokemon: (pokemonId: string) => void;
 };
 
@@ -27,11 +27,11 @@ export const useSelectedPokemonStore = create<SelectedPokemonStore>((set) => ({
   clearSelectedPokemon: () => {
     set(initialSelectedPokemonStoreState);
   },
-  selectPokemon: (item) => {
+  selectPokemon: (item, currentPage) => {
     set((state) => ({
       selectedItemsById: {
         ...state.selectedItemsById,
-        [item.id]: toSelectedPokemonItem(item),
+        [item.id]: toSelectedPokemonItem(item, currentPage),
       },
     }));
   },
@@ -58,7 +58,7 @@ export const useSelectedPokemonStore = create<SelectedPokemonStore>((set) => ({
       };
     });
   },
-  togglePokemonSelection: (item) => {
+  togglePokemonSelection: (item, currentPage) => {
     set((state) => {
       if (state.selectedItemsById[item.id]) {
         const nextSelectedItemsById = { ...state.selectedItemsById };
@@ -73,7 +73,7 @@ export const useSelectedPokemonStore = create<SelectedPokemonStore>((set) => ({
       return {
         selectedItemsById: {
           ...state.selectedItemsById,
-          [item.id]: toSelectedPokemonItem(item),
+          [item.id]: toSelectedPokemonItem(item, currentPage),
         },
       };
     });
@@ -112,9 +112,12 @@ export function selectSelectedPokemonItems(state: SelectedPokemonStoreState) {
   return Object.values(state.selectedItemsById);
 }
 
-function toSelectedPokemonItem(item: SearchResultItem): SelectedPokemonItem {
+function toSelectedPokemonItem(
+  item: SearchResultItem,
+  currentPage: number,
+): SelectedPokemonItem {
   return {
-    detailsRoute: `/?page=1&details=${item.id}`,
+    detailsRoute: `/?page=${currentPage}&details=${item.id}`,
     id: item.id,
     name: item.name,
     sourceUrl: item.url,
