@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
 import { vi } from 'vitest';
 import { PokemonSearch } from '../../../components/PokemonSearch/PokemonSearch';
+import { SelectedPokemonFlyout } from '../../../components/SelectedPokemonFlyout/SelectedPokemonFlyout';
 import { resetPokemonDetailsStore } from '../../../store/pokemonDetailsStore';
 import { resetPokemonSearchStore } from '../../../store/pokemonSearchStore';
 import {
@@ -27,6 +28,7 @@ describe('PokemonSearch', () => {
     render(
       <MemoryRouter initialEntries={initialEntries}>
         <PokemonSearch onTestError={vi.fn()} shouldThrowError={false} />
+        <SelectedPokemonFlyout />
       </MemoryRouter>,
     );
 
@@ -263,5 +265,45 @@ describe('PokemonSearch', () => {
 
     expect(await screen.findByLabelText('spearow')).toBeInTheDocument();
     expect(screen.getByText('Page 3 of 3')).toBeInTheDocument();
+  });
+
+  it('keeps the flyout visible after navigating away from a selected item', async () => {
+    const user = userEvent.setup();
+
+    mockedFetchPokemonResults
+      .mockResolvedValueOnce({
+        items: [
+          {
+            id: '25',
+            name: 'pikachu',
+            url: 'https://pokeapi.co/api/v2/pokemon/25/',
+          },
+        ],
+        page: 1,
+        totalPages: 2,
+      })
+      .mockResolvedValueOnce({
+        items: [
+          {
+            id: '4',
+            name: 'charmander',
+            url: 'https://pokeapi.co/api/v2/pokemon/4/',
+          },
+        ],
+        page: 2,
+        totalPages: 2,
+      });
+
+    renderPokemonSearch();
+
+    await user.click(
+      await screen.findByRole('checkbox', { name: 'Select pikachu' }),
+    );
+    expect(screen.getByText('1 selected')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Next page' }));
+
+    expect(await screen.findByLabelText('charmander')).toBeInTheDocument();
+    expect(screen.getByText('1 selected')).toBeInTheDocument();
   });
 });

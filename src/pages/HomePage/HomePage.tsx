@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Outlet } from 'react-router';
 import { ErrorBoundary } from '../../components/ErrorBoundary/ErrorBoundary';
 import { PokemonSearch } from '../../components/PokemonSearch/PokemonSearch';
+import { SelectedPokemonFlyout } from '../../components/SelectedPokemonFlyout/SelectedPokemonFlyout';
 import { usePokemonDetailsParam } from '../../hooks/usePokemonDetailsParam';
 import './HomePage.css';
 
@@ -19,14 +20,17 @@ export function HomePage() {
 
     return (
         <ErrorBoundary onReset={handleResetError}>
-            <div
-                className={`home-page__content${selectedPokemonId ? ' home-page__content--with-details' : ''}`}
-            >
-                <PokemonSearch
-                    onTestError={handleTriggerError}
-                    shouldThrowError={shouldThrowError}
-                />
-                <Outlet />
+            <div className="home-page">
+                <div
+                    className={`home-page__content${selectedPokemonId ? ' home-page__content--with-details' : ''}`}
+                >
+                    <PokemonSearch
+                        onTestError={handleTriggerError}
+                        shouldThrowError={shouldThrowError}
+                    />
+                    <Outlet />
+                </div>
+                <SelectedPokemonFlyout />
             </div>
         </ErrorBoundary>
     );

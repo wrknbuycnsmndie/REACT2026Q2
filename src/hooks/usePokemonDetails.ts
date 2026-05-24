@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { getRequestErrorMessage } from '../helpers/getRequestErrorMessage';
 import { fetchPokemonDetails } from '../services/pokemon';
 import { usePokemonDetailsStore } from '../store/pokemonDetailsStore';
+import { useSelectedPokemonStore } from '../store/selectedPokemonStore';
 import type { PokemonDetails } from '../types/pokemon';
 
 type UsePokemonDetailsResult = {
@@ -19,6 +20,9 @@ export function usePokemonDetails(
   const setDetails = usePokemonDetailsStore((state) => state.setDetails);
   const setDetailsError = usePokemonDetailsStore(
     (state) => state.setDetailsError,
+  );
+  const syncSelectedPokemonDetails = useSelectedPokemonStore(
+    (state) => state.syncSelectedPokemonDetails,
   );
   const startDetailsRequest = usePokemonDetailsStore(
     (state) => state.startDetailsRequest,
@@ -45,6 +49,7 @@ export function usePokemonDetails(
         }
 
         setDetails(nextDetails);
+        syncSelectedPokemonDetails(nextDetails);
       } catch (error) {
         if (isCancelled) {
           return;
@@ -64,6 +69,7 @@ export function usePokemonDetails(
     selectedPokemonId,
     setDetails,
     setDetailsError,
+    syncSelectedPokemonDetails,
     startDetailsRequest,
   ]);
 
