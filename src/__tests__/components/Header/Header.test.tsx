@@ -1,13 +1,21 @@
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
 import { Header } from '../../../components/Header/Header';
+import { ThemeProvider } from '../../../context/ThemeProvider';
 
 describe('Header', () => {
+  afterEach(() => {
+    delete document.documentElement.dataset.theme;
+  });
+
   it('renders the page heading and supporting copy', () => {
     render(
-      <MemoryRouter>
-        <Header />
-      </MemoryRouter>,
+      <ThemeProvider>
+        <MemoryRouter>
+          <Header />
+        </MemoryRouter>
+      </ThemeProvider>,
     );
 
     expect(screen.getByText('React Functional Components')).toBeInTheDocument();
@@ -19,10 +27,46 @@ describe('Header', () => {
     ).toBeInTheDocument();
     expect(
       screen.getByText(
-        'A compact search area sits on top, with a larger results area below for the upcoming features.',
+        'Search Pokemon, review details, and manage your selected list.',
       ),
     ).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Home' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'About' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Light' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    expect(screen.getByRole('button', { name: 'Dark' })).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    );
+  });
+
+  it('switches the app theme from the header controls', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <ThemeProvider>
+        <MemoryRouter>
+          <Header />
+        </MemoryRouter>
+      </ThemeProvider>,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Dark' }));
+
+    expect(document.documentElement.dataset.theme).toBe('dark');
+    expect(screen.getByRole('button', { name: 'Dark' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Light' }));
+
+    expect(document.documentElement.dataset.theme).toBe('light');
+    expect(screen.getByRole('button', { name: 'Light' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
   });
 });

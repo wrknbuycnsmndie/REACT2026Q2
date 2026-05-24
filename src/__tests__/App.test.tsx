@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
 import { vi } from 'vitest';
+import { ThemeProvider } from '../context/ThemeProvider';
 import { AppRouter } from '../router/AppRouter';
 import { resetPokemonDetailsStore } from '../store/pokemonDetailsStore';
 import { resetPokemonSearchStore } from '../store/pokemonSearchStore';
@@ -49,9 +50,11 @@ describe('App', () => {
       .mockImplementation(() => {});
 
     render(
-      <MemoryRouter initialEntries={['/']}>
-        <AppRouter />
-      </MemoryRouter>,
+      <ThemeProvider>
+        <MemoryRouter initialEntries={['/']}>
+          <AppRouter />
+        </MemoryRouter>
+      </ThemeProvider>,
     );
 
     await screen.findByText('No results to display yet.');
@@ -88,9 +91,11 @@ describe('App', () => {
     });
 
     render(
-      <MemoryRouter initialEntries={['/']}>
-        <AppRouter />
-      </MemoryRouter>,
+      <ThemeProvider>
+        <MemoryRouter initialEntries={['/']}>
+          <AppRouter />
+        </MemoryRouter>
+      </ThemeProvider>,
     );
 
     await user.click(await screen.findByRole('button', { name: 'pikachu' }));
@@ -119,9 +124,11 @@ describe('App', () => {
     });
 
     render(
-      <MemoryRouter initialEntries={['/']}>
-        <AppRouter />
-      </MemoryRouter>,
+      <ThemeProvider>
+        <MemoryRouter initialEntries={['/']}>
+          <AppRouter />
+        </MemoryRouter>
+      </ThemeProvider>,
     );
 
     await user.click(await screen.findByRole('button', { name: 'pikachu' }));
@@ -142,9 +149,11 @@ describe('App', () => {
     const user = userEvent.setup();
 
     render(
-      <MemoryRouter initialEntries={['/']}>
-        <AppRouter />
-      </MemoryRouter>,
+      <ThemeProvider>
+        <MemoryRouter initialEntries={['/']}>
+          <AppRouter />
+        </MemoryRouter>
+      </ThemeProvider>,
     );
 
     await user.click(screen.getByRole('link', { name: 'About' }));
@@ -168,9 +177,11 @@ describe('App', () => {
     const user = userEvent.setup();
 
     render(
-      <MemoryRouter initialEntries={['/missing-page']}>
-        <AppRouter />
-      </MemoryRouter>,
+      <ThemeProvider>
+        <MemoryRouter initialEntries={['/missing-page']}>
+          <AppRouter />
+        </MemoryRouter>
+      </ThemeProvider>,
     );
 
     expect(

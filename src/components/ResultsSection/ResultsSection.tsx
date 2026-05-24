@@ -37,7 +37,7 @@ export function ResultsSection({
                     Results
                 </h2>
                 <p className="results-section__description">
-                    Search results will appear here once the data layer is implemented.
+                    Open a row to view details or use the checkbox to manage selections.
                 </p>
             </div>
 

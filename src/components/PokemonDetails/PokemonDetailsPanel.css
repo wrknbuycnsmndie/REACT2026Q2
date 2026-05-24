@@ -39,6 +39,7 @@
 .pokemon-details__close {
   border: 3px solid var(--border);
   background: var(--accent-soft);
+  color: var(--text);
   padding: 10px 14px;
   font-weight: 700;
   text-transform: uppercase;
@@ -61,7 +62,7 @@
   height: 120px;
   object-fit: contain;
   image-rendering: pixelated;
-  background: #ffffff;
+  background: var(--surface-raised);
   border: 3px solid var(--border);
   border-radius: 12px;
 }

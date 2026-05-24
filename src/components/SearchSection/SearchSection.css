@@ -39,7 +39,7 @@
     width: 100%;
     padding: 0 14px;
     color: var(--text);
-    background: #ffffff;
+    background: var(--surface-raised);
 }
 
 .search-section__button {

@@ -30,7 +30,7 @@ export function SearchSection({
                     Search
                 </h2>
                 <p className="search-section__description">
-                    The search input restores the last saved term and drives the initial request.
+                    Search by name or browse the Pokemon list page by page.
                 </p>
             </div>
 

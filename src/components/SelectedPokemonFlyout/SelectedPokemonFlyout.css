@@ -28,7 +28,7 @@
 .selected-pokemon-flyout__button {
   border: 3px solid var(--border);
   padding: 10px 14px;
-  background: #ffffff;
+  background: var(--surface-raised);
   color: var(--text);
   font: inherit;
   font-weight: 700;
