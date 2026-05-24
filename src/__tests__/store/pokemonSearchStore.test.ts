@@ -48,12 +48,27 @@ describe('pokemonSearchStore', () => {
   it('stores a successful results page', () => {
     usePokemonSearchStore
       .getState()
-      .setResultsPage([{ id: '25', name: 'pikachu' }], 3);
+      .setResultsPage(
+        [
+          {
+            id: '25',
+            name: 'pikachu',
+            url: 'https://pokeapi.co/api/v2/pokemon/25/',
+          },
+        ],
+        3,
+      );
 
     expect(usePokemonSearchStore.getState()).toMatchObject({
       errorMessage: '',
       isLoading: false,
-      items: [{ id: '25', name: 'pikachu' }],
+      items: [
+        {
+          id: '25',
+          name: 'pikachu',
+          url: 'https://pokeapi.co/api/v2/pokemon/25/',
+        },
+      ],
       totalPages: 3,
     });
   });

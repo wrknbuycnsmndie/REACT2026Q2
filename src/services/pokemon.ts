@@ -50,6 +50,7 @@ export async function fetchPokemonResults(searchTerm: string, page = 1): Promise
                 {
                     id: String(pokemon.id),
                     name: pokemon.name,
+                    url: `${POKEMON_API_URL}/${pokemon.id}/`,
                 },
             ],
             page: DEFAULT_PAGE,

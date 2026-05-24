@@ -80,6 +80,7 @@ describe('App', () => {
         {
           id: '25',
           name: 'pikachu',
+          url: 'https://pokeapi.co/api/v2/pokemon/25/',
         },
       ],
       page: 1,
@@ -110,6 +111,7 @@ describe('App', () => {
         {
           id: '25',
           name: 'pikachu',
+          url: 'https://pokeapi.co/api/v2/pokemon/25/',
         },
       ],
       page: 1,

@@ -42,6 +42,7 @@ describe('PokemonSearch', () => {
         {
           id: '25',
           name: 'pikachu',
+          url: 'https://pokeapi.co/api/v2/pokemon/25/',
         },
       ],
       page: 1,
@@ -78,6 +79,7 @@ describe('PokemonSearch', () => {
           {
             id: '133',
             name: 'eevee',
+            url: 'https://pokeapi.co/api/v2/pokemon/133/',
           },
         ],
         page: 1,
@@ -109,6 +111,7 @@ describe('PokemonSearch', () => {
         {
           id: '143',
           name: 'snorlax',
+          url: 'https://pokeapi.co/api/v2/pokemon/143/',
         },
       ],
       page: 1,
@@ -162,6 +165,7 @@ describe('PokemonSearch', () => {
         {
           id: '151',
           name: 'mew',
+          url: 'https://pokeapi.co/api/v2/pokemon/151/',
         },
       ],
       page: 1,
@@ -195,6 +199,7 @@ describe('PokemonSearch', () => {
           {
             id: '150',
             name: 'mewtwo',
+            url: 'https://pokeapi.co/api/v2/pokemon/150/',
           },
         ],
         page: 1,
@@ -227,6 +232,7 @@ describe('PokemonSearch', () => {
           {
             id: '11',
             name: 'metapod',
+            url: 'https://pokeapi.co/api/v2/pokemon/11/',
           },
         ],
         page: 2,
@@ -237,6 +243,7 @@ describe('PokemonSearch', () => {
           {
             id: '21',
             name: 'spearow',
+            url: 'https://pokeapi.co/api/v2/pokemon/21/',
           },
         ],
         page: 3,
