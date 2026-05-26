@@ -32,7 +32,7 @@ describe('downloadSelectedPokemonCsv', () => {
     expect(getSelectedPokemonCsvFileName(15)).toBe('15_items.csv');
   });
 
-  it('downloads the csv with native browser apis', () => {
+  it('loads pokemon details and downloads the csv with native browser apis', async () => {
     const appendSpy = vi.spyOn(document.body, 'append');
     const revokeObjectUrlSpy = vi
       .spyOn(URL, 'revokeObjectURL')
@@ -50,16 +50,29 @@ describe('downloadSelectedPokemonCsv', () => {
         href: '',
         remove: removeSpy,
       } as unknown as HTMLAnchorElement);
+    const loadPokemonDetails = vi.fn().mockResolvedValue({
+      description: 'Mouse Pokemon',
+      height: 4,
+      id: '25',
+      imageUrl: 'https://example.com/pikachu.png',
+      name: 'pikachu',
+      types: ['electric'],
+      weight: 60,
+    });
 
-    downloadSelectedPokemonCsv([
-      {
-        detailsRoute: '/?page=1&details=25',
-        id: '25',
-        name: 'pikachu',
-        sourceUrl: 'https://pokeapi.co/api/v2/pokemon/25/',
-      },
-    ]);
+    await downloadSelectedPokemonCsv(
+      [
+        {
+          detailsRoute: '/?page=1&details=25',
+          id: '25',
+          name: 'pikachu',
+          sourceUrl: 'https://pokeapi.co/api/v2/pokemon/25/',
+        },
+      ],
+      loadPokemonDetails,
+    );
 
+    expect(loadPokemonDetails).toHaveBeenCalledWith('25');
     expect(createElementSpy).toHaveBeenCalledWith('a');
     expect(createObjectUrlSpy).toHaveBeenCalledOnce();
     expect(appendSpy).toHaveBeenCalledOnce();

@@ -13,10 +13,22 @@
   box-shadow: 6px 6px 0 var(--border);
 }
 
+.selected-pokemon-flyout__status {
+  display: grid;
+  gap: 6px;
+}
+
 .selected-pokemon-flyout__summary {
   margin: 0;
   font-weight: 700;
   text-transform: uppercase;
+}
+
+.selected-pokemon-flyout__error {
+  margin: 0;
+  color: var(--danger, #8f1d1d);
+  font-size: 0.95rem;
+  font-weight: 600;
 }
 
 .selected-pokemon-flyout__actions {
@@ -42,6 +54,12 @@
 
 .selected-pokemon-flyout__button:hover {
   transform: translate(-1px, -1px);
+}
+
+.selected-pokemon-flyout__button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+  transform: none;
 }
 
 @media (max-width: 640px) {

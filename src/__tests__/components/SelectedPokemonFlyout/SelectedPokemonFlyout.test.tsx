@@ -59,7 +59,6 @@ describe('SelectedPokemonFlyout', () => {
 
   it('downloads the selected items when requested', async () => {
     const user = userEvent.setup();
-
     useSelectedPokemonStore.getState().selectPokemon(
       {
         id: '25',
@@ -81,5 +80,41 @@ describe('SelectedPokemonFlyout', () => {
         sourceUrl: 'https://pokeapi.co/api/v2/pokemon/25/',
       },
     ]);
+  });
+
+  it('shows a request error and skips download when preparing export fails', async () => {
+    const user = userEvent.setup();
+
+    useSelectedPokemonStore.getState().selectPokemon(
+      {
+        id: '25',
+        name: 'pikachu',
+        url: 'https://pokeapi.co/api/v2/pokemon/25/',
+      },
+      1,
+    );
+    vi.mocked(downloadSelectedPokemonCsv).mockRejectedValue(
+      new Error(
+        'The Pokemon service is unavailable right now. Please try again.',
+      ),
+    );
+
+    render(<SelectedPokemonFlyout />);
+
+    await user.click(screen.getByRole('button', { name: 'Download' }));
+
+    expect(downloadSelectedPokemonCsv).toHaveBeenCalledWith([
+      {
+        detailsRoute: '/?page=1&details=25',
+        id: '25',
+        name: 'pikachu',
+        sourceUrl: 'https://pokeapi.co/api/v2/pokemon/25/',
+      },
+    ]);
+    expect(
+      screen.getByText(
+        'The Pokemon service is unavailable right now. Please try again.',
+      ),
+    ).toBeInTheDocument();
   });
 });

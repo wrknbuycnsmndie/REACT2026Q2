@@ -1,3 +1,5 @@
+import { fetchPokemonDetails } from './pokemon';
+import type { PokemonDetails } from '../types/pokemon';
 import type { SelectedPokemonItem } from '../types/pokemonSelection';
 
 const CSV_COLUMNS = [
@@ -11,14 +13,37 @@ const CSV_COLUMNS = [
   'weight',
 ] as const;
 
-export function downloadSelectedPokemonCsv(items: SelectedPokemonItem[]) {
-  const csvContent = buildSelectedPokemonCsv(items);
+export async function downloadSelectedPokemonCsv(
+  items: SelectedPokemonItem[],
+  loadPokemonDetails: (pokemonId: string) => Promise<PokemonDetails> =
+    fetchPokemonDetails,
+) {
+  const itemsForDownload = await Promise.all(
+    items.map(async (item) => {
+      const details = await loadPokemonDetails(item.id);
+
+      return {
+        description: details.description,
+        detailsRoute: item.detailsRoute,
+        height: details.height,
+        id: item.id,
+        imageUrl: details.imageUrl,
+        name: details.name,
+        sourceUrl: item.sourceUrl,
+        types: details.types,
+        weight: details.weight,
+      };
+    }),
+  );
+  const csvContent = buildSelectedPokemonCsv(itemsForDownload);
   const csvBlob = new Blob([csvContent], { type: 'text/csv;charset=utf-8' });
   const downloadUrl = URL.createObjectURL(csvBlob);
   const downloadLink = document.createElement('a');
 
   downloadLink.href = downloadUrl;
-  downloadLink.download = getSelectedPokemonCsvFileName(items.length);
+  downloadLink.download = getSelectedPokemonCsvFileName(
+    itemsForDownload.length,
+  );
   document.body.append(downloadLink);
   downloadLink.click();
   downloadLink.remove();
