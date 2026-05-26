@@ -1,4 +1,3 @@
-import type { ChangeEvent, SyntheticEvent } from 'react';
 import { usePokemonSearch } from '../../hooks/usePokemonSearch';
 import { ResultsSection } from '../ResultsSection/ResultsSection';
 import { SearchSection } from '../SearchSection/SearchSection';
@@ -27,12 +26,7 @@ export function PokemonSearch({
     totalPages,
   } = usePokemonSearch();
 
-  const handleSearchInputChange = (event: ChangeEvent<HTMLInputElement>) => {
-    handleSearchTermChange(event.target.value);
-  };
-
-  const handleSearchSubmit = (event: SyntheticEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const handleSearchSubmit = () => {
     void submitSearch();
   };
 
@@ -45,7 +39,7 @@ export function PokemonSearch({
       <SearchSection
         onTestError={onTestError}
         searchTerm={searchTerm}
-        onSearchTermChange={handleSearchInputChange}
+        onSearchTermChange={handleSearchTermChange}
         onSubmit={handleSearchSubmit}
       />
       <ResultsSection

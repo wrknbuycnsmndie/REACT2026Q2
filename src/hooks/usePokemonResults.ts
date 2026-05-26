@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
-import { DEFAULT_PAGE } from '../constants/pagination';
+import { useEffect } from 'react';
 import { getRequestErrorMessage } from '../helpers/getRequestErrorMessage';
 import { fetchPokemonResults } from '../services/pokemon';
+import { usePokemonSearchStore } from '../store/pokemonSearchStore';
 import type { SearchResultItem } from '../types/search';
 
 type UsePokemonResultsResult = {
@@ -15,16 +15,23 @@ export function usePokemonResults(
   submittedSearchTerm: string,
   currentPage: number,
 ): UsePokemonResultsResult {
-  const [errorMessage, setErrorMessage] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
-  const [items, setItems] = useState<SearchResultItem[]>([]);
-  const [totalPages, setTotalPages] = useState(DEFAULT_PAGE);
+  const errorMessage = usePokemonSearchStore((state) => state.errorMessage);
+  const isLoading = usePokemonSearchStore((state) => state.isLoading);
+  const items = usePokemonSearchStore((state) => state.items);
+  const setResultsError = usePokemonSearchStore(
+    (state) => state.setResultsError,
+  );
+  const setResultsLoading = usePokemonSearchStore(
+    (state) => state.setResultsLoading,
+  );
+  const setResultsPage = usePokemonSearchStore((state) => state.setResultsPage);
+  const totalPages = usePokemonSearchStore((state) => state.totalPages);
 
   useEffect(() => {
     let isCancelled = false;
 
     async function loadResults() {
-      setIsLoading(true);
+      setResultsLoading(true);
 
       try {
         const nextResults = await fetchPokemonResults(
@@ -36,21 +43,13 @@ export function usePokemonResults(
           return;
         }
 
-        setItems(nextResults.items);
-        setErrorMessage('');
-        setTotalPages(nextResults.totalPages);
+        setResultsPage(nextResults.items, nextResults.totalPages);
       } catch (error) {
         if (isCancelled) {
           return;
         }
 
-        setItems([]);
-        setErrorMessage(getRequestErrorMessage(error));
-        setTotalPages(DEFAULT_PAGE);
-      } finally {
-        if (!isCancelled) {
-          setIsLoading(false);
-        }
+        setResultsError(getRequestErrorMessage(error));
       }
     }
 
@@ -59,7 +58,13 @@ export function usePokemonResults(
     return () => {
       isCancelled = true;
     };
-  }, [currentPage, submittedSearchTerm]);
+  }, [
+    currentPage,
+    setResultsError,
+    setResultsLoading,
+    setResultsPage,
+    submittedSearchTerm,
+  ]);
 
   return {
     errorMessage,

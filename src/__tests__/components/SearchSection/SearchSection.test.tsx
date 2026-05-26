@@ -2,7 +2,6 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi } from 'vitest';
 import { SearchSection } from '../../../components/SearchSection/SearchSection';
-import type { SyntheticEvent } from 'react';
 
 describe('SearchSection', () => {
   it('renders the search input, submit button, and error trigger', () => {
@@ -53,9 +52,7 @@ describe('SearchSection', () => {
 
   it('calls the submit handler when the user submits the form', async () => {
     const user = userEvent.setup();
-    const onSubmit = vi.fn((event: SyntheticEvent<HTMLFormElement>) => {
-      event.preventDefault();
-    });
+    const onSubmit = vi.fn();
 
     render(
       <SearchSection

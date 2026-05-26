@@ -1,3 +1,5 @@
+import { PokemonDetailsContent } from './PokemonDetailsContent';
+import { PokemonDetailsState } from './PokemonDetailsState';
 import type { PokemonDetails } from '../../types/pokemon';
 import './PokemonDetailsPanel.css';
 
@@ -38,61 +40,17 @@ export function PokemonDetailsPanel({
           </button>
         </div>
 
-        {renderContent(details, errorMessage, isLoading)}
+        {isLoading ? <PokemonDetailsState message='Loading details...' /> : null}
+        {!isLoading && errorMessage ? (
+          <PokemonDetailsState message={errorMessage} />
+        ) : null}
+        {!isLoading && !errorMessage && !details ? (
+          <PokemonDetailsState message='Unable to load details.' />
+        ) : null}
+        {!isLoading && !errorMessage && details ? (
+          <PokemonDetailsContent details={details} />
+        ) : null}
       </div>
     </aside>
-  );
-}
-
-function renderContent(
-  details: PokemonDetails | null,
-  errorMessage: string,
-  isLoading: boolean,
-) {
-  if (isLoading) {
-    return <p className='pokemon-details__state'>Loading details...</p>;
-  }
-
-  if (errorMessage) {
-    return <p className='pokemon-details__state'>{errorMessage}</p>;
-  }
-
-  if (!details) {
-    return <p className='pokemon-details__state'>Unable to load details.</p>;
-  }
-
-  return (
-    <div className='pokemon-details__content'>
-      {details.imageUrl ? (
-        <img
-          className='pokemon-details__image'
-          src={details.imageUrl}
-          alt={details.name}
-        />
-      ) : null}
-
-      <div className='pokemon-details__meta'>
-        <h3 className='pokemon-details__name'>{details.name}</h3>
-        <p className='pokemon-details__description'>{details.description}</p>
-        <dl className='pokemon-details__facts'>
-          <div className='pokemon-details__fact'>
-            <dt>ID</dt>
-            <dd>{details.id}</dd>
-          </div>
-          <div className='pokemon-details__fact'>
-            <dt>Height</dt>
-            <dd>{details.height}</dd>
-          </div>
-          <div className='pokemon-details__fact'>
-            <dt>Weight</dt>
-            <dd>{details.weight}</dd>
-          </div>
-          <div className='pokemon-details__fact'>
-            <dt>Types</dt>
-            <dd>{details.types.join(', ')}</dd>
-          </div>
-        </dl>
-      </div>
-    </div>
   );
 }

@@ -2,8 +2,8 @@ import type { ChangeEvent, SyntheticEvent } from 'react';
 import './SearchSection.css';
 
 type SearchSectionProps = {
-    onSearchTermChange: (event: ChangeEvent<HTMLInputElement>) => void;
-    onSubmit: (event: SyntheticEvent<HTMLFormElement>) => void;
+    onSearchTermChange: (value: string) => void;
+    onSubmit: () => void;
     onTestError: () => void;
     searchTerm: string;
 };
@@ -14,6 +14,15 @@ export function SearchSection({
     onTestError,
     searchTerm,
 }: SearchSectionProps) {
+    const handleSearchTermChange = (event: ChangeEvent<HTMLInputElement>) => {
+        onSearchTermChange(event.target.value);
+    };
+
+    const handleSubmit = (event: SyntheticEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        onSubmit();
+    };
+
     return (
         <section className="search-section" aria-labelledby="search-title">
             <div className="search-section__header">
@@ -21,18 +30,18 @@ export function SearchSection({
                     Search
                 </h2>
                 <p className="search-section__description">
-                    The search input restores the last saved term and drives the initial request.
+                    Search by name or browse the Pokemon list page by page.
                 </p>
             </div>
 
-            <form className="search-section__form" onSubmit={onSubmit}>
+            <form className="search-section__form" onSubmit={handleSubmit}>
                 <input
                     className="search-section__input"
                     type="search"
                     placeholder="pikachu"
                     aria-label="Pokemon name"
                     value={searchTerm}
-                    onChange={onSearchTermChange}
+                    onChange={handleSearchTermChange}
                 />
                 <button className="search-section__button" type="submit">
                     Search

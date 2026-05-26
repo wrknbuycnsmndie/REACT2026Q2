@@ -1,6 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { getRequestErrorMessage } from '../helpers/getRequestErrorMessage';
 import { fetchPokemonDetails } from '../services/pokemon';
+import { usePokemonDetailsStore } from '../store/pokemonDetailsStore';
+import { useSelectedPokemonStore } from '../store/selectedPokemonStore';
 import type { PokemonDetails } from '../types/pokemon';
 
 type UsePokemonDetailsResult = {
@@ -12,12 +14,24 @@ type UsePokemonDetailsResult = {
 export function usePokemonDetails(
   selectedPokemonId: string | null,
 ): UsePokemonDetailsResult {
-  const [details, setDetails] = useState<PokemonDetails | null>(null);
-  const [errorMessage, setErrorMessage] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const clearDetails = usePokemonDetailsStore((state) => state.clearDetails);
+  const details = usePokemonDetailsStore((state) => state.details);
+  const errorMessage = usePokemonDetailsStore((state) => state.errorMessage);
+  const setDetails = usePokemonDetailsStore((state) => state.setDetails);
+  const setDetailsError = usePokemonDetailsStore(
+    (state) => state.setDetailsError,
+  );
+  const syncSelectedPokemonDetails = useSelectedPokemonStore(
+    (state) => state.syncSelectedPokemonDetails,
+  );
+  const startDetailsRequest = usePokemonDetailsStore(
+    (state) => state.startDetailsRequest,
+  );
+  const isLoading = usePokemonDetailsStore((state) => state.isLoading);
 
   useEffect(() => {
     if (!selectedPokemonId) {
+      clearDetails();
       return;
     }
 
@@ -25,7 +39,7 @@ export function usePokemonDetails(
     const detailsId = selectedPokemonId;
 
     async function loadDetails() {
-      setIsLoading(true);
+      startDetailsRequest(detailsId);
 
       try {
         const nextDetails = await fetchPokemonDetails(detailsId);
@@ -35,18 +49,13 @@ export function usePokemonDetails(
         }
 
         setDetails(nextDetails);
-        setErrorMessage('');
+        syncSelectedPokemonDetails(nextDetails);
       } catch (error) {
         if (isCancelled) {
           return;
         }
 
-        setDetails(null);
-        setErrorMessage(getRequestErrorMessage(error));
-      } finally {
-        if (!isCancelled) {
-          setIsLoading(false);
-        }
+        setDetailsError(getRequestErrorMessage(error));
       }
     }
 
@@ -55,7 +64,14 @@ export function usePokemonDetails(
     return () => {
       isCancelled = true;
     };
-  }, [selectedPokemonId]);
+  }, [
+    clearDetails,
+    selectedPokemonId,
+    setDetails,
+    setDetailsError,
+    syncSelectedPokemonDetails,
+    startDetailsRequest,
+  ]);
 
   return {
     details: selectedPokemonId ? details : null,

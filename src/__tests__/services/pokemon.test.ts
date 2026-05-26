@@ -21,6 +21,7 @@ describe('fetchPokemonResults', () => {
                 {
                     id: '25',
                     name: 'pikachu',
+                    url: 'https://pokeapi.co/api/v2/pokemon/25/',
                 },
             ],
             page: 1,

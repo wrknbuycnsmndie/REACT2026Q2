@@ -25,24 +25,26 @@
 
 .results-section__table {
     border: 3px solid var(--border);
-    background: #ffffff;
+    background: var(--surface-raised);
 }
 
 .results-section__row {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: 68px 1fr;
 }
 
 .results-section__row--head {
     border-bottom: 3px solid var(--border);
 }
 
+.results-section__select,
 .results-section__name {
     padding: 12px;
     font-weight: 700;
     text-transform: uppercase;
 }
 
+.results-section__select,
 .results-section__name {
     background: var(--accent-soft);
 }
@@ -54,22 +56,37 @@
 }
 
 .results-section__result {
-    display: grid;
-    grid-template-columns: 1fr;
+    display: block;
 }
 
 .results-section__result + .results-section__result {
     border-top: 3px solid var(--border);
 }
 
+.results-section__checkbox {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 12px;
+    border-right: 3px solid var(--border);
+}
+
+.results-section__checkbox-input {
+    inline-size: 18px;
+    block-size: 18px;
+    margin: 0;
+    accent-color: var(--control-accent);
+}
+
 .results-section__result-button {
     border: none;
     background: transparent;
     padding: 0;
+    color: var(--text);
     text-align: left;
 }
 
-.results-section__result-button--selected,
+.results-section__result-button--active,
 .results-section__result-button:hover {
     background: var(--accent-soft);
 }
@@ -92,11 +109,12 @@
     }
 
     .results-section__row {
-        grid-template-columns: 1fr;
+        grid-template-columns: 64px 1fr;
     }
 
-    .results-section__result {
-        grid-template-columns: 1fr;
+    .results-section__select,
+    .results-section__checkbox {
+        padding-inline: 8px;
     }
 
 }

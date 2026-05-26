@@ -1,66 +1,86 @@
 :root {
-    --font-main: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-main:
+    Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 
-    --bg: #f4efdf;
-    --surface: #fffaf0;
-    --text: #111111;
-    --muted: #555047;
+  --bg: #f4efdf;
+  --surface: #fffaf0;
+  --surface-raised: #ffffff;
+  --surface-soft: #f7efd9;
+  --text: #111111;
+  --muted: #555047;
 
-    --border: #111111;
-    --accent: #ff4d00;
-    --accent-soft: #ffd84d;
+  --border: #111111;
+  --accent: #ff4d00;
+  --accent-soft: #ffd84d;
+  --control-accent: #ff4d00;
+  --grid-line: rgb(17 17 17 / 5%);
 
-    --container: 1080px;
+  --container: 1080px;
 
-    font-family: var(--font-main);
-    color: var(--text);
-    background: var(--bg);
-    font-synthesis: none;
-    text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+  font-family: var(--font-main);
+  color: var(--text);
+  background: var(--bg);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+:root[data-theme='dark'] {
+  --bg: #141414;
+  --surface: #202020;
+  --surface-raised: #2b2b2b;
+  --surface-soft: #393939;
+  --text: #f5efe6;
+  --muted: #c8b9a6;
+
+  --border: #f0b35a;
+  --accent: #ff8a3d;
+  --accent-soft: #4b4030;
+  --control-accent: #f0b35a;
+  --grid-line: rgb(240 179 90 / 10%);
 }
 
 * {
-    box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 html {
-    min-width: 320px;
-    min-height: 100%;
+  min-width: 320px;
+  min-height: 100%;
 }
 
 body {
-    min-width: 320px;
-    min-height: 100vh;
-    margin: 0;
-    background:
-        linear-gradient(90deg, rgb(17 17 17 / 5%) 1px, transparent 1px),
-        linear-gradient(rgb(17 17 17 / 5%) 1px, transparent 1px),
-        var(--bg);
-    background-size: 28px 28px;
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  color: var(--text);
+  background:
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(var(--grid-line) 1px, transparent 1px), var(--bg);
+  background-size: 28px 28px;
 }
 
 button,
 input,
 textarea,
 select {
-    font: inherit;
+  font: inherit;
 }
 
 button {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 a {
-    color: inherit;
+  color: inherit;
 }
 
 img {
-    display: block;
-    max-width: 100%;
+  display: block;
+  max-width: 100%;
 }
 
 #root {
-    min-height: 100vh;
+  min-height: 100vh;
 }
