@@ -55,10 +55,6 @@ export function usePokemonSearch(): UsePokemonSearchResult {
     }
   };
 
-  const refreshResults = async () => {
-    await refreshPokemonResults(submittedSearchTerm, currentPage);
-  };
-
   return {
     currentPage,
     errorMessage,
@@ -67,7 +63,8 @@ export function usePokemonSearch(): UsePokemonSearchResult {
     isLoading,
     items,
     openDetails,
-    refreshResults,
+    refreshResults: () =>
+      refreshPokemonResults(submittedSearchTerm, currentPage),
     searchTerm,
     selectedPokemonId,
     submitSearch,

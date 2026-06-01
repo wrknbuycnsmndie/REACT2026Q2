@@ -35,10 +35,6 @@ export function usePokemonDetails(
     syncSelectedPokemonDetails(detailsQuery.data);
   }, [detailsQuery.data, syncSelectedPokemonDetails]);
 
-  const refreshDetails = async () => {
-    await refreshPokemonDetails(selectedPokemonId);
-  };
-
   return {
     details: selectedPokemonId ? detailsQuery.data ?? null : null,
     errorMessage:
@@ -46,6 +42,6 @@ export function usePokemonDetails(
         ? getRequestErrorMessage(detailsQuery.error)
         : '',
     isLoading: selectedPokemonId ? detailsQuery.isPending : false,
-    refreshDetails,
+    refreshDetails: () => refreshPokemonDetails(selectedPokemonId),
   };
 }
