@@ -4,7 +4,7 @@ import { usePokemonDetailsParam } from '../hooks/usePokemonDetailsParam';
 
 export function PokemonDetailsRoute() {
   const { closeDetails, selectedPokemonId } = usePokemonDetailsParam();
-  const { details, errorMessage, isLoading } = usePokemonDetails(
+  const { details, errorMessage, isLoading, refreshDetails } = usePokemonDetails(
     selectedPokemonId,
   );
 
@@ -18,6 +18,9 @@ export function PokemonDetailsRoute() {
       errorMessage={errorMessage}
       isLoading={isLoading}
       onClose={closeDetails}
+      onRefresh={() => {
+        void refreshDetails();
+      }}
     />
   );
 }

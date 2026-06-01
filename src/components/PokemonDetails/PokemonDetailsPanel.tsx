@@ -8,6 +8,7 @@ type PokemonDetailsPanelProps = {
   errorMessage: string;
   isLoading: boolean;
   onClose: () => void;
+  onRefresh: () => void;
 };
 
 export function PokemonDetailsPanel({
@@ -15,6 +16,7 @@ export function PokemonDetailsPanel({
   errorMessage,
   isLoading,
   onClose,
+  onRefresh,
 }: PokemonDetailsPanelProps) {
   return (
     <aside className='pokemon-details' onClick={onClose}>
@@ -31,13 +33,22 @@ export function PokemonDetailsPanel({
           <h2 id='pokemon-details-title' className='pokemon-details__title'>
             Details
           </h2>
-          <button
-            className='pokemon-details__close'
-            type='button'
-            onClick={onClose}
-          >
-            Close
-          </button>
+          <div className='pokemon-details__actions'>
+            <button
+              className='pokemon-details__close'
+              type='button'
+              onClick={onRefresh}
+            >
+              Refresh
+            </button>
+            <button
+              className='pokemon-details__close'
+              type='button'
+              onClick={onClose}
+            >
+              Close
+            </button>
+          </div>
         </div>
 
         {isLoading ? <PokemonDetailsState message='Loading details...' /> : null}

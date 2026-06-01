@@ -375,6 +375,46 @@ describe('PokemonSearch', () => {
     expect(mockedFetchPokemonResults).toHaveBeenCalledTimes(2);
   });
 
+  it('refreshes the current results query after invalidating its cache', async () => {
+    const user = userEvent.setup();
+
+    mockedFetchPokemonResults
+      .mockResolvedValueOnce({
+        items: [
+          {
+            id: '1',
+            name: 'bulbasaur',
+            url: 'https://pokeapi.co/api/v2/pokemon/1/',
+          },
+        ],
+        page: 1,
+        totalPages: 1,
+      })
+      .mockResolvedValueOnce({
+        items: [
+          {
+            id: '7',
+            name: 'squirtle',
+            url: 'https://pokeapi.co/api/v2/pokemon/7/',
+          },
+        ],
+        page: 1,
+        totalPages: 1,
+      });
+
+    renderPokemonSearch();
+
+    expect(await screen.findByLabelText('bulbasaur')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Refresh Results' }));
+
+    await waitFor(() => {
+      expect(mockedFetchPokemonResults).toHaveBeenCalledTimes(2);
+    });
+
+    expect(await screen.findByLabelText('squirtle')).toBeInTheDocument();
+  });
+
   it('keeps the flyout visible after navigating away from a selected item', async () => {
     const user = userEvent.setup();
 

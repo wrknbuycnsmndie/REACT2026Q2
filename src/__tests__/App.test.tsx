@@ -145,6 +145,57 @@ describe('App', () => {
     expect(mockedFetchPokemonDetails).toHaveBeenCalledTimes(1);
   });
 
+  it('refreshes the current Pokemon details query after invalidating its cache', async () => {
+    const user = userEvent.setup();
+
+    mockedFetchPokemonResults.mockResolvedValue({
+      items: [
+        {
+          id: '25',
+          name: 'pikachu',
+          url: 'https://pokeapi.co/api/v2/pokemon/25/',
+        },
+      ],
+      page: 1,
+      totalPages: 1,
+    });
+    mockedFetchPokemonDetails
+      .mockResolvedValueOnce({
+        description: 'A mouse Pokemon.',
+        height: 4,
+        id: '25',
+        imageUrl: 'https://example.com/pikachu.png',
+        name: 'pikachu',
+        types: ['electric'],
+        weight: 60,
+      })
+      .mockResolvedValueOnce({
+        description: 'A refreshed mouse Pokemon.',
+        height: 4,
+        id: '25',
+        imageUrl: 'https://example.com/pikachu.png',
+        name: 'pikachu',
+        types: ['electric'],
+        weight: 60,
+      });
+
+    renderWithQueryClient(
+      <ThemeProvider>
+        <MemoryRouter initialEntries={['/']}>
+          <AppRouter />
+        </MemoryRouter>
+      </ThemeProvider>,
+    );
+
+    await user.click(await screen.findByRole('button', { name: 'pikachu' }));
+    expect(await screen.findByText('A mouse Pokemon.')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Refresh' }));
+
+    expect(await screen.findByText('A refreshed mouse Pokemon.')).toBeInTheDocument();
+    expect(mockedFetchPokemonDetails).toHaveBeenCalledTimes(2);
+  });
+
   it('shows a clear details error message when loading Pokemon details fails', async () => {
     const user = userEvent.setup();
 

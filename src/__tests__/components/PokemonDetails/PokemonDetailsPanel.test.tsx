@@ -10,6 +10,7 @@ describe('PokemonDetailsPanel', () => {
                 errorMessage=''
                 isLoading
                 onClose={vi.fn()}
+                onRefresh={vi.fn()}
             />,
         );
 
@@ -23,6 +24,7 @@ describe('PokemonDetailsPanel', () => {
                 errorMessage='Details failed to load.'
                 isLoading={false}
                 onClose={vi.fn()}
+                onRefresh={vi.fn()}
             />,
         );
 
@@ -36,6 +38,7 @@ describe('PokemonDetailsPanel', () => {
                 errorMessage=''
                 isLoading={false}
                 onClose={vi.fn()}
+                onRefresh={vi.fn()}
             />,
         );
 
@@ -44,6 +47,7 @@ describe('PokemonDetailsPanel', () => {
 
     it('renders the details content and closes only from the outer panel area', () => {
         const onClose = vi.fn();
+        const onRefresh = vi.fn();
 
         render(
             <PokemonDetailsPanel
@@ -59,6 +63,7 @@ describe('PokemonDetailsPanel', () => {
                 errorMessage=''
                 isLoading={false}
                 onClose={onClose}
+                onRefresh={onRefresh}
             />,
         );
 
@@ -71,6 +76,9 @@ describe('PokemonDetailsPanel', () => {
 
         fireEvent.click(screen.getByRole('dialog'));
         expect(onClose).not.toHaveBeenCalled();
+
+        fireEvent.click(screen.getByRole('button', { name: 'Refresh' }));
+        expect(onRefresh).toHaveBeenCalledTimes(1);
 
         fireEvent.click(screen.getByRole('button', { name: 'Close' }));
         expect(onClose).toHaveBeenCalledTimes(1);

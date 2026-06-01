@@ -1,4 +1,5 @@
 import { DEFAULT_PAGE } from '../constants/pagination';
+import { usePokemonQueryRefresh } from '../query/usePokemonQueryRefresh';
 import { usePokemonSearchStore } from '../store/pokemonSearchStore';
 import type { SearchResultItem } from '../types/search';
 import { usePokemonDetailsParam } from './usePokemonDetailsParam';
@@ -13,6 +14,7 @@ type UsePokemonSearchResult = {
   isLoading: boolean;
   items: SearchResultItem[];
   openDetails: (detailsId: string) => void;
+  refreshResults: () => Promise<void>;
   searchTerm: string;
   selectedPokemonId: string | null;
   submitSearch: () => Promise<void>;
@@ -20,6 +22,7 @@ type UsePokemonSearchResult = {
 };
 
 export function usePokemonSearch(): UsePokemonSearchResult {
+  const { refreshPokemonResults } = usePokemonQueryRefresh();
   const searchTerm = usePokemonSearchStore((state) => state.searchTerm);
   const setSearchTerm = usePokemonSearchStore((state) => state.setSearchTerm);
   const submitSearchTerm = usePokemonSearchStore((state) => state.submitSearchTerm);
@@ -52,6 +55,10 @@ export function usePokemonSearch(): UsePokemonSearchResult {
     }
   };
 
+  const refreshResults = async () => {
+    await refreshPokemonResults(submittedSearchTerm, currentPage);
+  };
+
   return {
     currentPage,
     errorMessage,
@@ -60,6 +67,7 @@ export function usePokemonSearch(): UsePokemonSearchResult {
     isLoading,
     items,
     openDetails,
+    refreshResults,
     searchTerm,
     selectedPokemonId,
     submitSearch,
