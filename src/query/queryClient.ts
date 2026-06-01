@@ -1,4 +1,4 @@
-import { QueryClient, keepPreviousData } from '@tanstack/react-query';
+import { QueryClient } from '@tanstack/react-query';
 
 const DEFAULT_POKEMON_QUERY_TTL_MS = 5 * 60 * 1000;
 
@@ -22,7 +22,6 @@ export function createAppQueryClient() {
     defaultOptions: {
       queries: {
         gcTime: queryTtlMs,
-        placeholderData: keepPreviousData,
         refetchOnWindowFocus: false,
         retry: false,
         staleTime: queryTtlMs,

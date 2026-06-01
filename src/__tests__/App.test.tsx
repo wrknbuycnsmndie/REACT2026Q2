@@ -109,6 +109,42 @@ describe('App', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
+  it('reuses cached details when reopening the same Pokemon', async () => {
+    const user = userEvent.setup();
+
+    mockedFetchPokemonResults.mockResolvedValue({
+      items: [
+        {
+          id: '25',
+          name: 'pikachu',
+          url: 'https://pokeapi.co/api/v2/pokemon/25/',
+        },
+      ],
+      page: 1,
+      totalPages: 1,
+    });
+
+    renderWithQueryClient(
+      <ThemeProvider>
+        <MemoryRouter initialEntries={['/']}>
+          <AppRouter />
+        </MemoryRouter>
+      </ThemeProvider>,
+    );
+
+    await user.click(await screen.findByRole('button', { name: 'pikachu' }));
+    expect(await screen.findByText('A mouse Pokemon.')).toBeInTheDocument();
+    expect(mockedFetchPokemonDetails).toHaveBeenCalledTimes(1);
+
+    await user.click(screen.getByRole('button', { name: 'Close' }));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'pikachu' }));
+
+    expect(await screen.findByText('A mouse Pokemon.')).toBeInTheDocument();
+    expect(mockedFetchPokemonDetails).toHaveBeenCalledTimes(1);
+  });
+
   it('closes details after clicking the outer panel area', async () => {
     const user = userEvent.setup();
 
