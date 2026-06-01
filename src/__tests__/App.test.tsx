@@ -4,7 +4,6 @@ import { MemoryRouter } from 'react-router';
 import { vi } from 'vitest';
 import { ThemeProvider } from '../context/ThemeProvider';
 import { AppRouter } from '../router/AppRouter';
-import { resetPokemonDetailsStore } from '../store/pokemonDetailsStore';
 import { resetPokemonSearchStore } from '../store/pokemonSearchStore';
 import { renderWithQueryClient } from './testUtils/renderWithQueryClient';
 import {
@@ -26,7 +25,6 @@ vi.mock('../services/localStorageService', () => ({
 describe('App', () => {
   beforeEach(() => {
     resetPokemonSearchMocks();
-    resetPokemonDetailsStore();
     resetPokemonSearchStore();
     mockedFetchPokemonResults.mockResolvedValue({
       items: [],

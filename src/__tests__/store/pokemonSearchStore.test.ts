@@ -45,42 +45,16 @@ describe('pokemonSearchStore', () => {
     expect(setStoredSearchTerm).toHaveBeenCalledWith('mewtwo');
   });
 
-  it('stores a successful results page', () => {
-    usePokemonSearchStore
-      .getState()
-      .setResultsPage(
-        [
-          {
-            id: '25',
-            name: 'pikachu',
-            url: 'https://pokeapi.co/api/v2/pokemon/25/',
-          },
-        ],
-        3,
-      );
+  it('resets the editable and submitted search state from storage', () => {
+    vi.mocked(getStoredSearchTerm).mockReturnValue('eevee');
+    usePokemonSearchStore.getState().setSearchTerm('mew');
+    usePokemonSearchStore.getState().submitSearchTerm('mew');
+
+    usePokemonSearchStore.getState().resetSearchState();
 
     expect(usePokemonSearchStore.getState()).toMatchObject({
-      errorMessage: '',
-      isLoading: false,
-      items: [
-        {
-          id: '25',
-          name: 'pikachu',
-          url: 'https://pokeapi.co/api/v2/pokemon/25/',
-        },
-      ],
-      totalPages: 3,
-    });
-  });
-
-  it('stores a failed results request', () => {
-    usePokemonSearchStore.getState().setResultsError('Request failed');
-
-    expect(usePokemonSearchStore.getState()).toMatchObject({
-      errorMessage: 'Request failed',
-      isLoading: false,
-      items: [],
-      totalPages: 1,
+      searchTerm: 'eevee',
+      submittedSearchTerm: 'eevee',
     });
   });
 });

@@ -4,7 +4,6 @@ import { MemoryRouter } from 'react-router';
 import { vi } from 'vitest';
 import { PokemonSearch } from '../../../components/PokemonSearch/PokemonSearch';
 import { SelectedPokemonFlyout } from '../../../components/SelectedPokemonFlyout/SelectedPokemonFlyout';
-import { resetPokemonDetailsStore } from '../../../store/pokemonDetailsStore';
 import { resetPokemonSearchStore } from '../../../store/pokemonSearchStore';
 import { renderWithQueryClient } from '../../testUtils/renderWithQueryClient';
 import {
@@ -51,7 +50,6 @@ describe('PokemonSearch', () => {
 
   beforeEach(() => {
     resetPokemonSearchMocks();
-    resetPokemonDetailsStore();
     resetPokemonSearchStore();
   });
 
