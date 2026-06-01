@@ -4,10 +4,11 @@ import { vi } from 'vitest';
 import { SearchSection } from '../../../components/SearchSection/SearchSection';
 
 describe('SearchSection', () => {
-  it('renders the search input, submit button, and error trigger', () => {
+  it('renders the search input, submit button, and action buttons', () => {
     render(
       <SearchSection
         onSearchTermChange={vi.fn()}
+        onRefresh={vi.fn()}
         onSubmit={vi.fn()}
         onTestError={vi.fn()}
         searchTerm='pikachu'
@@ -25,6 +26,9 @@ describe('SearchSection', () => {
     );
     expect(screen.getByRole('button', { name: 'Search' })).toBeInTheDocument();
     expect(
+      screen.getByRole('button', { name: 'Refresh Results' }),
+    ).toBeInTheDocument();
+    expect(
       screen.getByRole('button', { name: 'Trigger Error' }),
     ).toBeInTheDocument();
   });
@@ -36,6 +40,7 @@ describe('SearchSection', () => {
     render(
       <SearchSection
         onSearchTermChange={onSearchTermChange}
+        onRefresh={vi.fn()}
         onSubmit={vi.fn()}
         onTestError={vi.fn()}
         searchTerm=''
@@ -57,6 +62,7 @@ describe('SearchSection', () => {
     render(
       <SearchSection
         onSearchTermChange={vi.fn()}
+        onRefresh={vi.fn()}
         onSubmit={onSubmit}
         onTestError={vi.fn()}
         searchTerm='eevee'
@@ -68,6 +74,25 @@ describe('SearchSection', () => {
     expect(onSubmit).toHaveBeenCalledTimes(1);
   });
 
+  it('calls the refresh handler when requested', async () => {
+    const user = userEvent.setup();
+    const onRefresh = vi.fn();
+
+    render(
+      <SearchSection
+        onSearchTermChange={vi.fn()}
+        onRefresh={onRefresh}
+        onSubmit={vi.fn()}
+        onTestError={vi.fn()}
+        searchTerm=''
+      />,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Refresh Results' }));
+
+    expect(onRefresh).toHaveBeenCalledTimes(1);
+  });
+
   it('calls the error trigger handler when requested', async () => {
     const user = userEvent.setup();
     const onTestError = vi.fn();
@@ -75,6 +100,7 @@ describe('SearchSection', () => {
     render(
       <SearchSection
         onSearchTermChange={vi.fn()}
+        onRefresh={vi.fn()}
         onSubmit={vi.fn()}
         onTestError={onTestError}
         searchTerm=''

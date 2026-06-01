@@ -1,11 +1,11 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
 import { vi } from 'vitest';
 import { PokemonSearch } from '../../../components/PokemonSearch/PokemonSearch';
 import { SelectedPokemonFlyout } from '../../../components/SelectedPokemonFlyout/SelectedPokemonFlyout';
-import { resetPokemonDetailsStore } from '../../../store/pokemonDetailsStore';
 import { resetPokemonSearchStore } from '../../../store/pokemonSearchStore';
+import { renderWithQueryClient } from '../../testUtils/renderWithQueryClient';
 import {
   mockedFetchPokemonResults,
   mockedGetStoredSearchTerm,
@@ -23,9 +23,25 @@ vi.mock('../../../services/localStorageService', () => ({
   setStoredSearchTerm: vi.fn(),
 }));
 
+function createDeferredPromise<T>() {
+  let resolvePromise!: (value: T) => void;
+  let rejectPromise!: (reason?: unknown) => void;
+
+  const promise = new Promise<T>((resolve, reject) => {
+    resolvePromise = resolve;
+    rejectPromise = reject;
+  });
+
+  return {
+    promise,
+    reject: rejectPromise,
+    resolve: resolvePromise,
+  };
+}
+
 describe('PokemonSearch', () => {
   const renderPokemonSearch = (initialEntries = ['/']) =>
-    render(
+    renderWithQueryClient(
       <MemoryRouter initialEntries={initialEntries}>
         <PokemonSearch onTestError={vi.fn()} shouldThrowError={false} />
         <SelectedPokemonFlyout />
@@ -34,7 +50,6 @@ describe('PokemonSearch', () => {
 
   beforeEach(() => {
     resetPokemonSearchMocks();
-    resetPokemonDetailsStore();
     resetPokemonSearchStore();
   });
 
@@ -60,7 +75,7 @@ describe('PokemonSearch', () => {
 
   it('renders an error state when the mocked initial request fails', async () => {
     mockedFetchPokemonResults.mockRejectedValue(
-      new Error('Mocked API failure'),
+      new TypeError('Failed to fetch'),
     );
 
     renderPokemonSearch();
@@ -68,7 +83,11 @@ describe('PokemonSearch', () => {
     expect(mockedFetchPokemonResults).toHaveBeenCalledWith('', 1);
 
     expect(await screen.findByText('Request failed')).toBeInTheDocument();
-    expect(screen.getByText('Mocked API failure')).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'Unable to reach the Pokemon service. Please check your connection and try again.',
+      ),
+    ).toBeInTheDocument();
   });
 
   it('calls the mocked API and updates results after a search submit', async () => {
@@ -138,7 +157,7 @@ describe('PokemonSearch', () => {
       totalPages: 3,
     });
     mockedFetchPokemonResults.mockRejectedValueOnce(
-      new Error('Mocked submit failure'),
+      new Error('Unexpected low-level failure'),
     );
 
     renderPokemonSearch();
@@ -152,7 +171,9 @@ describe('PokemonSearch', () => {
     await user.click(screen.getByRole('button', { name: 'Search' }));
 
     expect(
-      await screen.findByText('Mocked submit failure'),
+      await screen.findByText(
+        'Something went wrong while loading Pokemon data. Please try again.',
+      ),
     ).toBeInTheDocument();
     expect(screen.getByText('Request failed')).toBeInTheDocument();
   });
@@ -265,6 +286,131 @@ describe('PokemonSearch', () => {
 
     expect(await screen.findByLabelText('spearow')).toBeInTheDocument();
     expect(screen.getByText('Page 3 of 3')).toBeInTheDocument();
+  });
+
+  it('shows the loading state while navigating to an uncached page', async () => {
+    const user = userEvent.setup();
+    const pageThreeResults = createDeferredPromise<{
+      items: Array<{ id: string; name: string; url: string }>;
+      page: number;
+      totalPages: number;
+    }>();
+
+    mockedFetchPokemonResults
+      .mockResolvedValueOnce({
+        items: [
+          {
+            id: '11',
+            name: 'metapod',
+            url: 'https://pokeapi.co/api/v2/pokemon/11/',
+          },
+        ],
+        page: 2,
+        totalPages: 3,
+      })
+      .mockImplementationOnce(() => pageThreeResults.promise);
+
+    renderPokemonSearch(['/?page=2']);
+
+    expect(await screen.findByLabelText('metapod')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Next page' }));
+
+    expect(await screen.findByText('Loading results...')).toBeInTheDocument();
+
+    pageThreeResults.resolve({
+      items: [
+        {
+          id: '21',
+          name: 'spearow',
+          url: 'https://pokeapi.co/api/v2/pokemon/21/',
+        },
+      ],
+      page: 3,
+      totalPages: 3,
+    });
+
+    expect(await screen.findByLabelText('spearow')).toBeInTheDocument();
+  });
+
+  it('reuses cached page results when returning to a previous page', async () => {
+    const user = userEvent.setup();
+
+    mockedFetchPokemonResults
+      .mockResolvedValueOnce({
+        items: [
+          {
+            id: '1',
+            name: 'bulbasaur',
+            url: 'https://pokeapi.co/api/v2/pokemon/1/',
+          },
+        ],
+        page: 1,
+        totalPages: 2,
+      })
+      .mockResolvedValueOnce({
+        items: [
+          {
+            id: '4',
+            name: 'charmander',
+            url: 'https://pokeapi.co/api/v2/pokemon/4/',
+          },
+        ],
+        page: 2,
+        totalPages: 2,
+      });
+
+    renderPokemonSearch();
+
+    expect(await screen.findByLabelText('bulbasaur')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Next page' }));
+    expect(await screen.findByLabelText('charmander')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Previous page' }));
+
+    expect(await screen.findByLabelText('bulbasaur')).toBeInTheDocument();
+    expect(mockedFetchPokemonResults).toHaveBeenCalledTimes(2);
+  });
+
+  it('refreshes the current results query after invalidating its cache', async () => {
+    const user = userEvent.setup();
+
+    mockedFetchPokemonResults
+      .mockResolvedValueOnce({
+        items: [
+          {
+            id: '1',
+            name: 'bulbasaur',
+            url: 'https://pokeapi.co/api/v2/pokemon/1/',
+          },
+        ],
+        page: 1,
+        totalPages: 1,
+      })
+      .mockResolvedValueOnce({
+        items: [
+          {
+            id: '7',
+            name: 'squirtle',
+            url: 'https://pokeapi.co/api/v2/pokemon/7/',
+          },
+        ],
+        page: 1,
+        totalPages: 1,
+      });
+
+    renderPokemonSearch();
+
+    expect(await screen.findByLabelText('bulbasaur')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Refresh Results' }));
+
+    await waitFor(() => {
+      expect(mockedFetchPokemonResults).toHaveBeenCalledTimes(2);
+    });
+
+    expect(await screen.findByLabelText('squirtle')).toBeInTheDocument();
   });
 
   it('keeps the flyout visible after navigating away from a selected item', async () => {

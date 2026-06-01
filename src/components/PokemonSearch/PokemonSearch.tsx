@@ -20,6 +20,7 @@ export function PokemonSearch({
     isLoading,
     items,
     openDetails,
+    refreshResults,
     searchTerm,
     selectedPokemonId,
     submitSearch,
@@ -30,6 +31,10 @@ export function PokemonSearch({
     void submitSearch();
   };
 
+  const handleRefresh = () => {
+    void refreshResults();
+  };
+
   if (shouldThrowError) {
     throw new Error('Test error boundary triggered.');
   }
@@ -38,6 +43,7 @@ export function PokemonSearch({
     <div className='pokemon-search'>
       <SearchSection
         onTestError={onTestError}
+        onRefresh={handleRefresh}
         searchTerm={searchTerm}
         onSearchTermChange={handleSearchTermChange}
         onSubmit={handleSearchSubmit}

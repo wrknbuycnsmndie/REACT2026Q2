@@ -1,11 +1,11 @@
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
 import { vi } from 'vitest';
 import { ThemeProvider } from '../context/ThemeProvider';
 import { AppRouter } from '../router/AppRouter';
-import { resetPokemonDetailsStore } from '../store/pokemonDetailsStore';
 import { resetPokemonSearchStore } from '../store/pokemonSearchStore';
+import { renderWithQueryClient } from './testUtils/renderWithQueryClient';
 import {
   mockedFetchPokemonDetails,
   mockedFetchPokemonResults,
@@ -25,7 +25,6 @@ vi.mock('../services/localStorageService', () => ({
 describe('App', () => {
   beforeEach(() => {
     resetPokemonSearchMocks();
-    resetPokemonDetailsStore();
     resetPokemonSearchStore();
     mockedFetchPokemonResults.mockResolvedValue({
       items: [],
@@ -49,7 +48,7 @@ describe('App', () => {
       .spyOn(console, 'error')
       .mockImplementation(() => {});
 
-    render(
+    renderWithQueryClient(
       <ThemeProvider>
         <MemoryRouter initialEntries={['/']}>
           <AppRouter />
@@ -90,7 +89,7 @@ describe('App', () => {
       totalPages: 1,
     });
 
-    render(
+    renderWithQueryClient(
       <ThemeProvider>
         <MemoryRouter initialEntries={['/']}>
           <AppRouter />
@@ -108,6 +107,126 @@ describe('App', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
+  it('reuses cached details when reopening the same Pokemon', async () => {
+    const user = userEvent.setup();
+
+    mockedFetchPokemonResults.mockResolvedValue({
+      items: [
+        {
+          id: '25',
+          name: 'pikachu',
+          url: 'https://pokeapi.co/api/v2/pokemon/25/',
+        },
+      ],
+      page: 1,
+      totalPages: 1,
+    });
+
+    renderWithQueryClient(
+      <ThemeProvider>
+        <MemoryRouter initialEntries={['/']}>
+          <AppRouter />
+        </MemoryRouter>
+      </ThemeProvider>,
+    );
+
+    await user.click(await screen.findByRole('button', { name: 'pikachu' }));
+    expect(await screen.findByText('A mouse Pokemon.')).toBeInTheDocument();
+    expect(mockedFetchPokemonDetails).toHaveBeenCalledTimes(1);
+
+    await user.click(screen.getByRole('button', { name: 'Close' }));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'pikachu' }));
+
+    expect(await screen.findByText('A mouse Pokemon.')).toBeInTheDocument();
+    expect(mockedFetchPokemonDetails).toHaveBeenCalledTimes(1);
+  });
+
+  it('refreshes the current Pokemon details query after invalidating its cache', async () => {
+    const user = userEvent.setup();
+
+    mockedFetchPokemonResults.mockResolvedValue({
+      items: [
+        {
+          id: '25',
+          name: 'pikachu',
+          url: 'https://pokeapi.co/api/v2/pokemon/25/',
+        },
+      ],
+      page: 1,
+      totalPages: 1,
+    });
+    mockedFetchPokemonDetails
+      .mockResolvedValueOnce({
+        description: 'A mouse Pokemon.',
+        height: 4,
+        id: '25',
+        imageUrl: 'https://example.com/pikachu.png',
+        name: 'pikachu',
+        types: ['electric'],
+        weight: 60,
+      })
+      .mockResolvedValueOnce({
+        description: 'A refreshed mouse Pokemon.',
+        height: 4,
+        id: '25',
+        imageUrl: 'https://example.com/pikachu.png',
+        name: 'pikachu',
+        types: ['electric'],
+        weight: 60,
+      });
+
+    renderWithQueryClient(
+      <ThemeProvider>
+        <MemoryRouter initialEntries={['/']}>
+          <AppRouter />
+        </MemoryRouter>
+      </ThemeProvider>,
+    );
+
+    await user.click(await screen.findByRole('button', { name: 'pikachu' }));
+    expect(await screen.findByText('A mouse Pokemon.')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Refresh' }));
+
+    expect(await screen.findByText('A refreshed mouse Pokemon.')).toBeInTheDocument();
+    expect(mockedFetchPokemonDetails).toHaveBeenCalledTimes(2);
+  });
+
+  it('shows a clear details error message when loading Pokemon details fails', async () => {
+    const user = userEvent.setup();
+
+    mockedFetchPokemonResults.mockResolvedValue({
+      items: [
+        {
+          id: '25',
+          name: 'pikachu',
+          url: 'https://pokeapi.co/api/v2/pokemon/25/',
+        },
+      ],
+      page: 1,
+      totalPages: 1,
+    });
+    mockedFetchPokemonDetails.mockRejectedValueOnce(new TypeError('Failed to fetch'));
+
+    renderWithQueryClient(
+      <ThemeProvider>
+        <MemoryRouter initialEntries={['/']}>
+          <AppRouter />
+        </MemoryRouter>
+      </ThemeProvider>,
+    );
+
+    await user.click(await screen.findByRole('button', { name: 'pikachu' }));
+
+    expect(
+      await screen.findByText(
+        'Unable to reach the Pokemon service. Please check your connection and try again.',
+      ),
+    ).toBeInTheDocument();
+  });
+
   it('closes details after clicking the outer panel area', async () => {
     const user = userEvent.setup();
 
@@ -123,7 +242,7 @@ describe('App', () => {
       totalPages: 1,
     });
 
-    render(
+    renderWithQueryClient(
       <ThemeProvider>
         <MemoryRouter initialEntries={['/']}>
           <AppRouter />
@@ -148,7 +267,7 @@ describe('App', () => {
   it('opens the about page from the main navigation', async () => {
     const user = userEvent.setup();
 
-    render(
+    renderWithQueryClient(
       <ThemeProvider>
         <MemoryRouter initialEntries={['/']}>
           <AppRouter />
@@ -176,7 +295,7 @@ describe('App', () => {
   it('shows a 404 page for unknown routes and provides a way back to the app', async () => {
     const user = userEvent.setup();
 
-    render(
+    renderWithQueryClient(
       <ThemeProvider>
         <MemoryRouter initialEntries={['/missing-page']}>
           <AppRouter />

@@ -30,6 +30,11 @@
   margin-bottom: 18px;
 }
 
+.pokemon-details__actions {
+  display: flex;
+  gap: 10px;
+}
+
 .pokemon-details__title,
 .pokemon-details__name {
   margin: 0;

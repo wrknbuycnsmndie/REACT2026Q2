@@ -3,6 +3,7 @@ import './SearchSection.css';
 
 type SearchSectionProps = {
     onSearchTermChange: (value: string) => void;
+    onRefresh: () => void;
     onSubmit: () => void;
     onTestError: () => void;
     searchTerm: string;
@@ -10,6 +11,7 @@ type SearchSectionProps = {
 
 export function SearchSection({
     onSearchTermChange,
+    onRefresh,
     onSubmit,
     onTestError,
     searchTerm,
@@ -48,6 +50,9 @@ export function SearchSection({
                 </button>
             </form>
 
+            <button className="search-section__error-button" type="button" onClick={onRefresh}>
+                Refresh Results
+            </button>
             <button className="search-section__error-button" type="button" onClick={onTestError}>
                 Trigger Error
             </button>
