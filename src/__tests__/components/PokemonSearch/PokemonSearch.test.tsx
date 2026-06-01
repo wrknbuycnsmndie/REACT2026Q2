@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
 import { vi } from 'vitest';
@@ -6,6 +6,7 @@ import { PokemonSearch } from '../../../components/PokemonSearch/PokemonSearch';
 import { SelectedPokemonFlyout } from '../../../components/SelectedPokemonFlyout/SelectedPokemonFlyout';
 import { resetPokemonDetailsStore } from '../../../store/pokemonDetailsStore';
 import { resetPokemonSearchStore } from '../../../store/pokemonSearchStore';
+import { renderWithQueryClient } from '../../testUtils/renderWithQueryClient';
 import {
   mockedFetchPokemonResults,
   mockedGetStoredSearchTerm,
@@ -25,7 +26,7 @@ vi.mock('../../../services/localStorageService', () => ({
 
 describe('PokemonSearch', () => {
   const renderPokemonSearch = (initialEntries = ['/']) =>
-    render(
+    renderWithQueryClient(
       <MemoryRouter initialEntries={initialEntries}>
         <PokemonSearch onTestError={vi.fn()} shouldThrowError={false} />
         <SelectedPokemonFlyout />

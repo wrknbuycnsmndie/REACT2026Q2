@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
 import { vi } from 'vitest';
@@ -6,6 +6,7 @@ import { ThemeProvider } from '../context/ThemeProvider';
 import { AppRouter } from '../router/AppRouter';
 import { resetPokemonDetailsStore } from '../store/pokemonDetailsStore';
 import { resetPokemonSearchStore } from '../store/pokemonSearchStore';
+import { renderWithQueryClient } from './testUtils/renderWithQueryClient';
 import {
   mockedFetchPokemonDetails,
   mockedFetchPokemonResults,
@@ -49,7 +50,7 @@ describe('App', () => {
       .spyOn(console, 'error')
       .mockImplementation(() => {});
 
-    render(
+    renderWithQueryClient(
       <ThemeProvider>
         <MemoryRouter initialEntries={['/']}>
           <AppRouter />
@@ -90,7 +91,7 @@ describe('App', () => {
       totalPages: 1,
     });
 
-    render(
+    renderWithQueryClient(
       <ThemeProvider>
         <MemoryRouter initialEntries={['/']}>
           <AppRouter />
@@ -123,7 +124,7 @@ describe('App', () => {
       totalPages: 1,
     });
 
-    render(
+    renderWithQueryClient(
       <ThemeProvider>
         <MemoryRouter initialEntries={['/']}>
           <AppRouter />
@@ -148,7 +149,7 @@ describe('App', () => {
   it('opens the about page from the main navigation', async () => {
     const user = userEvent.setup();
 
-    render(
+    renderWithQueryClient(
       <ThemeProvider>
         <MemoryRouter initialEntries={['/']}>
           <AppRouter />
@@ -176,7 +177,7 @@ describe('App', () => {
   it('shows a 404 page for unknown routes and provides a way back to the app', async () => {
     const user = userEvent.setup();
 
-    render(
+    renderWithQueryClient(
       <ThemeProvider>
         <MemoryRouter initialEntries={['/missing-page']}>
           <AppRouter />

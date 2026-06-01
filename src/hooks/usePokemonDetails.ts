@@ -1,7 +1,8 @@
 import { useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { getRequestErrorMessage } from '../helpers/getRequestErrorMessage';
+import { getPokemonDetailsQueryKey } from '../query/pokemonQueryKeys';
 import { fetchPokemonDetails } from '../services/pokemon';
-import { usePokemonDetailsStore } from '../store/pokemonDetailsStore';
 import { useSelectedPokemonStore } from '../store/selectedPokemonStore';
 import type { PokemonDetails } from '../types/pokemon';
 
@@ -14,68 +15,29 @@ type UsePokemonDetailsResult = {
 export function usePokemonDetails(
   selectedPokemonId: string | null,
 ): UsePokemonDetailsResult {
-  const clearDetails = usePokemonDetailsStore((state) => state.clearDetails);
-  const details = usePokemonDetailsStore((state) => state.details);
-  const errorMessage = usePokemonDetailsStore((state) => state.errorMessage);
-  const setDetails = usePokemonDetailsStore((state) => state.setDetails);
-  const setDetailsError = usePokemonDetailsStore(
-    (state) => state.setDetailsError,
-  );
   const syncSelectedPokemonDetails = useSelectedPokemonStore(
     (state) => state.syncSelectedPokemonDetails,
   );
-  const startDetailsRequest = usePokemonDetailsStore(
-    (state) => state.startDetailsRequest,
-  );
-  const isLoading = usePokemonDetailsStore((state) => state.isLoading);
+  const detailsQuery = useQuery({
+    enabled: Boolean(selectedPokemonId),
+    queryFn: () => fetchPokemonDetails(selectedPokemonId!),
+    queryKey: getPokemonDetailsQueryKey(selectedPokemonId ?? ''),
+  });
 
   useEffect(() => {
-    if (!selectedPokemonId) {
-      clearDetails();
+    if (!detailsQuery.data) {
       return;
     }
 
-    let isCancelled = false;
-    const detailsId = selectedPokemonId;
-
-    async function loadDetails() {
-      startDetailsRequest(detailsId);
-
-      try {
-        const nextDetails = await fetchPokemonDetails(detailsId);
-
-        if (isCancelled) {
-          return;
-        }
-
-        setDetails(nextDetails);
-        syncSelectedPokemonDetails(nextDetails);
-      } catch (error) {
-        if (isCancelled) {
-          return;
-        }
-
-        setDetailsError(getRequestErrorMessage(error));
-      }
-    }
-
-    void loadDetails();
-
-    return () => {
-      isCancelled = true;
-    };
-  }, [
-    clearDetails,
-    selectedPokemonId,
-    setDetails,
-    setDetailsError,
-    syncSelectedPokemonDetails,
-    startDetailsRequest,
-  ]);
+    syncSelectedPokemonDetails(detailsQuery.data);
+  }, [detailsQuery.data, syncSelectedPokemonDetails]);
 
   return {
-    details: selectedPokemonId ? details : null,
-    errorMessage: selectedPokemonId ? errorMessage : '',
-    isLoading: selectedPokemonId ? isLoading : false,
+    details: selectedPokemonId ? detailsQuery.data ?? null : null,
+    errorMessage:
+      selectedPokemonId && detailsQuery.error
+        ? getRequestErrorMessage(detailsQuery.error)
+        : '',
+    isLoading: selectedPokemonId ? detailsQuery.isPending : false,
   };
 }
