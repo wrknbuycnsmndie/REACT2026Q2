@@ -77,7 +77,7 @@ describe('PokemonSearch', () => {
 
   it('renders an error state when the mocked initial request fails', async () => {
     mockedFetchPokemonResults.mockRejectedValue(
-      new Error('Mocked API failure'),
+      new TypeError('Failed to fetch'),
     );
 
     renderPokemonSearch();
@@ -85,7 +85,11 @@ describe('PokemonSearch', () => {
     expect(mockedFetchPokemonResults).toHaveBeenCalledWith('', 1);
 
     expect(await screen.findByText('Request failed')).toBeInTheDocument();
-    expect(screen.getByText('Mocked API failure')).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'Unable to reach the Pokemon service. Please check your connection and try again.',
+      ),
+    ).toBeInTheDocument();
   });
 
   it('calls the mocked API and updates results after a search submit', async () => {
@@ -155,7 +159,7 @@ describe('PokemonSearch', () => {
       totalPages: 3,
     });
     mockedFetchPokemonResults.mockRejectedValueOnce(
-      new Error('Mocked submit failure'),
+      new Error('Unexpected low-level failure'),
     );
 
     renderPokemonSearch();
@@ -169,7 +173,9 @@ describe('PokemonSearch', () => {
     await user.click(screen.getByRole('button', { name: 'Search' }));
 
     expect(
-      await screen.findByText('Mocked submit failure'),
+      await screen.findByText(
+        'Something went wrong while loading Pokemon data. Please try again.',
+      ),
     ).toBeInTheDocument();
     expect(screen.getByText('Request failed')).toBeInTheDocument();
   });

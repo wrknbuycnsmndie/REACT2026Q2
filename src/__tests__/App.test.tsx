@@ -145,6 +145,39 @@ describe('App', () => {
     expect(mockedFetchPokemonDetails).toHaveBeenCalledTimes(1);
   });
 
+  it('shows a clear details error message when loading Pokemon details fails', async () => {
+    const user = userEvent.setup();
+
+    mockedFetchPokemonResults.mockResolvedValue({
+      items: [
+        {
+          id: '25',
+          name: 'pikachu',
+          url: 'https://pokeapi.co/api/v2/pokemon/25/',
+        },
+      ],
+      page: 1,
+      totalPages: 1,
+    });
+    mockedFetchPokemonDetails.mockRejectedValueOnce(new TypeError('Failed to fetch'));
+
+    renderWithQueryClient(
+      <ThemeProvider>
+        <MemoryRouter initialEntries={['/']}>
+          <AppRouter />
+        </MemoryRouter>
+      </ThemeProvider>,
+    );
+
+    await user.click(await screen.findByRole('button', { name: 'pikachu' }));
+
+    expect(
+      await screen.findByText(
+        'Unable to reach the Pokemon service. Please check your connection and try again.',
+      ),
+    ).toBeInTheDocument();
+  });
+
   it('closes details after clicking the outer panel area', async () => {
     const user = userEvent.setup();
 
