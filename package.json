@@ -10,19 +10,29 @@
     "preview": "vite preview",
     "prepare": "husky",
     "test": "vitest",
-    "test:run": "vitest run --passWithNoTests"
+    "test:run": "vitest run --passWithNoTests",
+    "test:coverage": "vitest run --coverage",
+    "check": "npm run lint && npm run test:run",
+    "check:push": "npm run check && npm run build"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.4.0",
+    "@reduxjs/toolkit": "^2.12.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "react-hook-form": "^7.66.0",
+    "react-redux": "^9.3.0",
     "zod": "^4.1.12"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
     "@types/node": "^24.12.3",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
+    "@vitest/coverage-v8": "^4.1.8",
     "husky": "^9.1.7",
     "jsdom": "^26.1.0",
     "oxlint": "^1.29.0",
