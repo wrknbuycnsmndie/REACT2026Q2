@@ -54,5 +54,10 @@ describe('App form launchers', () => {
       'src',
       expect.stringMatching(/^data:image/),
     );
+
+    await user.click(screen.getByRole('button', { name: 'React Hook Form' }));
+
+    expect(screen.getByLabelText('Name')).toHaveValue('');
+    expect(screen.getByLabelText('Email')).toHaveValue('');
   });
 });

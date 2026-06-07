@@ -20,6 +20,23 @@
   box-shadow: var(--shadow-sm);
 }
 
+.submission-card--new {
+  animation: highlight-submission 3s ease-out;
+}
+
+@keyframes highlight-submission {
+  0%,
+  70% {
+    border-color: var(--color-primary);
+    background: var(--color-accent);
+  }
+
+  100% {
+    border-color: var(--color-border);
+    background: var(--color-card);
+  }
+}
+
 .submission-card__image {
   width: 4rem;
   height: 4rem;
@@ -31,4 +48,10 @@
 .submission-card p {
   margin-top: var(--space-1);
   color: var(--color-muted-foreground);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .submission-card--new {
+    animation: none;
+  }
 }

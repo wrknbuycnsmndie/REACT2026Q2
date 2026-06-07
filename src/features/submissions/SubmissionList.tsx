@@ -1,4 +1,5 @@
 import { useAppSelector } from '../../app/hooks';
+import { SubmissionCard } from './SubmissionCard';
 import { selectSubmissions } from './submissionsSlice';
 import './SubmissionList.css';
 
@@ -14,21 +15,7 @@ export function SubmissionList() {
       <h2 id='submissions-title'>Submissions</h2>
       <div className='submissions__grid'>
         {submissions.map((submission) => (
-          <article className='submission-card' key={submission.id}>
-            <img
-              alt={`${submission.name} profile`}
-              className='submission-card__image'
-              src={submission.image}
-            />
-            <div>
-              <h3>{submission.name}</h3>
-              <p>Email: {submission.email}</p>
-              <p>Age: {submission.age}</p>
-              <p>Gender: {submission.gender}</p>
-              <p>Country: {submission.country}</p>
-              <p>Form: {submission.source}</p>
-            </div>
-          </article>
+          <SubmissionCard key={submission.id} submission={submission} />
         ))}
       </div>
     </section>

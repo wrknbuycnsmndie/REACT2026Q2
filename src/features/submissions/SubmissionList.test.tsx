@@ -41,4 +41,10 @@ describe('SubmissionList', () => {
     expect(screen.getByText('Gender: female')).toBeInTheDocument();
     expect(screen.getByText('Country: Canada')).toBeInTheDocument();
   });
+
+  it('marks a newly displayed submission for CSS highlighting', () => {
+    renderSubmissionList();
+
+    expect(screen.getByRole('article')).toHaveClass('submission-card--new');
+  });
 });
