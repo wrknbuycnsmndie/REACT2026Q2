@@ -41,12 +41,17 @@
   outline-offset: 2px;
 }
 
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
 .button--primary {
   background: var(--color-primary);
   color: var(--color-primary-foreground);
 }
 
-.button--primary:hover {
+.button--primary:not(:disabled):hover {
   background: var(--color-secondary-foreground);
 }
 
@@ -56,6 +61,6 @@
   color: var(--color-secondary-foreground);
 }
 
-.button--secondary:hover {
+.button--secondary:not(:disabled):hover {
   background: var(--color-accent);
 }

@@ -21,3 +21,7 @@
   outline: 3px solid var(--color-ring);
   outline-offset: 1px;
 }
+
+.input-field input[aria-invalid='true'] {
+  border-color: var(--color-destructive);
+}

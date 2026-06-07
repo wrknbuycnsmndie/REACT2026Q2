@@ -18,6 +18,12 @@ describe('image utilities', () => {
       })),
     ).toBe('Image must be 2 MB or smaller.');
   });
+
+  it('rejects an image with an unsupported file extension', () => {
+    const image = new File(['image'], 'avatar.gif', { type: 'image/png' });
+
+    expect(getImageError(image)).toBe('Choose a PNG or JPEG image.');
+  });
 });
 
 describe('password utilities', () => {

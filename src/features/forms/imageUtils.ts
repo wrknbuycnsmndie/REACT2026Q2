@@ -1,9 +1,15 @@
 export const MAX_IMAGE_SIZE = 2 * 1024 * 1024;
 
 const allowedImageTypes = ['image/jpeg', 'image/png'];
+const allowedImageExtensions = ['.jpg', '.jpeg', '.png'];
 
 export function getImageError(file: File): string | null {
-  if (!allowedImageTypes.includes(file.type)) {
+  const fileName = file.name.toLowerCase();
+  const hasAllowedExtension = allowedImageExtensions.some((extension) =>
+    fileName.endsWith(extension),
+  );
+
+  if (!allowedImageTypes.includes(file.type) || !hasAllowedExtension) {
     return 'Choose a PNG or JPEG image.';
   }
 

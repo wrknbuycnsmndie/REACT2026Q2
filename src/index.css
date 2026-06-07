@@ -113,3 +113,9 @@ h6 {
 code {
   font-family: var(--font-mono);
 }
+
+.field-error {
+  margin-top: var(--space-1);
+  color: var(--color-destructive);
+  font-size: var(--font-size-sm);
+}

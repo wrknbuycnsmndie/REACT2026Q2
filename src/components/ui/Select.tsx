@@ -7,16 +7,24 @@ interface SelectOption {
 }
 
 interface SelectProps extends ComponentProps<'select'> {
+  error?: string;
   label: string;
   options: SelectOption[];
   placeholder?: string;
 }
 
-export function Select({ id, label, options, placeholder, ...props }: SelectProps) {
+export function Select({ error, id, label, options, placeholder, ...props }: SelectProps) {
+  const errorId = `${id}-error`;
+
   return (
     <div className='select-field'>
       <label htmlFor={id}>{label}</label>
-      <select id={id} {...props}>
+      <select
+        aria-describedby={error ? errorId : undefined}
+        aria-invalid={Boolean(error)}
+        id={id}
+        {...props}
+      >
         {placeholder && <option value=''>{placeholder}</option>}
         {options.map((option) => (
           <option key={option.value} value={option.value}>
@@ -24,6 +32,11 @@ export function Select({ id, label, options, placeholder, ...props }: SelectProp
           </option>
         ))}
       </select>
+      {error && (
+        <p className='field-error' id={errorId}>
+          {error}
+        </p>
+      )}
     </div>
   );
 }
