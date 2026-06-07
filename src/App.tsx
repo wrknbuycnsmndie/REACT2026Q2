@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import './App.css';
 import { Modal } from './components/Modal/Modal';
+import { HookForm } from './features/forms/HookForm';
+import { UncontrolledForm } from './features/forms/UncontrolledForm';
+import { SubmissionList } from './features/submissions/SubmissionList';
 
 type FormKind = 'uncontrolled' | 'react-hook-form';
 
@@ -34,11 +37,15 @@ function App() {
         </div>
       </section>
 
+      <SubmissionList />
+
       {activeForm && (
         <Modal title={modalTitle} onClose={() => setActiveForm(null)}>
-          <p className='app__modal-description'>
-            The {modalTitle} fields will be implemented in a later feature.
-          </p>
+          {activeForm === 'uncontrolled' ? (
+            <UncontrolledForm />
+          ) : (
+            <HookForm />
+          )}
         </Modal>
       )}
     </main>

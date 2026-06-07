@@ -1,0 +1,9 @@
+.user-form {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.user-form .button {
+  justify-self: start;
+  margin-top: var(--space-2);
+}
