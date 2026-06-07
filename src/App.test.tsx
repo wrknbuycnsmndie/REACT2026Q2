@@ -28,4 +28,31 @@ describe('App form launchers', () => {
 
     expect(screen.getByRole('dialog', { name: dialogName })).toBeInTheDocument();
   });
+
+  it('stores and displays a completed form', async () => {
+    const user = userEvent.setup();
+    renderApp();
+
+    await user.click(screen.getByRole('button', { name: 'React Hook Form' }));
+    await user.type(screen.getByLabelText('Name'), 'Alice');
+    await user.type(screen.getByLabelText('Age'), '30');
+    await user.type(screen.getByLabelText('Email'), 'alice@example.com');
+    await user.selectOptions(screen.getByLabelText('Gender'), 'female');
+    await user.click(screen.getByLabelText('I accept the Terms and Conditions'));
+    await user.upload(
+      screen.getByLabelText('Profile image'),
+      new File(['image'], 'avatar.png', { type: 'image/png' }),
+    );
+    await user.type(screen.getByLabelText('Password'), 'Password1!');
+    await user.type(screen.getByLabelText('Confirm password'), 'Password1!');
+    await user.type(screen.getByLabelText('Country'), 'Canada');
+    await user.click(screen.getByRole('button', { name: 'Submit' }));
+
+    expect(await screen.findByRole('heading', { name: 'Alice' })).toBeInTheDocument();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(screen.getByRole('img', { name: 'Alice profile' })).toHaveAttribute(
+      'src',
+      expect.stringMatching(/^data:image/),
+    );
+  });
 });

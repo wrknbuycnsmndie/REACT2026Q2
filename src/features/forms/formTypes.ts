@@ -1,12 +1,15 @@
 import type { FormSubmission, Gender } from '../submissions/submissionTypes';
 
-export type BasicSubmissionData = Pick<
+export type FormValues = Pick<
   FormSubmission,
-  'name' | 'age' | 'email' | 'gender' | 'acceptedTerms'
->;
+  'name' | 'age' | 'email' | 'gender' | 'acceptedTerms' | 'country' | 'image'
+> & {
+  password: string;
+  confirmPassword: string;
+};
 
 export interface FormProps {
-  onSubmit?: (data: BasicSubmissionData) => void;
+  onSubmit: (data: FormValues) => void;
 }
 
 export const genderOptions = [

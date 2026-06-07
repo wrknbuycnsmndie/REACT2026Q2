@@ -15,7 +15,11 @@ export function SubmissionList() {
       <div className='submissions__grid'>
         {submissions.map((submission) => (
           <article className='submission-card' key={submission.id}>
-            <img className='submission-card__image' src={submission.image} alt='' />
+            <img
+              alt={`${submission.name} profile`}
+              className='submission-card__image'
+              src={submission.image}
+            />
             <div>
               <h3>{submission.name}</h3>
               <p>Email: {submission.email}</p>

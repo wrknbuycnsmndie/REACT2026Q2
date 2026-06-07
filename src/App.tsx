@@ -1,16 +1,11 @@
 import { useState } from 'react';
 import './App.css';
-import { Modal } from './components/Modal/Modal';
-import { HookForm } from './features/forms/HookForm';
-import { UncontrolledForm } from './features/forms/UncontrolledForm';
+import { FormModal } from './features/forms/FormModal';
 import { SubmissionList } from './features/submissions/SubmissionList';
-
-type FormKind = 'uncontrolled' | 'react-hook-form';
+import type { FormSource } from './features/submissions/submissionTypes';
 
 function App() {
-  const [activeForm, setActiveForm] = useState<FormKind | null>(null);
-  const modalTitle =
-    activeForm === 'uncontrolled' ? 'Uncontrolled form' : 'React Hook Form';
+  const [activeForm, setActiveForm] = useState<FormSource | null>(null);
 
   return (
     <main className='app'>
@@ -40,13 +35,7 @@ function App() {
       <SubmissionList />
 
       {activeForm && (
-        <Modal title={modalTitle} onClose={() => setActiveForm(null)}>
-          {activeForm === 'uncontrolled' ? (
-            <UncontrolledForm />
-          ) : (
-            <HookForm />
-          )}
-        </Modal>
+        <FormModal formType={activeForm} onClose={() => setActiveForm(null)} />
       )}
     </main>
   );
