@@ -24,11 +24,14 @@ export function Modal({ children, onClose, title }: ModalProps) {
   const { closeButtonRef, dialogRef, handleDialogKeyDown } =
     useModalAccessibility(onClose);
 
+  const handleBackDropClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (event.target === event.currentTarget) {
+      onClose();
+    }
+  };
+
   return createPortal(
-    <div
-      className='modal-backdrop'
-      onClick={(event) => event.target === event.currentTarget && onClose()}
-    >
+    <div className='modal-backdrop' onClick={handleBackDropClick}>
       <div
         aria-labelledby={titleId}
         aria-modal='true'
