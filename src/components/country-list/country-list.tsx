@@ -1,8 +1,7 @@
-import { useMemo } from 'react';
-import { List } from 'react-window';
+import { memo, useMemo } from 'react';
+import { List, useDynamicRowHeight } from 'react-window';
 import type { Country } from '../../types';
-import { getPopulationForYear, createYearDataMap } from '../../utils/data-transformers';
-import { VirtualCountryRow } from './virtual-country-row';
+import { VirtualCountryRow, type VirtualCountryRowProps } from './virtual-country-row';
 
 import styles from './country-list.module.css';
 
@@ -14,52 +13,69 @@ type CountryListProps = {
   selectedYear: number;
   sortField: 'name' | 'population';
   sortOrder: 'asc' | 'desc';
-  onYearChange: (year: number) => void;
 };
 
-export const CountryList = ({
-  countries,
-  searchQuery,
-  selectedColumns,
-  selectedRegion,
-  selectedYear,
-  sortField,
-  sortOrder,
-}: CountryListProps) => {
-  const filteredCountries = useMemo(
-    () =>
-      countries
-        .filter((c) => {
-          const matchesSearch = c.id.toLowerCase().includes(searchQuery.toLowerCase());
-          const matchesRegion =
-            !selectedRegion || c.data.some((d) => d.region === selectedRegion);
-          return matchesSearch && matchesRegion;
-        })
-        .sort((a, b) => {
-          if (sortField === 'name') {
-            return sortOrder === 'asc' ? a.id.localeCompare(b.id) : b.id.localeCompare(a.id);
-          } else {
-            const popA = getPopulationForYear(createYearDataMap(a.data), selectedYear) || 0;
-            const popB = getPopulationForYear(createYearDataMap(b.data), selectedYear) || 0;
-            return sortOrder === 'asc' ? popA - popB : popB - popA;
-          }
-        }),
-    [countries, searchQuery, selectedRegion, selectedYear, sortField, sortOrder]
-  );
+export const CountryList = memo(
+  ({
+    countries,
+    searchQuery,
+    selectedColumns,
+    selectedRegion,
+    selectedYear,
+    sortField,
+    sortOrder,
+  }: CountryListProps) => {
+    const filteredCountries = useMemo(() => {
+      const normalizedQuery = searchQuery.toLowerCase();
+      const filteredCountries = countries.filter((country) => {
+        const matchesSearch = country.id.toLowerCase().includes(normalizedQuery);
+        const matchesRegion =
+          !selectedRegion || country.data.some((yearData) => yearData.region === selectedRegion);
 
-  return (
-    <List
-      className={styles.countryList}
-      rowComponent={VirtualCountryRow}
-      rowCount={filteredCountries.length}
-      rowHeight={260}
-      rowProps={{
+        return matchesSearch && matchesRegion;
+      });
+
+      if (sortField === 'name') {
+        return filteredCountries.sort((a, b) =>
+          sortOrder === 'asc' ? a.id.localeCompare(b.id) : b.id.localeCompare(a.id)
+        );
+      }
+
+      const populations = new Map<string, number>();
+      filteredCountries.forEach((country) => {
+        const population =
+          country.data.find((yearData) => yearData.year === selectedYear)?.population ?? 0;
+        populations.set(country.id, population);
+      });
+
+      return filteredCountries.sort((a, b) => {
+        const populationA = populations.get(a.id) ?? 0;
+        const populationB = populations.get(b.id) ?? 0;
+        return sortOrder === 'asc' ? populationA - populationB : populationB - populationA;
+      });
+    }, [countries, searchQuery, selectedRegion, selectedYear, sortField, sortOrder]);
+
+    const rowHeight = useDynamicRowHeight({ defaultRowHeight: 260 });
+
+    const rowProps = useMemo<VirtualCountryRowProps>(
+      () => ({
         countries: filteredCountries,
         selectedColumns,
         selectedYear,
-      }}
-      overscanCount={3}
-      style={{ height: 720 }}
-    />
-  );
-};
+      }),
+      [filteredCountries, selectedColumns, selectedYear]
+    );
+
+    return (
+      <List
+        className={styles.countryList}
+        rowComponent={VirtualCountryRow}
+        rowCount={filteredCountries.length}
+        rowHeight={rowHeight}
+        rowProps={rowProps}
+        overscanCount={3}
+        style={{ height: 720 }}
+      />
+    );
+  }
+);

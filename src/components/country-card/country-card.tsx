@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useMemo } from 'react';
 import type { Country } from '../../types';
 import { DataTable } from '../data-table/data-table';
 import {
@@ -21,7 +21,7 @@ export const CountryCard = memo(function CountryCard({
   selectedYear,
   selectedColumns,
 }: CountryCardProps) {
-  const yearDataMap = createYearDataMap(country.data);
+  const yearDataMap = useMemo(() => createYearDataMap(country.data), [country.data]);
   const population = getPopulationForYear(yearDataMap, selectedYear);
   const co2 = getCo2ForYear(yearDataMap, selectedYear);
 
