@@ -15,7 +15,7 @@
 
 - **Action**: Entered search query `united`
 - **Commit duration**: N/A
-- **Render duration**: 219.4 ms
+- **Render duration**: 145.9 ms
 - **Screenshot**:
 
 ![Search countries baseline](/public/screenshots/baseline/search-country-before-optimization.png)
@@ -45,7 +45,7 @@ Most rendering time is spent inside the `CountryList` component.
 | Interaction      | Render duration |
 | ---------------- | --------------: |
 | Sort countries   |        275.1 ms |
-| Search countries |        219.4 ms |
+| Search countries |        145.9 ms |
 | Change year      |        276.4 ms |
 | Toggle column    |        277.7 ms |
 
@@ -58,7 +58,7 @@ _To be filled after optimizations._
 | Interaction      | Baseline (ms) | Optimized (ms) | Improvement |
 | ---------------- | ------------: | -------------: | ----------: |
 | Sort countries   |         275.1 |         \_\_\_ |     \_\_\_% |
-| Search countries |         219.4 |         \_\_\_ |     \_\_\_% |
+| Search countries |         145.9 |         \_\_\_ |     \_\_\_% |
 | Change year      |         276.4 |         \_\_\_ |     \_\_\_% |
 | Toggle column    |         277.7 |         \_\_\_ |     \_\_\_% |
 | **Average**      |    **262.15** |     **\_\_\_** | **\_\_\_%** |
