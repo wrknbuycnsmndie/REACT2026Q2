@@ -6,7 +6,6 @@ import {
   selectSelectedPokemonItems,
   useSelectedPokemonStore,
 } from '../../store/selectedPokemonStore';
-import './SelectedPokemonFlyout.css';
 
 export function SelectedPokemonFlyout() {
   const clearSelectedPokemon = useSelectedPokemonStore(

@@ -1,15 +1,17 @@
-import { Link } from 'react-router';
-import './NotFoundPage.css';
+import Image from 'next/image';
+import Link from 'next/link';
 
 export function NotFoundPage() {
   return (
     <section className='not-found-page' aria-labelledby='not-found-page-title'>
       <div className='not-found-page__art' aria-hidden='true'>
         <div className='not-found-page__badge'>404</div>
-        <img
+        <Image
           className='not-found-page__pikachu'
           alt=''
           src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png'
+          width={160}
+          height={160}
         />
       </div>
       <div className='not-found-page__content'>
@@ -21,7 +23,7 @@ export function NotFoundPage() {
           The page you requested vanished into the tall grass. Head back to the
           Pokedex and keep your search moving.
         </p>
-        <Link className='not-found-page__link' to='/?page=1'>
+        <Link className='not-found-page__link' href='/?page=1'>
           Return to Pokemon Search
         </Link>
       </div>

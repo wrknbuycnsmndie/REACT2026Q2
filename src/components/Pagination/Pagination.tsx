@@ -1,5 +1,3 @@
-import './Pagination.css';
-
 type PaginationProps = {
     currentPage: number;
     onPageChange: (page: number) => void;

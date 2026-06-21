@@ -1,5 +1,4 @@
 import type { ChangeEvent, SyntheticEvent } from 'react';
-import './SearchSection.css';
 
 type SearchSectionProps = {
     onSearchTermChange: (value: string) => void;

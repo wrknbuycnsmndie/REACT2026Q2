@@ -1,7 +1,6 @@
 import { usePokemonSearch } from '../../hooks/usePokemonSearch';
 import { ResultsSection } from '../ResultsSection/ResultsSection';
 import { SearchSection } from '../SearchSection/SearchSection';
-import './PokemonSearch.css';
 
 type PokemonSearchProps = {
   onTestError: () => void;

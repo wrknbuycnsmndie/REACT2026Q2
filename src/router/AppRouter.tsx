@@ -1,8 +1,8 @@
 import { Route, Routes } from 'react-router';
 import App from '../App';
-import { AboutPage } from '../pages/AboutPage/AboutPage';
-import { HomePage } from '../pages/HomePage/HomePage';
-import { NotFoundPage } from '../pages/NotFoundPage/NotFoundPage';
+import { AboutPage } from '../views/AboutPage/AboutPage';
+import { HomePage } from '../views/HomePage/HomePage';
+import { NotFoundPage } from '../views/NotFoundPage/NotFoundPage';
 import { PokemonDetailsRoute } from './PokemonDetailsRoute';
 import { RequirePageParam } from './RequirePageParam';
 

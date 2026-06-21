@@ -1,7 +1,6 @@
 import { PokemonDetailsContent } from './PokemonDetailsContent';
 import { PokemonDetailsState } from './PokemonDetailsState';
 import type { PokemonDetails } from '../../types/pokemon';
-import './PokemonDetailsPanel.css';
 
 type PokemonDetailsPanelProps = {
   details: PokemonDetails | null;

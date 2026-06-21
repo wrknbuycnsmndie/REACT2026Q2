@@ -5,7 +5,6 @@ import { ResultsLoader } from './ResultsLoader';
 import { ResultsTable } from './ResultsTable';
 import { ResultsTableBody } from './ResultsTableBody';
 import type { SearchResultItem } from '../../types/search';
-import './ResultsSection.css';
 
 type ResultsSectionProps = {
     currentPage: number;

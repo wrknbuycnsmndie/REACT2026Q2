@@ -1,5 +1,3 @@
-import './ResultsLoader.css';
-
 export function ResultsLoader() {
     return (
         <div className="results-loader" aria-live="polite">

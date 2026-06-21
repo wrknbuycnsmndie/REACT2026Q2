@@ -1,5 +1,3 @@
-import './ResultsError.css';
-
 type ResultsErrorProps = {
     message: string;
 };

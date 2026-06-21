@@ -1,14 +1,19 @@
+'use client';
+
 import { useState } from 'react';
-import { Outlet } from 'react-router';
 import { ErrorBoundary } from '../../components/ErrorBoundary/ErrorBoundary';
+import { PokemonDetailsPanel } from '../../components/PokemonDetails/PokemonDetailsPanel';
 import { PokemonSearch } from '../../components/PokemonSearch/PokemonSearch';
 import { SelectedPokemonFlyout } from '../../components/SelectedPokemonFlyout/SelectedPokemonFlyout';
+import { usePokemonDetails } from '../../hooks/usePokemonDetails';
 import { usePokemonDetailsParam } from '../../hooks/usePokemonDetailsParam';
-import './HomePage.css';
 
 export function HomePage() {
     const [shouldThrowError, setShouldThrowError] = useState(false);
-    const { selectedPokemonId } = usePokemonDetailsParam();
+    const { closeDetails, selectedPokemonId } = usePokemonDetailsParam();
+    const { details, errorMessage, isLoading, refreshDetails } = usePokemonDetails(
+        selectedPokemonId,
+    );
 
     const handleResetError = () => {
         setShouldThrowError(false);
@@ -28,7 +33,17 @@ export function HomePage() {
                         onTestError={handleTriggerError}
                         shouldThrowError={shouldThrowError}
                     />
-                    <Outlet />
+                    {selectedPokemonId ? (
+                        <PokemonDetailsPanel
+                            details={details}
+                            errorMessage={errorMessage}
+                            isLoading={isLoading}
+                            onClose={closeDetails}
+                            onRefresh={() => {
+                                void refreshDetails();
+                            }}
+                        />
+                    ) : null}
                 </div>
                 <SelectedPokemonFlyout />
             </div>
