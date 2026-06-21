@@ -1,9 +1,14 @@
-import { NavLink } from 'react-router';
+'use client';
+
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useTheme } from '../../context/themeContext';
-import './Header.css';
 
 export function Header() {
   const { setTheme, theme } = useTheme();
+  const pathname = usePathname();
+  const isHomeActive = pathname === '/';
+  const isAboutActive = pathname === '/about';
 
   return (
     <header className='header'>
@@ -40,22 +45,18 @@ export function Header() {
         Search Pokemon, review details, and manage your selected list.
       </p>
       <nav className='header__nav' aria-label='Primary'>
-        <NavLink
-          className={({ isActive }) =>
-            `header__nav-link${isActive ? ' header__nav-link--active' : ''}`
-          }
-          to='/?page=1'
+        <Link
+          className={`header__nav-link${isHomeActive ? ' header__nav-link--active' : ''}`}
+          href='/?page=1'
         >
           Home
-        </NavLink>
-        <NavLink
-          className={({ isActive }) =>
-            `header__nav-link${isActive ? ' header__nav-link--active' : ''}`
-          }
-          to='/about'
+        </Link>
+        <Link
+          className={`header__nav-link${isAboutActive ? ' header__nav-link--active' : ''}`}
+          href='/about'
         >
           About
-        </NavLink>
+        </Link>
       </nav>
     </header>
   );

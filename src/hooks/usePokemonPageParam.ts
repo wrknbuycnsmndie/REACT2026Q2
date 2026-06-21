@@ -1,4 +1,4 @@
-import { useSearchParams } from 'react-router';
+import { useRouteSearchParams } from './useUrlSearchParams';
 import { DEFAULT_PAGE } from '../constants/pagination';
 import { getCurrentPage, getSearchParamsWithPage } from '../helpers/searchParams';
 
@@ -9,7 +9,7 @@ type UsePokemonPageParamResult = {
 };
 
 export function usePokemonPageParam(): UsePokemonPageParamResult {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const { searchParams, setSearchParams } = useRouteSearchParams();
   const currentPage = getCurrentPage(searchParams);
 
   const updatePage = (page: number) => {
@@ -20,7 +20,7 @@ export function usePokemonPageParam(): UsePokemonPageParamResult {
       return;
     }
 
-    setSearchParams(nextSearchParams, { replace: true });
+    setSearchParams(nextSearchParams);
   };
 
   const resetPage = () => {

@@ -1,4 +1,4 @@
-import { useSearchParams } from 'react-router';
+import { useRouteSearchParams } from './useUrlSearchParams';
 import {
   getCurrentDetailsId,
   getSearchParamsWithDetails,
@@ -11,18 +11,21 @@ type UsePokemonDetailsParamResult = {
 };
 
 export function usePokemonDetailsParam(): UsePokemonDetailsParamResult {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const { searchParams, setSearchParams } = useRouteSearchParams();
   const selectedPokemonId = getCurrentDetailsId(searchParams);
 
   const updateDetails = (detailsId: string | null) => {
-    const nextSearchParams = getSearchParamsWithDetails(searchParams, detailsId);
+    const nextSearchParams = getSearchParamsWithDetails(
+      searchParams,
+      detailsId,
+    );
     const nextDetailsId = getCurrentDetailsId(nextSearchParams);
 
     if (nextDetailsId === selectedPokemonId) {
       return;
     }
 
-    setSearchParams(nextSearchParams, { replace: true });
+    setSearchParams(nextSearchParams);
   };
 
   return {
