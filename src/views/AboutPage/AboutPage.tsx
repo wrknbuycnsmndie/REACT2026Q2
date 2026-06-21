@@ -6,7 +6,7 @@ export function AboutPage() {
         Pokemon Search Workshop
       </h2>
       <p className='about-page__text'>
-        Built by an RS School student as a React Router exercise around search,
+        Built by an RS School student as a Next.js exercise around search,
         pagination, and master-detail navigation patterns.
       </p>
       <dl className='about-page__facts'>

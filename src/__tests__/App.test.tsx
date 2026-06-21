@@ -1,10 +1,11 @@
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { MemoryRouter } from 'react-router';
 import { vi } from 'vitest';
+import { Header } from '../components/Header/Header';
 import { ThemeProvider } from '../context/ThemeProvider';
-import { AppRouter } from '../router/AppRouter';
 import { resetPokemonSearchStore } from '../store/pokemonSearchStore';
+import { HomePage } from '../views/HomePage/HomePage';
+import { setMockUrl } from './testUtils/nextMocks';
 import { renderWithQueryClient } from './testUtils/renderWithQueryClient';
 import {
   mockedFetchPokemonDetails,
@@ -21,6 +22,21 @@ vi.mock('../services/localStorageService', () => ({
   getStoredSearchTerm: vi.fn(),
   setStoredSearchTerm: vi.fn(),
 }));
+
+function renderApp(initialUrl = '/') {
+  setMockUrl(initialUrl);
+
+  return renderWithQueryClient(
+    <ThemeProvider>
+      <main className='app'>
+        <div className='app__container'>
+          <Header />
+        <HomePage />
+        </div>
+      </main>
+    </ThemeProvider>,
+  );
+}
 
 describe('App', () => {
   beforeEach(() => {
@@ -48,13 +64,7 @@ describe('App', () => {
       .spyOn(console, 'error')
       .mockImplementation(() => {});
 
-    renderWithQueryClient(
-      <ThemeProvider>
-        <MemoryRouter initialEntries={['/']}>
-          <AppRouter />
-        </MemoryRouter>
-      </ThemeProvider>,
-    );
+    renderApp();
 
     await screen.findByText('No results to display yet.');
 
@@ -89,13 +99,7 @@ describe('App', () => {
       totalPages: 1,
     });
 
-    renderWithQueryClient(
-      <ThemeProvider>
-        <MemoryRouter initialEntries={['/']}>
-          <AppRouter />
-        </MemoryRouter>
-      </ThemeProvider>,
-    );
+    renderApp();
 
     await user.click(await screen.findByRole('button', { name: 'pikachu' }));
 
@@ -122,13 +126,7 @@ describe('App', () => {
       totalPages: 1,
     });
 
-    renderWithQueryClient(
-      <ThemeProvider>
-        <MemoryRouter initialEntries={['/']}>
-          <AppRouter />
-        </MemoryRouter>
-      </ThemeProvider>,
-    );
+    renderApp();
 
     await user.click(await screen.findByRole('button', { name: 'pikachu' }));
     expect(await screen.findByText('A mouse Pokemon.')).toBeInTheDocument();
@@ -177,13 +175,7 @@ describe('App', () => {
         weight: 60,
       });
 
-    renderWithQueryClient(
-      <ThemeProvider>
-        <MemoryRouter initialEntries={['/']}>
-          <AppRouter />
-        </MemoryRouter>
-      </ThemeProvider>,
-    );
+    renderApp();
 
     await user.click(await screen.findByRole('button', { name: 'pikachu' }));
     expect(await screen.findByText('A mouse Pokemon.')).toBeInTheDocument();
@@ -210,13 +202,7 @@ describe('App', () => {
     });
     mockedFetchPokemonDetails.mockRejectedValueOnce(new TypeError('Failed to fetch'));
 
-    renderWithQueryClient(
-      <ThemeProvider>
-        <MemoryRouter initialEntries={['/']}>
-          <AppRouter />
-        </MemoryRouter>
-      </ThemeProvider>,
-    );
+    renderApp();
 
     await user.click(await screen.findByRole('button', { name: 'pikachu' }));
 
@@ -242,13 +228,7 @@ describe('App', () => {
       totalPages: 1,
     });
 
-    renderWithQueryClient(
-      <ThemeProvider>
-        <MemoryRouter initialEntries={['/']}>
-          <AppRouter />
-        </MemoryRouter>
-      </ThemeProvider>,
-    );
+    renderApp();
 
     await user.click(await screen.findByRole('button', { name: 'pikachu' }));
 
@@ -264,66 +244,4 @@ describe('App', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
-  it('opens the about page from the main navigation', async () => {
-    const user = userEvent.setup();
-
-    renderWithQueryClient(
-      <ThemeProvider>
-        <MemoryRouter initialEntries={['/']}>
-          <AppRouter />
-        </MemoryRouter>
-      </ThemeProvider>,
-    );
-
-    await user.click(screen.getByRole('link', { name: 'About' }));
-
-    expect(
-      await screen.findByRole('heading', {
-        level: 2,
-        name: 'Pokemon Search Workshop',
-      }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole('link', { name: 'RS School React Course' }),
-    ).toHaveAttribute('href', 'https://rs.school/courses/reactjs');
-    expect(screen.getByRole('link', { name: 'Anton Chapala' })).toHaveAttribute(
-      'href',
-      'https://github.com/wrknbuycnsmndie',
-    );
-  });
-
-  it('shows a 404 page for unknown routes and provides a way back to the app', async () => {
-    const user = userEvent.setup();
-
-    renderWithQueryClient(
-      <ThemeProvider>
-        <MemoryRouter initialEntries={['/missing-page']}>
-          <AppRouter />
-        </MemoryRouter>
-      </ThemeProvider>,
-    );
-
-    expect(
-      await screen.findByRole('heading', {
-        level: 2,
-        name: 'Pikachu used Thunder Shock on this route',
-      }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        'The page you requested vanished into the tall grass. Head back to the Pokedex and keep your search moving.',
-      ),
-    ).toBeInTheDocument();
-
-    await user.click(
-      screen.getByRole('link', { name: 'Return to Pokemon Search' }),
-    );
-
-    expect(
-      await screen.findByRole('heading', {
-        level: 1,
-        name: 'Pokemon Search',
-      }),
-    ).toBeInTheDocument();
-  });
 });

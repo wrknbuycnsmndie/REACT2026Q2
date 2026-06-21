@@ -1,10 +1,10 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { MemoryRouter } from 'react-router';
 import { vi } from 'vitest';
 import { PokemonSearch } from '../../../components/PokemonSearch/PokemonSearch';
 import { SelectedPokemonFlyout } from '../../../components/SelectedPokemonFlyout/SelectedPokemonFlyout';
 import { resetPokemonSearchStore } from '../../../store/pokemonSearchStore';
+import { setMockUrl } from '../../testUtils/nextMocks';
 import { renderWithQueryClient } from '../../testUtils/renderWithQueryClient';
 import {
   mockedFetchPokemonResults,
@@ -40,13 +40,16 @@ function createDeferredPromise<T>() {
 }
 
 describe('PokemonSearch', () => {
-  const renderPokemonSearch = (initialEntries = ['/']) =>
-    renderWithQueryClient(
-      <MemoryRouter initialEntries={initialEntries}>
+  const renderPokemonSearch = (initialUrl = '/') => {
+    setMockUrl(initialUrl);
+
+    return renderWithQueryClient(
+      <>
         <PokemonSearch onTestError={vi.fn()} shouldThrowError={false} />
         <SelectedPokemonFlyout />
-      </MemoryRouter>,
+      </>,
     );
+  };
 
   beforeEach(() => {
     resetPokemonSearchMocks();
@@ -273,7 +276,7 @@ describe('PokemonSearch', () => {
         totalPages: 3,
       });
 
-    renderPokemonSearch(['/?page=2']);
+    renderPokemonSearch('/?page=2');
 
     expect(await screen.findByLabelText('metapod')).toBeInTheDocument();
     expect(screen.getByText('Page 2 of 3')).toBeInTheDocument();
@@ -310,7 +313,7 @@ describe('PokemonSearch', () => {
       })
       .mockImplementationOnce(() => pageThreeResults.promise);
 
-    renderPokemonSearch(['/?page=2']);
+    renderPokemonSearch('/?page=2');
 
     expect(await screen.findByLabelText('metapod')).toBeInTheDocument();
 

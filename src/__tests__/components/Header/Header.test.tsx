@@ -1,8 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { MemoryRouter } from 'react-router';
 import { Header } from '../../../components/Header/Header';
 import { ThemeProvider } from '../../../context/ThemeProvider';
+import { getMockUrl, setMockUrl } from '../../testUtils/nextMocks';
 
 describe('Header', () => {
   afterEach(() => {
@@ -10,11 +10,11 @@ describe('Header', () => {
   });
 
   it('renders the page heading and supporting copy', () => {
+    setMockUrl('/');
+
     render(
       <ThemeProvider>
-        <MemoryRouter>
-          <Header />
-        </MemoryRouter>
+        <Header />
       </ThemeProvider>,
     );
 
@@ -45,11 +45,11 @@ describe('Header', () => {
   it('switches the app theme from the header controls', async () => {
     const user = userEvent.setup();
 
+    setMockUrl('/');
+
     render(
       <ThemeProvider>
-        <MemoryRouter>
-          <Header />
-        </MemoryRouter>
+        <Header />
       </ThemeProvider>,
     );
 
@@ -68,5 +68,25 @@ describe('Header', () => {
       'aria-pressed',
       'true',
     );
+  });
+
+  it('updates the route when primary navigation links are clicked', async () => {
+    const user = userEvent.setup();
+
+    setMockUrl('/');
+
+    render(
+      <ThemeProvider>
+        <Header />
+      </ThemeProvider>,
+    );
+
+    await user.click(screen.getByRole('link', { name: 'About' }));
+
+    expect(getMockUrl()).toBe('/about');
+
+    await user.click(screen.getByRole('link', { name: 'Home' }));
+
+    expect(getMockUrl()).toBe('/?page=1');
   });
 });
