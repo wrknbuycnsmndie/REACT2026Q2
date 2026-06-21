@@ -6,7 +6,7 @@ describe('createAppQueryClient', () => {
   });
 
   it('uses the default query TTL when no env override is provided', () => {
-    vi.stubEnv('VITE_POKEMON_QUERY_TTL_MS', '');
+    vi.stubEnv('NEXT_PUBLIC_POKEMON_QUERY_TTL_MS', '');
 
     const queryClient = createAppQueryClient();
     const queryDefaults = queryClient.getDefaultOptions().queries;
@@ -18,7 +18,7 @@ describe('createAppQueryClient', () => {
   });
 
   it('uses the env TTL when a valid override is provided', () => {
-    vi.stubEnv('VITE_POKEMON_QUERY_TTL_MS', '120000');
+    vi.stubEnv('NEXT_PUBLIC_POKEMON_QUERY_TTL_MS', '120000');
 
     const queryClient = createAppQueryClient();
     const queryDefaults = queryClient.getDefaultOptions().queries;
@@ -28,7 +28,7 @@ describe('createAppQueryClient', () => {
   });
 
   it('falls back to the default TTL when the env value is invalid', () => {
-    vi.stubEnv('VITE_POKEMON_QUERY_TTL_MS', '-1');
+    vi.stubEnv('NEXT_PUBLIC_POKEMON_QUERY_TTL_MS', '-1');
 
     const queryClient = createAppQueryClient();
     const queryDefaults = queryClient.getDefaultOptions().queries;
@@ -38,7 +38,7 @@ describe('createAppQueryClient', () => {
   });
 
   it('falls back to the default TTL when the env value is not a number', () => {
-    vi.stubEnv('VITE_POKEMON_QUERY_TTL_MS', 'abc');
+    vi.stubEnv('NEXT_PUBLIC_POKEMON_QUERY_TTL_MS', 'abc');
 
     const queryClient = createAppQueryClient();
     const queryDefaults = queryClient.getDefaultOptions().queries;
@@ -48,7 +48,7 @@ describe('createAppQueryClient', () => {
   });
 
   it('allows a zero TTL override', () => {
-    vi.stubEnv('VITE_POKEMON_QUERY_TTL_MS', '0');
+    vi.stubEnv('NEXT_PUBLIC_POKEMON_QUERY_TTL_MS', '0');
 
     const queryClient = createAppQueryClient();
     const queryDefaults = queryClient.getDefaultOptions().queries;

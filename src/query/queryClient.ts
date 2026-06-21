@@ -4,7 +4,7 @@ const DEFAULT_POKEMON_QUERY_TTL_MS = 5 * 60 * 1000;
 
 function getPokemonQueryTtlMs() {
   const parsedValue = Number.parseInt(
-    import.meta.env.VITE_POKEMON_QUERY_TTL_MS ?? '',
+    process.env.NEXT_PUBLIC_POKEMON_QUERY_TTL_MS ?? '',
     10,
   );
 
