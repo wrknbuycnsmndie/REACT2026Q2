@@ -1,7 +1,15 @@
 import { redirect } from 'next/navigation';
+import { PokemonDetailsPanel } from '../../components/PokemonDetails/PokemonDetailsPanel';
 import { DEFAULT_PAGE } from '../../constants/pagination';
-import { hasValidPageParam } from '../../helpers/searchParams';
+import {
+  getCurrentDetailsId,
+  getCurrentPage,
+  getCurrentSearchTerm,
+  getSearchParamsWithDetails,
+  hasValidPageParam,
+} from '../../helpers/searchParams';
 import { isLocale } from '../../i18n/routing';
+import { fetchPokemonDetails, fetchPokemonResults } from '../../services/pokemon';
 import { HomePage } from '../../views/HomePage/HomePage';
 
 export const dynamic = 'force-dynamic';
@@ -22,7 +30,38 @@ export default async function Page({ params, searchParams }: PageProps) {
     redirect(`/${locale}?${currentSearchParams.toString()}`);
   }
 
-  return <HomePage />;
+  const currentPage = getCurrentPage(currentSearchParams);
+  const currentSearchTerm = getCurrentSearchTerm(currentSearchParams);
+  const currentDetailsId = getCurrentDetailsId(currentSearchParams);
+  const closeDetailsSearchParams = getSearchParamsWithDetails(
+    currentSearchParams,
+    null,
+  );
+  const closeDetailsHref = closeDetailsSearchParams.toString()
+    ? `/?${closeDetailsSearchParams.toString()}`
+    : '/';
+  const [initialResults, initialDetails] = await Promise.all([
+    fetchPokemonResults(currentSearchTerm, currentPage).catch(() => null),
+    currentDetailsId ? fetchPokemonDetails(currentDetailsId).catch(() => null) : null,
+  ]);
+
+  return (
+    <HomePage
+      detailsPanel={
+        currentDetailsId ? (
+          <PokemonDetailsPanel
+            closeHref={closeDetailsHref}
+            details={initialDetails}
+            errorMessage=''
+            isLoading={false}
+          />
+        ) : null
+      }
+      hasDetailsPanel={Boolean(currentDetailsId)}
+      initialResults={initialResults}
+      initialSearchTerm={currentSearchParams.has('query') ? currentSearchTerm : undefined}
+    />
+  );
 }
 
 function toUrlSearchParams(

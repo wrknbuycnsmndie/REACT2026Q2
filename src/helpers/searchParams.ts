@@ -1,5 +1,7 @@
 import { DEFAULT_PAGE } from '../constants/pagination';
 
+const SEARCH_QUERY_PARAM = 'query';
+
 export function hasValidPageParam(searchParams: URLSearchParams): boolean {
     const rawPage = searchParams.get('page');
     const parsedPage = Number(rawPage);
@@ -22,6 +24,33 @@ export function getSearchParamsWithPage(
     const nextSearchParams = new URLSearchParams(searchParams);
 
     nextSearchParams.set('page', String(Math.max(DEFAULT_PAGE, page)));
+
+    return nextSearchParams;
+}
+
+export function getCurrentSearchTerm(searchParams: URLSearchParams): string {
+    const rawSearchTerm = searchParams.get(SEARCH_QUERY_PARAM);
+
+    if (!rawSearchTerm) {
+        return '';
+    }
+
+    return rawSearchTerm.trim();
+}
+
+export function getSearchParamsWithSearchTerm(
+    searchParams: URLSearchParams,
+    searchTerm: string,
+): URLSearchParams {
+    const nextSearchParams = new URLSearchParams(searchParams);
+    const trimmedSearchTerm = searchTerm.trim();
+
+    if (trimmedSearchTerm === '') {
+        nextSearchParams.delete(SEARCH_QUERY_PARAM);
+        return nextSearchParams;
+    }
+
+    nextSearchParams.set(SEARCH_QUERY_PARAM, trimmedSearchTerm);
 
     return nextSearchParams;
 }

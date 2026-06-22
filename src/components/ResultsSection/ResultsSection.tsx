@@ -8,23 +8,23 @@ import { ResultsTableBody } from './ResultsTableBody';
 import type { SearchResultItem } from '../../types/search';
 
 type ResultsSectionProps = {
+    getDetailsHref: (detailsId: string | null) => string;
+    getPageHref: (page: number) => string;
     currentPage: number;
     errorMessage: string;
     isLoading: boolean;
     items: SearchResultItem[];
-    onItemSelect: (detailsId: string) => void;
-    onPageChange: (page: number) => void;
     selectedPokemonId: string | null;
     totalPages: number;
 };
 
 export function ResultsSection({
+    getDetailsHref,
+    getPageHref,
     currentPage,
     errorMessage,
     isLoading,
     items,
-    onItemSelect,
-    onPageChange,
     selectedPokemonId,
     totalPages,
 }: ResultsSectionProps) {
@@ -48,8 +48,8 @@ export function ResultsSection({
                 {!isLoading && errorMessage === '' && items.length > 0 ? (
                     <ResultsTableBody
                         currentPage={currentPage}
+                        getDetailsHref={getDetailsHref}
                         items={items}
-                        onItemSelect={onItemSelect}
                         selectedPokemonId={selectedPokemonId}
                     />
                 ) : null}
@@ -61,7 +61,7 @@ export function ResultsSection({
             {showPagination ? (
                 <Pagination
                     currentPage={currentPage}
-                    onPageChange={onPageChange}
+                    getPageHref={getPageHref}
                     totalPages={totalPages}
                 />
             ) : null}

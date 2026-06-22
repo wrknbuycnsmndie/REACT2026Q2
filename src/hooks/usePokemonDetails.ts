@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { getRequestErrorMessage } from '../helpers/getRequestErrorMessage';
 import { getPokemonDetailsQueryKey } from '../query/pokemonQueryKeys';
-import { usePokemonQueryRefresh } from '../query/usePokemonQueryRefresh';
 import { fetchPokemonDetails } from '../services/pokemon';
 import { useSelectedPokemonStore } from '../store/selectedPokemonStore';
 import type { PokemonDetails } from '../types/pokemon';
@@ -14,15 +13,19 @@ type UsePokemonDetailsResult = {
   refreshDetails: () => Promise<void>;
 };
 
+type UsePokemonDetailsOptions = {
+  enabled?: boolean;
+};
+
 export function usePokemonDetails(
   selectedPokemonId: string | null,
+  { enabled = true }: UsePokemonDetailsOptions = {},
 ): UsePokemonDetailsResult {
-  const { refreshPokemonDetails } = usePokemonQueryRefresh();
   const syncSelectedPokemonDetails = useSelectedPokemonStore(
     (state) => state.syncSelectedPokemonDetails,
   );
   const detailsQuery = useQuery({
-    enabled: Boolean(selectedPokemonId),
+    enabled: Boolean(selectedPokemonId) && enabled,
     queryFn: () => fetchPokemonDetails(selectedPokemonId!),
     queryKey: getPokemonDetailsQueryKey(selectedPokemonId ?? ''),
   });
@@ -42,6 +45,12 @@ export function usePokemonDetails(
         ? getRequestErrorMessage(detailsQuery.error)
         : '',
     isLoading: selectedPokemonId ? detailsQuery.isPending : false,
-    refreshDetails: () => refreshPokemonDetails(selectedPokemonId),
+    refreshDetails: async () => {
+      if (!selectedPokemonId) {
+        return;
+      }
+
+      await detailsQuery.refetch();
+    },
   };
 }

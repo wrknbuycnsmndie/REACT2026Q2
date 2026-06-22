@@ -1,5 +1,6 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import type { ComponentProps } from 'react';
 import { vi } from 'vitest';
 import { PokemonSearch } from '../../../components/PokemonSearch/PokemonSearch';
 import { SelectedPokemonFlyout } from '../../../components/SelectedPokemonFlyout/SelectedPokemonFlyout';
@@ -9,7 +10,6 @@ import { renderWithQueryClient } from '../../testUtils/renderWithQueryClient';
 import {
   mockedFetchPokemonResults,
   mockedGetStoredSearchTerm,
-  mockedSetStoredSearchTerm,
   resetPokemonSearchMocks,
 } from '../../testUtils/pokemonSearchMocks';
 
@@ -40,12 +40,19 @@ function createDeferredPromise<T>() {
 }
 
 describe('PokemonSearch', () => {
-  const renderPokemonSearch = (initialUrl = '/') => {
+  const renderPokemonSearch = (
+    initialUrl = '/',
+    props?: Partial<ComponentProps<typeof PokemonSearch>>,
+  ) => {
     setMockUrl(initialUrl);
 
     return renderWithQueryClient(
       <>
-        <PokemonSearch onTestError={vi.fn()} shouldThrowError={false} />
+        <PokemonSearch
+          onTestError={vi.fn()}
+          shouldThrowError={false}
+          {...props}
+        />
         <SelectedPokemonFlyout />
       </>,
     );
@@ -93,22 +100,14 @@ describe('PokemonSearch', () => {
     ).toBeInTheDocument();
   });
 
-  it('calls the mocked API and updates results after a search submit', async () => {
+  it('does not trigger a new results request while the user is only typing', async () => {
     const user = userEvent.setup();
 
-    mockedFetchPokemonResults
-      .mockResolvedValueOnce({ items: [], page: 1, totalPages: 3 })
-      .mockResolvedValueOnce({
-        items: [
-          {
-            id: '133',
-            name: 'eevee',
-            url: 'https://pokeapi.co/api/v2/pokemon/133/',
-          },
-        ],
-        page: 1,
-        totalPages: 1,
-      });
+    mockedFetchPokemonResults.mockResolvedValueOnce({
+      items: [],
+      page: 1,
+      totalPages: 3,
+    });
 
     renderPokemonSearch();
 
@@ -118,16 +117,14 @@ describe('PokemonSearch', () => {
       screen.getByRole('searchbox', { name: 'Pokemon name' }),
       '  Eevee  ',
     );
-    await user.click(screen.getByRole('button', { name: 'Search' }));
 
-    await waitFor(() => {
-      expect(mockedFetchPokemonResults).toHaveBeenNthCalledWith(2, 'Eevee', 1);
-    });
-
-    expect(await screen.findByLabelText('eevee')).toBeInTheDocument();
+    expect(mockedFetchPokemonResults).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole('searchbox', { name: 'Pokemon name' })).toHaveValue(
+      '  Eevee  ',
+    );
   });
 
-  it('restores the stored search term on mount and uses it for the initial request', async () => {
+  it('restores the stored search term on mount without changing the initial fetch query', async () => {
     mockedGetStoredSearchTerm.mockReturnValue('snorlax');
     resetPokemonSearchStore();
     mockedFetchPokemonResults.mockResolvedValue({
@@ -147,80 +144,13 @@ describe('PokemonSearch', () => {
     expect(screen.getByRole('searchbox', { name: 'Pokemon name' })).toHaveValue(
       'snorlax',
     );
-    expect(mockedFetchPokemonResults).toHaveBeenCalledWith('snorlax', 1);
+    expect(mockedFetchPokemonResults).toHaveBeenCalledWith('', 1);
     expect(await screen.findByLabelText('snorlax')).toBeInTheDocument();
   });
 
-  it('renders a mocked error response after a submitted search fails', async () => {
-    const user = userEvent.setup();
-
-    mockedFetchPokemonResults.mockResolvedValueOnce({
-      items: [],
-      page: 1,
-      totalPages: 3,
-    });
-    mockedFetchPokemonResults.mockRejectedValueOnce(
-      new Error('Unexpected low-level failure'),
-    );
-
-    renderPokemonSearch();
-
-    await screen.findByText('No results to display yet.');
-
-    await user.type(
-      screen.getByRole('searchbox', { name: 'Pokemon name' }),
-      'mew',
-    );
-    await user.click(screen.getByRole('button', { name: 'Search' }));
-
-    expect(
-      await screen.findByText(
-        'Something went wrong while loading Pokemon data. Please try again.',
-      ),
-    ).toBeInTheDocument();
-    expect(screen.getByText('Request failed')).toBeInTheDocument();
-  });
-
-  it('does not call the API again when submitting the same trimmed term', async () => {
-    const user = userEvent.setup();
-
-    mockedGetStoredSearchTerm.mockReturnValue('mew');
-    resetPokemonSearchStore();
-    mockedFetchPokemonResults.mockResolvedValue({
-      items: [
-        {
-          id: '151',
-          name: 'mew',
-          url: 'https://pokeapi.co/api/v2/pokemon/151/',
-        },
-      ],
-      page: 1,
-      totalPages: 1,
-    });
-
-    renderPokemonSearch();
-
-    await screen.findByLabelText('mew');
-
-    await user.clear(screen.getByRole('searchbox', { name: 'Pokemon name' }));
-    await user.type(
-      screen.getByRole('searchbox', { name: 'Pokemon name' }),
-      '  mew  ',
-    );
-    await user.click(screen.getByRole('button', { name: 'Search' }));
-
-    expect(mockedFetchPokemonResults).toHaveBeenCalledTimes(1);
-    expect(screen.getByRole('searchbox', { name: 'Pokemon name' })).toHaveValue(
-      'mew',
-    );
-  });
-
-  it('stores the trimmed search term after a successful user search', async () => {
-    const user = userEvent.setup();
-
-    mockedFetchPokemonResults
-      .mockResolvedValueOnce({ items: [], page: 1, totalPages: 3 })
-      .mockResolvedValueOnce({
+  it('renders initial server-provided search data without an extra client request', async () => {
+    renderPokemonSearch('/', {
+      initialResults: {
         items: [
           {
             id: '150',
@@ -230,7 +160,25 @@ describe('PokemonSearch', () => {
         ],
         page: 1,
         totalPages: 1,
-      });
+      },
+      initialSearchTerm: 'mewtwo',
+    });
+
+    expect(mockedFetchPokemonResults).not.toHaveBeenCalled();
+    expect(screen.getByRole('searchbox', { name: 'Pokemon name' })).toHaveValue(
+      'mewtwo',
+    );
+    expect(await screen.findByLabelText('mewtwo')).toBeInTheDocument();
+  });
+
+  it('does not persist the search term while the user is only editing the input', async () => {
+    const user = userEvent.setup();
+
+    mockedFetchPokemonResults.mockResolvedValue({
+      items: [],
+      page: 1,
+      totalPages: 1,
+    });
 
     renderPokemonSearch();
 
@@ -240,13 +188,6 @@ describe('PokemonSearch', () => {
       screen.getByRole('searchbox', { name: 'Pokemon name' }),
       '  mewtwo ',
     );
-    await user.click(screen.getByRole('button', { name: 'Search' }));
-
-    await waitFor(() => {
-      expect(mockedSetStoredSearchTerm).toHaveBeenCalledWith('mewtwo');
-    });
-
-    expect(await screen.findByLabelText('mewtwo')).toBeInTheDocument();
   });
 
   it('loads the page from the URL and updates results when navigating pages', async () => {
@@ -281,7 +222,7 @@ describe('PokemonSearch', () => {
     expect(await screen.findByLabelText('metapod')).toBeInTheDocument();
     expect(screen.getByText('Page 2 of 3')).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: 'Next page' }));
+    await user.click(screen.getByRole('link', { name: 'Next page' }));
 
     await waitFor(() => {
       expect(mockedFetchPokemonResults).toHaveBeenNthCalledWith(2, '', 3);
@@ -317,7 +258,7 @@ describe('PokemonSearch', () => {
 
     expect(await screen.findByLabelText('metapod')).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: 'Next page' }));
+    await user.click(screen.getByRole('link', { name: 'Next page' }));
 
     expect(await screen.findByText('Loading results...')).toBeInTheDocument();
 
@@ -367,10 +308,10 @@ describe('PokemonSearch', () => {
 
     expect(await screen.findByLabelText('bulbasaur')).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: 'Next page' }));
+    await user.click(screen.getByRole('link', { name: 'Next page' }));
     expect(await screen.findByLabelText('charmander')).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: 'Previous page' }));
+    await user.click(screen.getByRole('link', { name: 'Previous page' }));
 
     expect(await screen.findByLabelText('bulbasaur')).toBeInTheDocument();
     expect(mockedFetchPokemonResults).toHaveBeenCalledTimes(2);
@@ -450,7 +391,7 @@ describe('PokemonSearch', () => {
     );
     expect(screen.getByText('1 selected')).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: 'Next page' }));
+    await user.click(screen.getByRole('link', { name: 'Next page' }));
 
     expect(await screen.findByLabelText('charmander')).toBeInTheDocument();
     expect(screen.getByText('1 selected')).toBeInTheDocument();

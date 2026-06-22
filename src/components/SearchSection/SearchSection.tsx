@@ -1,10 +1,9 @@
 import { useTranslations } from 'next-intl';
-import type { ChangeEvent, SyntheticEvent } from 'react';
+import type { ChangeEvent } from 'react';
 
 type SearchSectionProps = {
     onSearchTermChange: (value: string) => void;
     onRefresh: () => void;
-    onSubmit: () => void;
     onTestError: () => void;
     searchTerm: string;
 };
@@ -12,7 +11,6 @@ type SearchSectionProps = {
 export function SearchSection({
     onSearchTermChange,
     onRefresh,
-    onSubmit,
     onTestError,
     searchTerm,
 }: SearchSectionProps) {
@@ -20,11 +18,6 @@ export function SearchSection({
 
     const handleSearchTermChange = (event: ChangeEvent<HTMLInputElement>) => {
         onSearchTermChange(event.target.value);
-    };
-
-    const handleSubmit = (event: SyntheticEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        onSubmit();
     };
 
     return (
@@ -38,10 +31,12 @@ export function SearchSection({
                 </p>
             </div>
 
-            <form className="search-section__form" onSubmit={handleSubmit}>
+            <form className="search-section__form" method="get">
+                <input type="hidden" name="page" value="1" />
                 <input
                     className="search-section__input"
                     type="search"
+                    name="query"
                     placeholder="pikachu"
                     aria-label={t('pokemonName')}
                     value={searchTerm}

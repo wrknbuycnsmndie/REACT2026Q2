@@ -3,15 +3,15 @@ import type { SearchResultItem } from '../../types/search';
 
 type ResultsTableBodyProps = {
   currentPage: number;
+  getDetailsHref: (detailsId: string | null) => string;
   items: SearchResultItem[];
-  onItemSelect: (detailsId: string) => void;
   selectedPokemonId: string | null;
 };
 
 export function ResultsTableBody({
   currentPage,
+  getDetailsHref,
   items,
-  onItemSelect,
   selectedPokemonId,
 }: ResultsTableBodyProps) {
   return (
@@ -19,10 +19,10 @@ export function ResultsTableBody({
       {items.map((item) => (
         <ResultsTableRow
           currentPage={currentPage}
+          detailsHref={getDetailsHref(item.id)}
           key={item.id}
           isActive={item.id === selectedPokemonId}
           item={item}
-          onSelect={onItemSelect}
         />
       ))}
     </ul>

@@ -1,19 +1,26 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { ErrorBoundary } from '../../components/ErrorBoundary/ErrorBoundary';
-import { PokemonDetailsPanel } from '../../components/PokemonDetails/PokemonDetailsPanel';
 import { PokemonSearch } from '../../components/PokemonSearch/PokemonSearch';
 import { SelectedPokemonFlyout } from '../../components/SelectedPokemonFlyout/SelectedPokemonFlyout';
-import { usePokemonDetails } from '../../hooks/usePokemonDetails';
-import { usePokemonDetailsParam } from '../../hooks/usePokemonDetailsParam';
+import type { SearchResultsPage } from '../../types/search';
 
-export function HomePage() {
+type HomePageProps = {
+    detailsPanel?: ReactNode;
+    hasDetailsPanel?: boolean;
+    initialResults?: SearchResultsPage | null;
+    initialSearchTerm?: string;
+};
+
+export function HomePage({
+    detailsPanel = null,
+    hasDetailsPanel = false,
+    initialResults = null,
+    initialSearchTerm,
+}: HomePageProps) {
     const [shouldThrowError, setShouldThrowError] = useState(false);
-    const { closeDetails, selectedPokemonId } = usePokemonDetailsParam();
-    const { details, errorMessage, isLoading, refreshDetails } = usePokemonDetails(
-        selectedPokemonId,
-    );
 
     const handleResetError = () => {
         setShouldThrowError(false);
@@ -27,23 +34,15 @@ export function HomePage() {
         <ErrorBoundary onReset={handleResetError}>
             <div className="home-page">
                 <div
-                    className={`home-page__content${selectedPokemonId ? ' home-page__content--with-details' : ''}`}
+                    className={`home-page__content${hasDetailsPanel ? ' home-page__content--with-details' : ''}`}
                 >
                     <PokemonSearch
+                        initialResults={initialResults}
+                        initialSearchTerm={initialSearchTerm}
                         onTestError={handleTriggerError}
                         shouldThrowError={shouldThrowError}
                     />
-                    {selectedPokemonId ? (
-                        <PokemonDetailsPanel
-                            details={details}
-                            errorMessage={errorMessage}
-                            isLoading={isLoading}
-                            onClose={closeDetails}
-                            onRefresh={() => {
-                                void refreshDetails();
-                            }}
-                        />
-                    ) : null}
+                    {detailsPanel}
                 </div>
                 <SelectedPokemonFlyout />
             </div>

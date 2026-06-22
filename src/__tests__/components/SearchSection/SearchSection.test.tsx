@@ -10,7 +10,6 @@ describe('SearchSection', () => {
       <SearchSection
         onSearchTermChange={vi.fn()}
         onRefresh={vi.fn()}
-        onSubmit={vi.fn()}
         onTestError={vi.fn()}
         searchTerm='pikachu'
       />,
@@ -25,6 +24,11 @@ describe('SearchSection', () => {
     expect(screen.getByRole('searchbox', { name: 'Pokemon name' })).toHaveValue(
       'pikachu',
     );
+    expect(screen.getByRole('searchbox', { name: 'Pokemon name' })).toHaveAttribute(
+      'name',
+      'query',
+    );
+    expect(screen.getByDisplayValue('1')).toHaveAttribute('name', 'page');
     expect(screen.getByRole('button', { name: 'Search' })).toBeInTheDocument();
     expect(
       screen.getByRole('button', { name: 'Refresh Results' }),
@@ -42,7 +46,6 @@ describe('SearchSection', () => {
       <SearchSection
         onSearchTermChange={onSearchTermChange}
         onRefresh={vi.fn()}
-        onSubmit={vi.fn()}
         onTestError={vi.fn()}
         searchTerm=''
       />,
@@ -56,23 +59,19 @@ describe('SearchSection', () => {
     expect(onSearchTermChange).toHaveBeenCalled();
   });
 
-  it('calls the submit handler when the user submits the form', async () => {
-    const user = userEvent.setup();
-    const onSubmit = vi.fn();
-
+  it('renders a GET form for URL-driven search submission', () => {
     renderWithIntl(
       <SearchSection
         onSearchTermChange={vi.fn()}
         onRefresh={vi.fn()}
-        onSubmit={onSubmit}
         onTestError={vi.fn()}
         searchTerm='eevee'
       />,
     );
 
-    await user.click(screen.getByRole('button', { name: 'Search' }));
-
-    expect(onSubmit).toHaveBeenCalledTimes(1);
+    expect(
+      screen.getByRole('searchbox', { name: 'Pokemon name' }).closest('form'),
+    ).toHaveAttribute('method', 'get');
   });
 
   it('calls the refresh handler when requested', async () => {
@@ -83,7 +82,6 @@ describe('SearchSection', () => {
       <SearchSection
         onSearchTermChange={vi.fn()}
         onRefresh={onRefresh}
-        onSubmit={vi.fn()}
         onTestError={vi.fn()}
         searchTerm=''
       />,
@@ -102,7 +100,6 @@ describe('SearchSection', () => {
       <SearchSection
         onSearchTermChange={vi.fn()}
         onRefresh={vi.fn()}
-        onSubmit={vi.fn()}
         onTestError={onTestError}
         searchTerm=''
       />,

@@ -1,35 +1,26 @@
-import { useRouteSearchParams } from './useUrlSearchParams';
-import { DEFAULT_PAGE } from '../constants/pagination';
+import { usePathname } from '../i18n/navigation';
 import { getCurrentPage, getSearchParamsWithPage } from '../helpers/searchParams';
+import { useRouteSearchParams } from './useUrlSearchParams';
 
 type UsePokemonPageParamResult = {
+  getPageHref: (page: number) => string;
   currentPage: number;
-  goToPage: (page: number) => void;
-  resetPage: () => void;
 };
 
 export function usePokemonPageParam(): UsePokemonPageParamResult {
-  const { searchParams, setSearchParams } = useRouteSearchParams();
+  const pathname = usePathname();
+  const { searchParams } = useRouteSearchParams();
   const currentPage = getCurrentPage(searchParams);
 
-  const updatePage = (page: number) => {
+  const getPageHref = (page: number) => {
     const nextSearchParams = getSearchParamsWithPage(searchParams, page);
-    const nextPage = getCurrentPage(nextSearchParams);
+    const queryString = nextSearchParams.toString();
 
-    if (nextPage === currentPage) {
-      return;
-    }
-
-    setSearchParams(nextSearchParams);
-  };
-
-  const resetPage = () => {
-    updatePage(DEFAULT_PAGE);
+    return queryString ? `${pathname}?${queryString}` : pathname;
   };
 
   return {
+    getPageHref,
     currentPage,
-    goToPage: updatePage,
-    resetPage,
   };
 }
