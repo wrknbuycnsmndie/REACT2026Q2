@@ -32,6 +32,13 @@
     justify-items: end;
 }
 
+.header__language-panel {
+    display: grid;
+    gap: 8px;
+    justify-items: start;
+    margin-top: 18px;
+}
+
 .header__theme-label {
     font-size: 0.8rem;
     font-weight: 700;
@@ -49,6 +56,9 @@
 }
 
 .header__theme-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     min-width: 88px;
     border: 2px solid transparent;
     padding: 10px 14px;
@@ -57,6 +67,7 @@
     font-weight: 700;
     letter-spacing: 0.04em;
     text-transform: uppercase;
+    text-decoration: none;
     transition:
         background-color 160ms ease,
         color 160ms ease,
@@ -137,6 +148,10 @@
         width: 100%;
         margin-top: 4px;
         margin-bottom: 14px;
+        justify-items: stretch;
+    }
+
+    .header__language-panel {
         justify-items: stretch;
     }
 

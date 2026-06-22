@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi } from 'vitest';
 import { ResultsTableRow } from '../../../components/ResultsSection/ResultsTableRow';
@@ -6,6 +6,7 @@ import {
   resetSelectedPokemonStore,
   useSelectedPokemonStore,
 } from '../../../store/selectedPokemonStore';
+import { renderWithIntl } from '../../testUtils/renderWithIntl';
 
 describe('ResultsTableRow', () => {
   beforeEach(() => {
@@ -13,7 +14,7 @@ describe('ResultsTableRow', () => {
   });
 
   it('renders the item name and selection checkbox', () => {
-    render(
+    renderWithIntl(
       <ResultsTableRow
         currentPage={2}
         isActive={false}
@@ -35,7 +36,7 @@ describe('ResultsTableRow', () => {
     const user = userEvent.setup();
     const onSelect = vi.fn();
 
-    render(
+    renderWithIntl(
       <ResultsTableRow
         currentPage={3}
         isActive={false}
@@ -60,7 +61,7 @@ describe('ResultsTableRow', () => {
     const user = userEvent.setup();
     const onSelect = vi.fn();
 
-    render(
+    renderWithIntl(
       <ResultsTableRow
         currentPage={1}
         isActive={false}

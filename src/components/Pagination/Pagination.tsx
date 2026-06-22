@@ -1,3 +1,5 @@
+import { useTranslations } from 'next-intl';
+
 type PaginationProps = {
     currentPage: number;
     onPageChange: (page: number) => void;
@@ -9,18 +11,20 @@ export function Pagination({
     onPageChange,
     totalPages,
 }: PaginationProps) {
+    const t = useTranslations('Pagination');
+
     return (
-        <nav className="pagination" aria-label="Pagination">
+        <nav className="pagination" aria-label={t('label')}>
             <button
                 className="pagination__button"
                 type="button"
                 onClick={() => onPageChange(currentPage - 1)}
                 disabled={currentPage === 1}
             >
-                Previous page
+                {t('previous')}
             </button>
             <p className="pagination__status">
-                Page {currentPage} of {totalPages}
+                {t('status', { currentPage, totalPages })}
             </p>
             <button
                 className="pagination__button"
@@ -28,7 +32,7 @@ export function Pagination({
                 onClick={() => onPageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
             >
-                Next page
+                {t('next')}
             </button>
         </nav>
     );

@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import { Component } from 'react';
 import type { ErrorInfo, ReactNode } from 'react';
 
@@ -33,25 +34,28 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
         const { hasError } = this.state;
 
         if (hasError) {
-            return (
-                <section className="error-boundary" aria-live="polite">
-                    <p className="error-boundary__label">Application error</p>
-                    <h2 className="error-boundary__title">Something went wrong.</h2>
-                    <p className="error-boundary__message">
-                        The interface hit an unexpected problem and switched to a safe fallback
-                        view.
-                    </p>
-                    <button
-                        className="error-boundary__button"
-                        type="button"
-                        onClick={this.handleReset}
-                    >
-                        Remove Error
-                    </button>
-                </section>
-            );
+            return <ErrorBoundaryFallback onReset={this.handleReset} />;
         }
 
         return children;
     }
+}
+
+function ErrorBoundaryFallback({ onReset }: { onReset: () => void }) {
+    const t = useTranslations('ErrorBoundary');
+
+    return (
+        <section className="error-boundary" aria-live="polite">
+            <p className="error-boundary__label">{t('label')}</p>
+            <h2 className="error-boundary__title">{t('title')}</h2>
+            <p className="error-boundary__message">{t('message')}</p>
+            <button
+                className="error-boundary__button"
+                type="button"
+                onClick={onReset}
+            >
+                {t('reset')}
+            </button>
+        </section>
+    );
 }

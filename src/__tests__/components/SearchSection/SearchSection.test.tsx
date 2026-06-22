@@ -1,11 +1,12 @@
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi } from 'vitest';
 import { SearchSection } from '../../../components/SearchSection/SearchSection';
+import { renderWithIntl } from '../../testUtils/renderWithIntl';
 
 describe('SearchSection', () => {
   it('renders the search input, submit button, and action buttons', () => {
-    render(
+    renderWithIntl(
       <SearchSection
         onSearchTermChange={vi.fn()}
         onRefresh={vi.fn()}
@@ -37,7 +38,7 @@ describe('SearchSection', () => {
     const user = userEvent.setup();
     const onSearchTermChange = vi.fn();
 
-    render(
+    renderWithIntl(
       <SearchSection
         onSearchTermChange={onSearchTermChange}
         onRefresh={vi.fn()}
@@ -59,7 +60,7 @@ describe('SearchSection', () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();
 
-    render(
+    renderWithIntl(
       <SearchSection
         onSearchTermChange={vi.fn()}
         onRefresh={vi.fn()}
@@ -78,7 +79,7 @@ describe('SearchSection', () => {
     const user = userEvent.setup();
     const onRefresh = vi.fn();
 
-    render(
+    renderWithIntl(
       <SearchSection
         onSearchTermChange={vi.fn()}
         onRefresh={onRefresh}
@@ -97,7 +98,7 @@ describe('SearchSection', () => {
     const user = userEvent.setup();
     const onTestError = vi.fn();
 
-    render(
+    renderWithIntl(
       <SearchSection
         onSearchTermChange={vi.fn()}
         onRefresh={vi.fn()}

@@ -1,9 +1,10 @@
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import { ResultsError } from '../../../components/ResultsSection/ResultsError';
+import { renderWithIntl } from '../../testUtils/renderWithIntl';
 
 describe('ResultsError', () => {
     it('renders the request failure label and message', () => {
-        render(<ResultsError message="Network timeout" />);
+        renderWithIntl(<ResultsError message="Network timeout" />);
 
         expect(screen.getByText('Request failed')).toBeInTheDocument();
         expect(screen.getByText('Network timeout')).toBeInTheDocument();

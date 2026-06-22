@@ -1,3 +1,7 @@
+import { useTranslations } from 'next-intl';
+
 export function ResultsEmptyState() {
-    return <p className="results-section__empty">No results to display yet.</p>;
+    const t = useTranslations('ResultsSection');
+
+    return <p className="results-section__empty">{t('empty')}</p>;
 }

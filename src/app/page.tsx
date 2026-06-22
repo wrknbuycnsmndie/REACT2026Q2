@@ -1,7 +1,7 @@
-import { HomePage } from '../views/HomePage/HomePage';
-
-export const dynamic = 'force-dynamic';
+import { redirect } from 'next/navigation';
+import { DEFAULT_PAGE } from '../constants/pagination';
+import { defaultLocale } from '../i18n/routing';
 
 export default function Page() {
-  return <HomePage />;
+  redirect(`/${defaultLocale}?page=${DEFAULT_PAGE}`);
 }

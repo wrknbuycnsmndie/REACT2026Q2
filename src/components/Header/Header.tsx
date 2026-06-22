@@ -1,11 +1,14 @@
 'use client';
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { useTranslations } from 'next-intl';
+import { Suspense } from 'react';
 import { useTheme } from '../../context/themeContext';
+import { Link, usePathname } from '../../i18n/navigation';
+import { LanguageSwitcher } from './LanguageSwitcher';
 
 export function Header() {
   const { setTheme, theme } = useTheme();
+  const t = useTranslations('Header');
   const pathname = usePathname();
   const isHomeActive = pathname === '/';
   const isAboutActive = pathname === '/about';
@@ -13,11 +16,11 @@ export function Header() {
   return (
     <header className='header'>
       <div className='header__top-row'>
-        <p className='header__eyebrow'>React Functional Components</p>
+        <p className='header__eyebrow'>{t('eyebrow')}</p>
         <div className='header__theme-panel'>
-          <span className='header__theme-label'>Theme</span>
+          <span className='header__theme-label'>{t('theme')}</span>
           <div
-            aria-label='Theme'
+            aria-label={t('theme')}
             className='header__theme-switcher'
             role='group'
           >
@@ -27,7 +30,7 @@ export function Header() {
               type='button'
               onClick={() => setTheme('light')}
             >
-              Light
+              {t('light')}
             </button>
             <button
               aria-pressed={theme === 'dark'}
@@ -35,29 +38,30 @@ export function Header() {
               type='button'
               onClick={() => setTheme('dark')}
             >
-              Dark
+              {t('dark')}
             </button>
           </div>
         </div>
       </div>
-      <h1 className='header__title'>Pokemon Search</h1>
-      <p className='header__subtitle'>
-        Search Pokemon, review details, and manage your selected list.
-      </p>
-      <nav className='header__nav' aria-label='Primary'>
+      <h1 className='header__title'>{t('title')}</h1>
+      <p className='header__subtitle'>{t('subtitle')}</p>
+      <nav className='header__nav' aria-label={t('primaryNav')}>
         <Link
           className={`header__nav-link${isHomeActive ? ' header__nav-link--active' : ''}`}
           href='/?page=1'
         >
-          Home
+          {t('home')}
         </Link>
         <Link
           className={`header__nav-link${isAboutActive ? ' header__nav-link--active' : ''}`}
           href='/about'
         >
-          About
+          {t('about')}
         </Link>
       </nav>
+      <Suspense fallback={null}>
+        <LanguageSwitcher />
+      </Suspense>
     </header>
   );
 }

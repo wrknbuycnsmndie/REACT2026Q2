@@ -1,8 +1,9 @@
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi } from 'vitest';
 import { ResultsSection } from '../../../components/ResultsSection/ResultsSection';
 import { resetSelectedPokemonStore } from '../../../store/selectedPokemonStore';
+import { renderWithIntl } from '../../testUtils/renderWithIntl';
 
 describe('ResultsSection', () => {
   beforeEach(() => {
@@ -10,7 +11,7 @@ describe('ResultsSection', () => {
   });
 
   it('renders the empty state when there are no results', () => {
-    render(
+    renderWithIntl(
       <ResultsSection
         currentPage={1}
         errorMessage=""
@@ -33,7 +34,7 @@ describe('ResultsSection', () => {
   });
 
   it('renders the loading state while data is being fetched', () => {
-    render(
+    renderWithIntl(
       <ResultsSection
         currentPage={1}
         errorMessage=""
@@ -50,7 +51,7 @@ describe('ResultsSection', () => {
   });
 
   it('renders the error state when a request fails', () => {
-    render(
+    renderWithIntl(
       <ResultsSection
         currentPage={1}
         errorMessage="Unable to load Pokemon data."
@@ -68,7 +69,7 @@ describe('ResultsSection', () => {
   });
 
   it('renders a row for each item when results are available', () => {
-    render(
+    renderWithIntl(
       <ResultsSection
         currentPage={2}
         errorMessage=""
@@ -113,7 +114,7 @@ describe('ResultsSection', () => {
       name: 'eevee',
       url: 'https://pokeapi.co/api/v2/pokemon/133/',
     };
-    const { rerender } = render(
+    const { rerender } = renderWithIntl(
       <ResultsSection
         currentPage={1}
         errorMessage=""

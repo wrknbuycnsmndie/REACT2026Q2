@@ -14,7 +14,6 @@ import '../components/SelectedPokemonFlyout/SelectedPokemonFlyout.css';
 import '../views/HomePage/HomePage.css';
 import '../views/AboutPage/AboutPage.css';
 import '../views/NotFoundPage/NotFoundPage.css';
-import { Header } from '../components/Header/Header';
 import { Providers } from './providers';
 
 export const metadata: Metadata = {
@@ -30,14 +29,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang='en'>
       <body>
-        <Providers>
-          <main className='app'>
-            <div className='app__container'>
-              <Header />
-              {children}
-            </div>
-          </main>
-        </Providers>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

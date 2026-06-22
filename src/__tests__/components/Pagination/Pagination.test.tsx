@@ -1,14 +1,15 @@
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi } from 'vitest';
 import { Pagination } from '../../../components/Pagination/Pagination';
+import { renderWithIntl } from '../../testUtils/renderWithIntl';
 
 describe('Pagination', () => {
     it('disables the previous button on the first page and advances to the next page', async () => {
         const user = userEvent.setup();
         const onPageChange = vi.fn();
 
-        render(
+        renderWithIntl(
             <Pagination currentPage={1} totalPages={3} onPageChange={onPageChange} />,
         );
 
@@ -24,7 +25,7 @@ describe('Pagination', () => {
         const user = userEvent.setup();
         const onPageChange = vi.fn();
 
-        render(
+        renderWithIntl(
             <Pagination currentPage={3} totalPages={3} onPageChange={onPageChange} />,
         );
 

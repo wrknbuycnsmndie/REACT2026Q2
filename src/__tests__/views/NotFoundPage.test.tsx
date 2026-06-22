@@ -1,7 +1,8 @@
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { NotFoundPage } from '../../views/NotFoundPage/NotFoundPage';
 import { getMockUrl, setMockUrl } from '../testUtils/nextMocks';
+import { renderWithIntl } from '../testUtils/renderWithIntl';
 
 describe('NotFoundPage', () => {
   it('renders a clear 404 state with a link back to search', async () => {
@@ -9,7 +10,7 @@ describe('NotFoundPage', () => {
 
     setMockUrl('/missing-page');
 
-    render(<NotFoundPage />);
+    renderWithIntl(<NotFoundPage />);
 
     expect(
       screen.getByRole('heading', {
@@ -24,12 +25,12 @@ describe('NotFoundPage', () => {
     ).toBeInTheDocument();
     expect(
       screen.getByRole('link', { name: 'Return to Pokemon Search' }),
-    ).toHaveAttribute('href', '/?page=1');
+    ).toHaveAttribute('href', '/en?page=1');
 
     await user.click(
       screen.getByRole('link', { name: 'Return to Pokemon Search' }),
     );
 
-    expect(getMockUrl()).toBe('/?page=1');
+    expect(getMockUrl()).toBe('/en?page=1');
   });
 });

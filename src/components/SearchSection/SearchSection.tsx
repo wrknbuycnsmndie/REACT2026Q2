@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import type { ChangeEvent, SyntheticEvent } from 'react';
 
 type SearchSectionProps = {
@@ -15,6 +16,8 @@ export function SearchSection({
     onTestError,
     searchTerm,
 }: SearchSectionProps) {
+    const t = useTranslations('SearchSection');
+
     const handleSearchTermChange = (event: ChangeEvent<HTMLInputElement>) => {
         onSearchTermChange(event.target.value);
     };
@@ -28,10 +31,10 @@ export function SearchSection({
         <section className="search-section" aria-labelledby="search-title">
             <div className="search-section__header">
                 <h2 id="search-title" className="search-section__title">
-                    Search
+                    {t('title')}
                 </h2>
                 <p className="search-section__description">
-                    Search by name or browse the Pokemon list page by page.
+                    {t('description')}
                 </p>
             </div>
 
@@ -40,20 +43,20 @@ export function SearchSection({
                     className="search-section__input"
                     type="search"
                     placeholder="pikachu"
-                    aria-label="Pokemon name"
+                    aria-label={t('pokemonName')}
                     value={searchTerm}
                     onChange={handleSearchTermChange}
                 />
                 <button className="search-section__button" type="submit">
-                    Search
+                    {t('submit')}
                 </button>
             </form>
 
             <button className="search-section__error-button" type="button" onClick={onRefresh}>
-                Refresh Results
+                {t('refreshResults')}
             </button>
             <button className="search-section__error-button" type="button" onClick={onTestError}>
-                Trigger Error
+                {t('triggerError')}
             </button>
         </section>
     );

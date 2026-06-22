@@ -1,9 +1,10 @@
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import { AboutPage } from '../../views/AboutPage/AboutPage';
+import { renderWithIntl } from '../testUtils/renderWithIntl';
 
 describe('AboutPage', () => {
   it('renders static about content and external course links', () => {
-    render(<AboutPage />);
+    renderWithIntl(<AboutPage />);
 
     expect(
       screen.getByRole('heading', {
@@ -13,7 +14,7 @@ describe('AboutPage', () => {
     ).toBeInTheDocument();
     expect(
       screen.getByText(
-        'Built by an RS School student as a Next.js exercise around search, pagination, and master-detail navigation patterns.',
+        'An RS School student application translated from Vite to Next.js with search, pagination, and master-detail navigation.',
       ),
     ).toBeInTheDocument();
     expect(

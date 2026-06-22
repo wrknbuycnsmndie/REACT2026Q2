@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi } from 'vitest';
 import { SelectedPokemonFlyout } from '../../../components/SelectedPokemonFlyout/SelectedPokemonFlyout';
@@ -7,6 +7,7 @@ import {
   resetSelectedPokemonStore,
   useSelectedPokemonStore,
 } from '../../../store/selectedPokemonStore';
+import { renderWithIntl } from '../../testUtils/renderWithIntl';
 
 vi.mock('../../../services/downloadSelectedPokemonCsv', () => ({
   downloadSelectedPokemonCsv: vi.fn(),
@@ -19,7 +20,7 @@ describe('SelectedPokemonFlyout', () => {
   });
 
   it('does not render when there are no selected items', () => {
-    render(<SelectedPokemonFlyout />);
+    renderWithIntl(<SelectedPokemonFlyout />);
 
     expect(
       screen.queryByRole('complementary', { name: 'Selected Pokemon' }),
@@ -46,7 +47,7 @@ describe('SelectedPokemonFlyout', () => {
       2,
     );
 
-    render(<SelectedPokemonFlyout />);
+    renderWithIntl(<SelectedPokemonFlyout />);
 
     expect(screen.getByText('2 selected')).toBeInTheDocument();
 
@@ -68,7 +69,7 @@ describe('SelectedPokemonFlyout', () => {
       4,
     );
 
-    render(<SelectedPokemonFlyout />);
+    renderWithIntl(<SelectedPokemonFlyout />);
 
     await user.click(screen.getByRole('button', { name: 'Download' }));
 
@@ -99,7 +100,7 @@ describe('SelectedPokemonFlyout', () => {
       ),
     );
 
-    render(<SelectedPokemonFlyout />);
+    renderWithIntl(<SelectedPokemonFlyout />);
 
     await user.click(screen.getByRole('button', { name: 'Download' }));
 

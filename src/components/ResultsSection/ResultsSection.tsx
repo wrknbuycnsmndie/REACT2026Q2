@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import { Pagination } from '../Pagination/Pagination';
 import { ResultsEmptyState } from './ResultsEmptyState';
 import { ResultsError } from './ResultsError';
@@ -27,16 +28,17 @@ export function ResultsSection({
     selectedPokemonId,
     totalPages,
 }: ResultsSectionProps) {
+    const t = useTranslations('ResultsSection');
     const showPagination = !isLoading && errorMessage === '' && items.length > 0 && totalPages > 1;
 
     return (
         <section className="results-section" aria-labelledby="results-title">
             <div className="results-section__header">
                 <h2 id="results-title" className="results-section__title">
-                    Results
+                    {t('title')}
                 </h2>
                 <p className="results-section__description">
-                    Open a row to view details or use the checkbox to manage selections.
+                    {t('description')}
                 </p>
             </div>
 

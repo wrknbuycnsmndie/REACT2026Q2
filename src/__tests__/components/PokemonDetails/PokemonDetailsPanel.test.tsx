@@ -1,10 +1,11 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, screen } from '@testing-library/react';
 import { vi } from 'vitest';
 import { PokemonDetailsPanel } from '../../../components/PokemonDetails/PokemonDetailsPanel';
+import { renderWithIntl } from '../../testUtils/renderWithIntl';
 
 describe('PokemonDetailsPanel', () => {
     it('renders the loading state', () => {
-        render(
+        renderWithIntl(
             <PokemonDetailsPanel
                 details={null}
                 errorMessage=''
@@ -18,7 +19,7 @@ describe('PokemonDetailsPanel', () => {
     });
 
     it('renders the error state', () => {
-        render(
+        renderWithIntl(
             <PokemonDetailsPanel
                 details={null}
                 errorMessage='Details failed to load.'
@@ -32,7 +33,7 @@ describe('PokemonDetailsPanel', () => {
     });
 
     it('renders a fallback message when details are missing', () => {
-        render(
+        renderWithIntl(
             <PokemonDetailsPanel
                 details={null}
                 errorMessage=''
@@ -49,7 +50,7 @@ describe('PokemonDetailsPanel', () => {
         const onClose = vi.fn();
         const onRefresh = vi.fn();
 
-        render(
+        renderWithIntl(
             <PokemonDetailsPanel
                 details={{
                     description: 'Electric mouse Pokemon.',

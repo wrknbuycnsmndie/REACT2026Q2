@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { getRequestErrorMessage } from '../../helpers/getRequestErrorMessage';
 import { downloadSelectedPokemonCsv } from '../../services/downloadSelectedPokemonCsv';
@@ -8,6 +9,7 @@ import {
 } from '../../store/selectedPokemonStore';
 
 export function SelectedPokemonFlyout() {
+  const t = useTranslations('SelectedPokemonFlyout');
   const clearSelectedPokemon = useSelectedPokemonStore(
     (state) => state.clearSelectedPokemon,
   );
@@ -38,10 +40,10 @@ export function SelectedPokemonFlyout() {
   };
 
   return (
-    <aside className='selected-pokemon-flyout' aria-label='Selected Pokemon'>
+    <aside className='selected-pokemon-flyout' aria-label={t('label')}>
       <div className='selected-pokemon-flyout__status'>
         <p className='selected-pokemon-flyout__summary'>
-          {selectedPokemonCount} selected
+          {t('summary', { count: selectedPokemonCount })}
         </p>
         {downloadErrorMessage ? (
           <p className='selected-pokemon-flyout__error' aria-live='polite'>
@@ -56,7 +58,7 @@ export function SelectedPokemonFlyout() {
           disabled={isDownloading}
           onClick={clearSelectedPokemon}
         >
-          Unselect all
+          {t('unselectAll')}
         </button>
         <button
           className='selected-pokemon-flyout__button selected-pokemon-flyout__button--accent'
@@ -64,7 +66,7 @@ export function SelectedPokemonFlyout() {
           disabled={isDownloading}
           onClick={handleDownload}
         >
-          {isDownloading ? 'Preparing...' : 'Download'}
+          {isDownloading ? t('preparing') : t('download')}
         </button>
       </div>
     </aside>

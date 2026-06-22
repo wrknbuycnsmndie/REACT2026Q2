@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import type { PokemonDetails } from '../../types/pokemon';
 
 type PokemonDetailsContentProps = {
@@ -5,6 +6,8 @@ type PokemonDetailsContentProps = {
 };
 
 export function PokemonDetailsContent({ details }: PokemonDetailsContentProps) {
+  const t = useTranslations('PokemonDetails');
+
   return (
     <div className='pokemon-details__content'>
       {details.imageUrl ? (
@@ -20,19 +23,19 @@ export function PokemonDetailsContent({ details }: PokemonDetailsContentProps) {
         <p className='pokemon-details__description'>{details.description}</p>
         <dl className='pokemon-details__facts'>
           <div className='pokemon-details__fact'>
-            <dt>ID</dt>
+            <dt>{t('id')}</dt>
             <dd>{details.id}</dd>
           </div>
           <div className='pokemon-details__fact'>
-            <dt>Height</dt>
+            <dt>{t('height')}</dt>
             <dd>{details.height}</dd>
           </div>
           <div className='pokemon-details__fact'>
-            <dt>Weight</dt>
+            <dt>{t('weight')}</dt>
             <dd>{details.weight}</dd>
           </div>
           <div className='pokemon-details__fact'>
-            <dt>Types</dt>
+            <dt>{t('types')}</dt>
             <dd>{details.types.join(', ')}</dd>
           </div>
         </dl>

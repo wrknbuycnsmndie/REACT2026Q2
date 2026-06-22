@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import { PokemonDetailsContent } from './PokemonDetailsContent';
 import { PokemonDetailsState } from './PokemonDetailsState';
 import type { PokemonDetails } from '../../types/pokemon';
@@ -17,6 +18,8 @@ export function PokemonDetailsPanel({
   onClose,
   onRefresh,
 }: PokemonDetailsPanelProps) {
+  const t = useTranslations('PokemonDetails');
+
   return (
     <aside className='pokemon-details' onClick={onClose}>
       <div
@@ -30,7 +33,7 @@ export function PokemonDetailsPanel({
       >
         <div className='pokemon-details__header'>
           <h2 id='pokemon-details-title' className='pokemon-details__title'>
-            Details
+            {t('title')}
           </h2>
           <div className='pokemon-details__actions'>
             <button
@@ -38,24 +41,24 @@ export function PokemonDetailsPanel({
               type='button'
               onClick={onRefresh}
             >
-              Refresh
+              {t('refresh')}
             </button>
             <button
               className='pokemon-details__close'
               type='button'
               onClick={onClose}
             >
-              Close
+              {t('close')}
             </button>
           </div>
         </div>
 
-        {isLoading ? <PokemonDetailsState message='Loading details...' /> : null}
+        {isLoading ? <PokemonDetailsState message={t('loading')} /> : null}
         {!isLoading && errorMessage ? (
           <PokemonDetailsState message={errorMessage} />
         ) : null}
         {!isLoading && !errorMessage && !details ? (
-          <PokemonDetailsState message='Unable to load details.' />
+          <PokemonDetailsState message={t('unableToLoad')} />
         ) : null}
         {!isLoading && !errorMessage && details ? (
           <PokemonDetailsContent details={details} />
