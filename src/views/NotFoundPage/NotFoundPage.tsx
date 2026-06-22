@@ -1,8 +1,9 @@
 import Image from 'next/image';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { Link } from '../../i18n/navigation';
 
 export function NotFoundPage() {
+  const locale = useLocale();
   const t = useTranslations('NotFoundPage');
 
   return (
@@ -23,7 +24,7 @@ export function NotFoundPage() {
           {t('title')}
         </h2>
         <p className='not-found-page__text'>{t('description')}</p>
-        <Link className='not-found-page__link' href='/?page=1'>
+        <Link className='not-found-page__link' href='/?page=1' locale={locale}>
           {t('returnToSearch')}
         </Link>
       </div>
