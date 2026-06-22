@@ -1,5 +1,5 @@
-import { screen } from '@testing-library/react';
-import type { ComponentProps } from 'react';
+import { render, screen } from '@testing-library/react';
+import type { ComponentProps, ReactNode } from 'react';
 import { vi } from 'vitest';
 import { Header } from '../components/Header/Header';
 import { PokemonDetailsPanel } from '../components/PokemonDetails/PokemonDetailsPanel';
@@ -7,7 +7,7 @@ import { ThemeProvider } from '../context/ThemeProvider';
 import { resetPokemonSearchStore } from '../store/pokemonSearchStore';
 import { HomePage } from '../views/HomePage/HomePage';
 import { setMockUrl } from './testUtils/nextMocks';
-import { renderWithQueryClient } from './testUtils/renderWithQueryClient';
+import { IntlTestProvider } from './testUtils/renderWithIntl';
 import {
   mockedFetchPokemonDetails,
   mockedFetchPokemonResults,
@@ -25,15 +25,22 @@ vi.mock('../services/localStorageService', () => ({
 }));
 
 function renderAppWithHomePage(homePageProps: ComponentProps<typeof HomePage>) {
-  return renderWithQueryClient(
-    <ThemeProvider>
-      <main className='app'>
-        <div className='app__container'>
-          <Header />
-          <HomePage {...homePageProps} />
-        </div>
-      </main>
-    </ThemeProvider>,
+  function Wrapper({ children }: { children: ReactNode }) {
+    return (
+      <IntlTestProvider>
+        <ThemeProvider>{children}</ThemeProvider>
+      </IntlTestProvider>
+    );
+  }
+
+  return render(
+    <main className='app'>
+      <div className='app__container'>
+        <Header />
+        <HomePage {...homePageProps} />
+      </div>
+    </main>,
+    { wrapper: Wrapper },
   );
 }
 

@@ -1,12 +1,12 @@
-import { screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import type { ComponentProps } from 'react';
+import type { ComponentProps, ReactNode } from 'react';
 import { vi } from 'vitest';
 import { PokemonSearch } from '../../../components/PokemonSearch/PokemonSearch';
 import { SelectedPokemonFlyout } from '../../../components/SelectedPokemonFlyout/SelectedPokemonFlyout';
 import { resetPokemonSearchStore } from '../../../store/pokemonSearchStore';
 import { setMockUrl } from '../../testUtils/nextMocks';
-import { renderWithQueryClient } from '../../testUtils/renderWithQueryClient';
+import { IntlTestProvider } from '../../testUtils/renderWithIntl';
 import {
   mockedFetchPokemonResults,
   mockedGetStoredSearchTerm,
@@ -46,11 +46,16 @@ describe('PokemonSearch', () => {
   ) => {
     setMockUrl(initialUrl);
 
-    return renderWithQueryClient(
+    function Wrapper({ children }: { children: ReactNode }) {
+      return <IntlTestProvider>{children}</IntlTestProvider>;
+    }
+
+    return render(
       <>
         <PokemonSearch {...props} />
         <SelectedPokemonFlyout />
       </>,
+      { wrapper: Wrapper },
     );
   };
 
