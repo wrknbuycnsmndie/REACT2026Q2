@@ -1,5 +1,6 @@
 import { PokemonRequestError } from './pokemonRequestError';
 import { DEFAULT_PAGE, POKEMON_RESULTS_PAGE_SIZE } from '../constants/pagination';
+import type { Locale } from '../i18n/routing';
 import type { PokemonDetails } from '../types/pokemon';
 import type { SearchResultItem, SearchResultsPage } from '../types/search';
 
@@ -71,14 +72,17 @@ export async function fetchPokemonResults(searchTerm: string, page = 1): Promise
     };
 }
 
-export async function fetchPokemonDetails(id: string): Promise<PokemonDetails> {
+export async function fetchPokemonDetails(
+    id: string,
+    locale: Locale = 'en',
+): Promise<PokemonDetails> {
     const [pokemon, species] = await Promise.all([
         requestJson<PokemonResponse>(`${POKEMON_API_URL}/${id}`),
         requestJson<PokemonSpeciesResponse>(`${POKEMON_API_URL}-species/${id}`),
     ]);
 
     return {
-        description: getEnglishDescription(species),
+        description: getLocalizedDescription(species, locale),
         height: pokemon.height,
         id: String(pokemon.id),
         imageUrl: pokemon.sprites.front_default,
@@ -111,14 +115,28 @@ function getPokemonIdFromUrl(url: string): string {
     return segments.at(-1) ?? '';
 }
 
-function getEnglishDescription(species: PokemonSpeciesResponse): string {
+function getLocalizedDescription(species: PokemonSpeciesResponse, locale: Locale): string {
+    const localizedEntry = species.flavor_text_entries.find((entry) => {
+        return entry.language.name === locale;
+    });
+
+    if (localizedEntry) {
+        return localizedEntry.flavor_text.replace(/\s+/g, ' ').trim();
+    }
+
     const englishEntry = species.flavor_text_entries.find((entry) => {
         return entry.language.name === 'en';
     });
 
-    if (!englishEntry) {
+    if (englishEntry) {
+        return englishEntry.flavor_text.replace(/\s+/g, ' ').trim();
+    }
+
+    const fallbackEntry = species.flavor_text_entries[0];
+
+    if (!fallbackEntry) {
         return 'No description available.';
     }
 
-    return englishEntry.flavor_text.replace(/\s+/g, ' ').trim();
+    return fallbackEntry.flavor_text.replace(/\s+/g, ' ').trim();
 }
