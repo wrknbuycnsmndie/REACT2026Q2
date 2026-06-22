@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import type { PokemonDetails } from '../../types/pokemon';
 
@@ -11,10 +12,13 @@ export function PokemonDetailsContent({ details }: PokemonDetailsContentProps) {
   return (
     <div className='pokemon-details__content'>
       {details.imageUrl ? (
-        <img
+        <Image
           className='pokemon-details__image'
           src={details.imageUrl}
           alt={details.name}
+          width={120}
+          height={120}
+          sizes='120px'
         />
       ) : null}
 
