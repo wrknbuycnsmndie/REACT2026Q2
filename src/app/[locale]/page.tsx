@@ -24,6 +24,14 @@ type PageProps = {
 export default async function Page({ params, searchParams }: PageProps) {
   const { locale } = await params;
   const currentSearchParams = toUrlSearchParams(await searchParams);
+  const currentSearchTerm = getCurrentSearchTerm(currentSearchParams);
+
+  if (isLocale(locale) && currentSearchParams.has('query') && currentSearchTerm === '') {
+    currentSearchParams.delete('query');
+    const queryString = currentSearchParams.toString();
+
+    redirect(queryString ? `/${locale}?${queryString}` : `/${locale}`);
+  }
 
   if (isLocale(locale) && !hasValidPageParam(currentSearchParams)) {
     currentSearchParams.set('page', String(DEFAULT_PAGE));
@@ -31,7 +39,6 @@ export default async function Page({ params, searchParams }: PageProps) {
   }
 
   const currentPage = getCurrentPage(currentSearchParams);
-  const currentSearchTerm = getCurrentSearchTerm(currentSearchParams);
   const currentDetailsId = getCurrentDetailsId(currentSearchParams);
   const closeDetailsSearchParams = getSearchParamsWithDetails(
     currentSearchParams,

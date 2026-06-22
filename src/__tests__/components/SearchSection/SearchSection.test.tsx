@@ -10,7 +10,6 @@ describe('SearchSection', () => {
       <SearchSection
         onSearchTermChange={vi.fn()}
         onRefresh={vi.fn()}
-        onTestError={vi.fn()}
         searchTerm='pikachu'
       />,
     );
@@ -33,9 +32,6 @@ describe('SearchSection', () => {
     expect(
       screen.getByRole('button', { name: 'Refresh Results' }),
     ).toBeInTheDocument();
-    expect(
-      screen.getByRole('button', { name: 'Trigger Error' }),
-    ).toBeInTheDocument();
   });
 
   it('calls the change handler when the user types', async () => {
@@ -46,7 +42,6 @@ describe('SearchSection', () => {
       <SearchSection
         onSearchTermChange={onSearchTermChange}
         onRefresh={vi.fn()}
-        onTestError={vi.fn()}
         searchTerm=''
       />,
     );
@@ -64,7 +59,6 @@ describe('SearchSection', () => {
       <SearchSection
         onSearchTermChange={vi.fn()}
         onRefresh={vi.fn()}
-        onTestError={vi.fn()}
         searchTerm='eevee'
       />,
     );
@@ -82,7 +76,6 @@ describe('SearchSection', () => {
       <SearchSection
         onSearchTermChange={vi.fn()}
         onRefresh={onRefresh}
-        onTestError={vi.fn()}
         searchTerm=''
       />,
     );
@@ -92,21 +85,4 @@ describe('SearchSection', () => {
     expect(onRefresh).toHaveBeenCalledTimes(1);
   });
 
-  it('calls the error trigger handler when requested', async () => {
-    const user = userEvent.setup();
-    const onTestError = vi.fn();
-
-    renderWithIntl(
-      <SearchSection
-        onSearchTermChange={vi.fn()}
-        onRefresh={vi.fn()}
-        onTestError={onTestError}
-        searchTerm=''
-      />,
-    );
-
-    await user.click(screen.getByRole('button', { name: 'Trigger Error' }));
-
-    expect(onTestError).toHaveBeenCalledTimes(1);
-  });
 });

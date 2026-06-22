@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect } from 'react';
 import { usePokemonSearchStore } from '../store/pokemonSearchStore';
 import type { SearchResultItem, SearchResultsPage } from '../types/search';

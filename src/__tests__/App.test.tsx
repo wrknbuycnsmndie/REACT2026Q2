@@ -1,5 +1,4 @@
 import { screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import type { ComponentProps } from 'react';
 import { vi } from 'vitest';
 import { Header } from '../components/Header/Header';
@@ -24,21 +23,6 @@ vi.mock('../services/localStorageService', () => ({
   getStoredSearchTerm: vi.fn(),
   setStoredSearchTerm: vi.fn(),
 }));
-
-function renderApp(initialUrl = '/') {
-  setMockUrl(initialUrl);
-
-  return renderWithQueryClient(
-    <ThemeProvider>
-      <main className='app'>
-        <div className='app__container'>
-          <Header />
-        <HomePage />
-        </div>
-      </main>
-    </ThemeProvider>,
-  );
-}
 
 function renderAppWithHomePage(homePageProps: ComponentProps<typeof HomePage>) {
   return renderWithQueryClient(
@@ -71,32 +55,6 @@ describe('App', () => {
       types: ['electric'],
       weight: 60,
     });
-  });
-
-  it('shows the error boundary fallback after triggering a test error and recovers on reset', async () => {
-    const user = userEvent.setup();
-    const consoleErrorSpy = vi
-      .spyOn(console, 'error')
-      .mockImplementation(() => {});
-
-    renderApp();
-
-    await screen.findByText('No results to display yet.');
-
-    await user.click(screen.getByRole('button', { name: 'Trigger Error' }));
-
-    expect(await screen.findByText('Application error')).toBeInTheDocument();
-
-    await user.click(screen.getByRole('button', { name: 'Remove Error' }));
-
-    expect(
-      await screen.findByRole('heading', { level: 1, name: 'Pokemon Search' }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole('button', { name: 'Trigger Error' }),
-    ).toBeInTheDocument();
-
-    consoleErrorSpy.mockRestore();
   });
 
   it('renders server-provided selected details without an immediate client details fetch', async () => {

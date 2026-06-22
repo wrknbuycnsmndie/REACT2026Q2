@@ -4,14 +4,12 @@ import type { ChangeEvent } from 'react';
 type SearchSectionProps = {
     onSearchTermChange: (value: string) => void;
     onRefresh: () => void;
-    onTestError: () => void;
     searchTerm: string;
 };
 
 export function SearchSection({
     onSearchTermChange,
     onRefresh,
-    onTestError,
     searchTerm,
 }: SearchSectionProps) {
     const t = useTranslations('SearchSection');
@@ -49,9 +47,6 @@ export function SearchSection({
 
             <button className="search-section__error-button" type="button" onClick={onRefresh}>
                 {t('refreshResults')}
-            </button>
-            <button className="search-section__error-button" type="button" onClick={onTestError}>
-                {t('triggerError')}
             </button>
         </section>
     );

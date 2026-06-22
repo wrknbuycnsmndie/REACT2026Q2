@@ -48,11 +48,7 @@ describe('PokemonSearch', () => {
 
     return renderWithQueryClient(
       <>
-        <PokemonSearch
-          onTestError={vi.fn()}
-          shouldThrowError={false}
-          {...props}
-        />
+        <PokemonSearch {...props} />
         <SelectedPokemonFlyout />
       </>,
     );

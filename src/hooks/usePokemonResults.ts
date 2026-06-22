@@ -1,3 +1,5 @@
+'use client';
+
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { getRequestErrorMessage } from '../helpers/getRequestErrorMessage';
 import { fetchPokemonResults } from '../services/pokemon';
