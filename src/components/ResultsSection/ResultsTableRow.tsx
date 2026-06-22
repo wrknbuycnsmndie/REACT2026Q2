@@ -1,19 +1,20 @@
+import { Link } from '../../i18n/navigation';
 import { selectIsPokemonSelected, useSelectedPokemonStore } from '../../store/selectedPokemonStore';
 import type { SearchResultItem } from '../../types/search';
 import { ResultsTableRowCheckbox } from './ResultsTableRowCheckbox';
 
 type ResultsTableRowProps = {
   currentPage: number;
+  detailsHref: string;
   isActive: boolean;
   item: SearchResultItem;
-  onSelect: (detailsId: string) => void;
 };
 
 export function ResultsTableRow({
   currentPage,
+  detailsHref,
   isActive,
   item,
-  onSelect,
 }: ResultsTableRowProps) {
   const isSelected = useSelectedPokemonStore(selectIsPokemonSelected(item.id));
   const togglePokemonSelection = useSelectedPokemonStore(
@@ -28,13 +29,12 @@ export function ResultsTableRow({
           itemName={item.name}
           onChange={() => togglePokemonSelection(item, currentPage)}
         />
-        <button
+        <Link
           className={`results-section__result-button${isActive ? ' results-section__result-button--active' : ''}`}
-          type="button"
-          onClick={() => onSelect(item.id)}
+          href={detailsHref}
         >
           <span className="results-section__result-name">{item.name}</span>
-        </button>
+        </Link>
       </div>
     </li>
   );

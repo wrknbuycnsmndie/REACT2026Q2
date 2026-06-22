@@ -91,7 +91,7 @@ describe('fetchPokemonDetails', () => {
 
     const mockFetch = () => vi.spyOn(globalThis, 'fetch');
 
-    it('loads pokemon details and normalizes the english description', async () => {
+    it('loads pokemon details and picks the localized description when available', async () => {
         const fetchSpy = mockFetch()
             .mockResolvedValueOnce({
                 ok: true,
@@ -111,8 +111,16 @@ describe('fetchPokemonDetails', () => {
                 json: async () => ({
                     flavor_text_entries: [
                         {
+                            flavor_text: 'Игнорируемый текст',
+                            language: { name: 'ru' },
+                        },
+                        {
                             flavor_text: 'Ignored text',
                             language: { name: 'ja' },
+                        },
+                        {
+                            flavor_text: 'Мышь\nПокемон\tс острыми щёчками.',
+                            language: { name: 'ru' },
                         },
                         {
                             flavor_text: 'Mouse\nPokemon\twith static cheeks.',
@@ -122,8 +130,8 @@ describe('fetchPokemonDetails', () => {
                 }),
             } as Response);
 
-        await expect(fetchPokemonDetails('25')).resolves.toEqual({
-            description: 'Mouse Pokemon with static cheeks.',
+        await expect(fetchPokemonDetails('25', 'ru')).resolves.toEqual({
+            description: 'Игнорируемый текст',
             height: 4,
             id: '25',
             imageUrl: 'https://example.com/pikachu.png',
@@ -136,7 +144,7 @@ describe('fetchPokemonDetails', () => {
         expect(fetchSpy).toHaveBeenNthCalledWith(2, 'https://pokeapi.co/api/v2/pokemon-species/25');
     });
 
-    it('returns a fallback description when no english entry exists', async () => {
+    it('falls back to english when the requested locale is unavailable', async () => {
         mockFetch()
             .mockResolvedValueOnce({
                 ok: true,
@@ -159,12 +167,16 @@ describe('fetchPokemonDetails', () => {
                             flavor_text: 'Texto',
                             language: { name: 'es' },
                         },
+                        {
+                            flavor_text: 'Mouse Pokemon fallback.',
+                            language: { name: 'en' },
+                        },
                     ],
                 }),
             } as Response);
 
-        await expect(fetchPokemonDetails('133')).resolves.toEqual({
-            description: 'No description available.',
+        await expect(fetchPokemonDetails('133', 'ru')).resolves.toEqual({
+            description: 'Mouse Pokemon fallback.',
             height: 7,
             id: '133',
             imageUrl: null,

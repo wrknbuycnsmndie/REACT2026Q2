@@ -1,16 +1,20 @@
-import { fireEvent, render, screen } from '@testing-library/react';
-import { vi } from 'vitest';
+import { fireEvent, screen } from '@testing-library/react';
 import { PokemonDetailsPanel } from '../../../components/PokemonDetails/PokemonDetailsPanel';
+import { getMockUrl, setMockUrl } from '../../testUtils/nextMocks';
+import { renderWithIntl } from '../../testUtils/renderWithIntl';
 
 describe('PokemonDetailsPanel', () => {
+    beforeEach(() => {
+        setMockUrl('/?page=1&details=25');
+    });
+
     it('renders the loading state', () => {
-        render(
+        renderWithIntl(
             <PokemonDetailsPanel
+                closeHref='/?page=1'
                 details={null}
                 errorMessage=''
                 isLoading
-                onClose={vi.fn()}
-                onRefresh={vi.fn()}
             />,
         );
 
@@ -18,13 +22,12 @@ describe('PokemonDetailsPanel', () => {
     });
 
     it('renders the error state', () => {
-        render(
+        renderWithIntl(
             <PokemonDetailsPanel
+                closeHref='/?page=1'
                 details={null}
                 errorMessage='Details failed to load.'
                 isLoading={false}
-                onClose={vi.fn()}
-                onRefresh={vi.fn()}
             />,
         );
 
@@ -32,25 +35,22 @@ describe('PokemonDetailsPanel', () => {
     });
 
     it('renders a fallback message when details are missing', () => {
-        render(
+        renderWithIntl(
             <PokemonDetailsPanel
+                closeHref='/?page=1'
                 details={null}
                 errorMessage=''
                 isLoading={false}
-                onClose={vi.fn()}
-                onRefresh={vi.fn()}
             />,
         );
 
         expect(screen.getByText('Unable to load details.')).toBeInTheDocument();
     });
 
-    it('renders the details content and closes only from the outer panel area', () => {
-        const onClose = vi.fn();
-        const onRefresh = vi.fn();
-
-        render(
+    it('renders the details content and keeps closing URL-driven through the close link only', () => {
+        renderWithIntl(
             <PokemonDetailsPanel
+                closeHref='/?page=1'
                 details={{
                     description: 'Electric mouse Pokemon.',
                     height: 4,
@@ -62,8 +62,6 @@ describe('PokemonDetailsPanel', () => {
                 }}
                 errorMessage=''
                 isLoading={false}
-                onClose={onClose}
-                onRefresh={onRefresh}
             />,
         );
 
@@ -74,16 +72,9 @@ describe('PokemonDetailsPanel', () => {
         expect(screen.getByText('Electric mouse Pokemon.')).toBeInTheDocument();
         expect(screen.getByText('electric')).toBeInTheDocument();
 
-        fireEvent.click(screen.getByRole('dialog'));
-        expect(onClose).not.toHaveBeenCalled();
-
         fireEvent.click(screen.getByRole('button', { name: 'Refresh' }));
-        expect(onRefresh).toHaveBeenCalledTimes(1);
 
-        fireEvent.click(screen.getByRole('button', { name: 'Close' }));
-        expect(onClose).toHaveBeenCalledTimes(1);
-
-        fireEvent.click(screen.getByRole('dialog').parentElement as HTMLElement);
-        expect(onClose).toHaveBeenCalledTimes(2);
+        fireEvent.click(screen.getByRole('link', { name: 'Close' }));
+        expect(getMockUrl()).toBe('/en?page=1');
     });
 });

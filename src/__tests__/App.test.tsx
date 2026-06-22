@@ -1,11 +1,13 @@
-import { screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { MemoryRouter } from 'react-router';
+import { render, screen } from '@testing-library/react';
+import type { ComponentProps, ReactNode } from 'react';
 import { vi } from 'vitest';
+import { Header } from '../components/Header/Header';
+import { PokemonDetailsPanel } from '../components/PokemonDetails/PokemonDetailsPanel';
 import { ThemeProvider } from '../context/ThemeProvider';
-import { AppRouter } from '../router/AppRouter';
 import { resetPokemonSearchStore } from '../store/pokemonSearchStore';
-import { renderWithQueryClient } from './testUtils/renderWithQueryClient';
+import { HomePage } from '../views/HomePage/HomePage';
+import { setMockUrl } from './testUtils/nextMocks';
+import { IntlTestProvider } from './testUtils/renderWithIntl';
 import {
   mockedFetchPokemonDetails,
   mockedFetchPokemonResults,
@@ -21,6 +23,26 @@ vi.mock('../services/localStorageService', () => ({
   getStoredSearchTerm: vi.fn(),
   setStoredSearchTerm: vi.fn(),
 }));
+
+function renderAppWithHomePage(homePageProps: ComponentProps<typeof HomePage>) {
+  function Wrapper({ children }: { children: ReactNode }) {
+    return (
+      <IntlTestProvider>
+        <ThemeProvider>{children}</ThemeProvider>
+      </IntlTestProvider>
+    );
+  }
+
+  return render(
+    <main className='app'>
+      <div className='app__container'>
+        <Header />
+        <HomePage {...homePageProps} />
+      </div>
+    </main>,
+    { wrapper: Wrapper },
+  );
+}
 
 describe('App', () => {
   beforeEach(() => {
@@ -42,288 +64,45 @@ describe('App', () => {
     });
   });
 
-  it('shows the error boundary fallback after triggering a test error and recovers on reset', async () => {
-    const user = userEvent.setup();
-    const consoleErrorSpy = vi
-      .spyOn(console, 'error')
-      .mockImplementation(() => {});
+  it('renders server-provided selected details without an immediate client details fetch', async () => {
+    setMockUrl('/?details=25');
 
-    renderWithQueryClient(
-      <ThemeProvider>
-        <MemoryRouter initialEntries={['/']}>
-          <AppRouter />
-        </MemoryRouter>
-      </ThemeProvider>,
-    );
-
-    await screen.findByText('No results to display yet.');
-
-    await user.click(screen.getByRole('button', { name: 'Trigger Error' }));
-
-    expect(await screen.findByText('Application error')).toBeInTheDocument();
-
-    await user.click(screen.getByRole('button', { name: 'Remove Error' }));
-
-    expect(
-      await screen.findByRole('heading', { level: 1, name: 'Pokemon Search' }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole('button', { name: 'Trigger Error' }),
-    ).toBeInTheDocument();
-
-    consoleErrorSpy.mockRestore();
-  });
-
-  it('opens details after clicking a result and closes them with the close button', async () => {
-    const user = userEvent.setup();
-
-    mockedFetchPokemonResults.mockResolvedValue({
-      items: [
-        {
-          id: '25',
-          name: 'pikachu',
-          url: 'https://pokeapi.co/api/v2/pokemon/25/',
-        },
-      ],
-      page: 1,
-      totalPages: 1,
+    renderAppWithHomePage({
+      detailsPanel: (
+        <PokemonDetailsPanel
+          closeHref='/?page=1'
+          details={{
+            description: 'Server-rendered mouse Pokemon.',
+            height: 4,
+            id: '25',
+            imageUrl: 'https://example.com/pikachu.png',
+            name: 'pikachu',
+            types: ['electric'],
+            weight: 60,
+          }}
+          errorMessage=''
+          isLoading={false}
+        />
+      ),
+      hasDetailsPanel: true,
+      initialResults: {
+        items: [
+          {
+            id: '25',
+            name: 'pikachu',
+            url: 'https://pokeapi.co/api/v2/pokemon/25/',
+          },
+        ],
+        page: 1,
+        totalPages: 1,
+      },
+      initialSearchTerm: '',
     });
-
-    renderWithQueryClient(
-      <ThemeProvider>
-        <MemoryRouter initialEntries={['/']}>
-          <AppRouter />
-        </MemoryRouter>
-      </ThemeProvider>,
-    );
-
-    await user.click(await screen.findByRole('button', { name: 'pikachu' }));
 
     expect(await screen.findByRole('dialog')).toBeInTheDocument();
-    expect(await screen.findByText('A mouse Pokemon.')).toBeInTheDocument();
-
-    await user.click(screen.getByRole('button', { name: 'Close' }));
-
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-  });
-
-  it('reuses cached details when reopening the same Pokemon', async () => {
-    const user = userEvent.setup();
-
-    mockedFetchPokemonResults.mockResolvedValue({
-      items: [
-        {
-          id: '25',
-          name: 'pikachu',
-          url: 'https://pokeapi.co/api/v2/pokemon/25/',
-        },
-      ],
-      page: 1,
-      totalPages: 1,
-    });
-
-    renderWithQueryClient(
-      <ThemeProvider>
-        <MemoryRouter initialEntries={['/']}>
-          <AppRouter />
-        </MemoryRouter>
-      </ThemeProvider>,
-    );
-
-    await user.click(await screen.findByRole('button', { name: 'pikachu' }));
-    expect(await screen.findByText('A mouse Pokemon.')).toBeInTheDocument();
-    expect(mockedFetchPokemonDetails).toHaveBeenCalledTimes(1);
-
-    await user.click(screen.getByRole('button', { name: 'Close' }));
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-
-    await user.click(screen.getByRole('button', { name: 'pikachu' }));
-
-    expect(await screen.findByText('A mouse Pokemon.')).toBeInTheDocument();
-    expect(mockedFetchPokemonDetails).toHaveBeenCalledTimes(1);
-  });
-
-  it('refreshes the current Pokemon details query after invalidating its cache', async () => {
-    const user = userEvent.setup();
-
-    mockedFetchPokemonResults.mockResolvedValue({
-      items: [
-        {
-          id: '25',
-          name: 'pikachu',
-          url: 'https://pokeapi.co/api/v2/pokemon/25/',
-        },
-      ],
-      page: 1,
-      totalPages: 1,
-    });
-    mockedFetchPokemonDetails
-      .mockResolvedValueOnce({
-        description: 'A mouse Pokemon.',
-        height: 4,
-        id: '25',
-        imageUrl: 'https://example.com/pikachu.png',
-        name: 'pikachu',
-        types: ['electric'],
-        weight: 60,
-      })
-      .mockResolvedValueOnce({
-        description: 'A refreshed mouse Pokemon.',
-        height: 4,
-        id: '25',
-        imageUrl: 'https://example.com/pikachu.png',
-        name: 'pikachu',
-        types: ['electric'],
-        weight: 60,
-      });
-
-    renderWithQueryClient(
-      <ThemeProvider>
-        <MemoryRouter initialEntries={['/']}>
-          <AppRouter />
-        </MemoryRouter>
-      </ThemeProvider>,
-    );
-
-    await user.click(await screen.findByRole('button', { name: 'pikachu' }));
-    expect(await screen.findByText('A mouse Pokemon.')).toBeInTheDocument();
-
-    await user.click(screen.getByRole('button', { name: 'Refresh' }));
-
-    expect(await screen.findByText('A refreshed mouse Pokemon.')).toBeInTheDocument();
-    expect(mockedFetchPokemonDetails).toHaveBeenCalledTimes(2);
-  });
-
-  it('shows a clear details error message when loading Pokemon details fails', async () => {
-    const user = userEvent.setup();
-
-    mockedFetchPokemonResults.mockResolvedValue({
-      items: [
-        {
-          id: '25',
-          name: 'pikachu',
-          url: 'https://pokeapi.co/api/v2/pokemon/25/',
-        },
-      ],
-      page: 1,
-      totalPages: 1,
-    });
-    mockedFetchPokemonDetails.mockRejectedValueOnce(new TypeError('Failed to fetch'));
-
-    renderWithQueryClient(
-      <ThemeProvider>
-        <MemoryRouter initialEntries={['/']}>
-          <AppRouter />
-        </MemoryRouter>
-      </ThemeProvider>,
-    );
-
-    await user.click(await screen.findByRole('button', { name: 'pikachu' }));
-
     expect(
-      await screen.findByText(
-        'Unable to reach the Pokemon service. Please check your connection and try again.',
-      ),
+      await screen.findByText('Server-rendered mouse Pokemon.'),
     ).toBeInTheDocument();
-  });
-
-  it('closes details after clicking the outer panel area', async () => {
-    const user = userEvent.setup();
-
-    mockedFetchPokemonResults.mockResolvedValue({
-      items: [
-        {
-          id: '25',
-          name: 'pikachu',
-          url: 'https://pokeapi.co/api/v2/pokemon/25/',
-        },
-      ],
-      page: 1,
-      totalPages: 1,
-    });
-
-    renderWithQueryClient(
-      <ThemeProvider>
-        <MemoryRouter initialEntries={['/']}>
-          <AppRouter />
-        </MemoryRouter>
-      </ThemeProvider>,
-    );
-
-    await user.click(await screen.findByRole('button', { name: 'pikachu' }));
-
-    const dialog = await screen.findByRole('dialog');
-    const panel = dialog.parentElement;
-
-    if (!panel) {
-      throw new Error('Expected details panel wrapper to exist.');
-    }
-
-    await user.click(panel);
-
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-  });
-
-  it('opens the about page from the main navigation', async () => {
-    const user = userEvent.setup();
-
-    renderWithQueryClient(
-      <ThemeProvider>
-        <MemoryRouter initialEntries={['/']}>
-          <AppRouter />
-        </MemoryRouter>
-      </ThemeProvider>,
-    );
-
-    await user.click(screen.getByRole('link', { name: 'About' }));
-
-    expect(
-      await screen.findByRole('heading', {
-        level: 2,
-        name: 'Pokemon Search Workshop',
-      }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole('link', { name: 'RS School React Course' }),
-    ).toHaveAttribute('href', 'https://rs.school/courses/reactjs');
-    expect(screen.getByRole('link', { name: 'Anton Chapala' })).toHaveAttribute(
-      'href',
-      'https://github.com/wrknbuycnsmndie',
-    );
-  });
-
-  it('shows a 404 page for unknown routes and provides a way back to the app', async () => {
-    const user = userEvent.setup();
-
-    renderWithQueryClient(
-      <ThemeProvider>
-        <MemoryRouter initialEntries={['/missing-page']}>
-          <AppRouter />
-        </MemoryRouter>
-      </ThemeProvider>,
-    );
-
-    expect(
-      await screen.findByRole('heading', {
-        level: 2,
-        name: 'Pikachu used Thunder Shock on this route',
-      }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        'The page you requested vanished into the tall grass. Head back to the Pokedex and keep your search moving.',
-      ),
-    ).toBeInTheDocument();
-
-    await user.click(
-      screen.getByRole('link', { name: 'Return to Pokemon Search' }),
-    );
-
-    expect(
-      await screen.findByRole('heading', {
-        level: 1,
-        name: 'Pokemon Search',
-      }),
-    ).toBeInTheDocument();
+    expect(mockedFetchPokemonDetails).not.toHaveBeenCalled();
   });
 });

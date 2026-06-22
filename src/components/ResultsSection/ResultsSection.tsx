@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import { Pagination } from '../Pagination/Pagination';
 import { ResultsEmptyState } from './ResultsEmptyState';
 import { ResultsError } from './ResultsError';
@@ -5,39 +6,39 @@ import { ResultsLoader } from './ResultsLoader';
 import { ResultsTable } from './ResultsTable';
 import { ResultsTableBody } from './ResultsTableBody';
 import type { SearchResultItem } from '../../types/search';
-import './ResultsSection.css';
 
 type ResultsSectionProps = {
+    getDetailsHref: (detailsId: string | null) => string;
+    getPageHref: (page: number) => string;
     currentPage: number;
     errorMessage: string;
     isLoading: boolean;
     items: SearchResultItem[];
-    onItemSelect: (detailsId: string) => void;
-    onPageChange: (page: number) => void;
     selectedPokemonId: string | null;
     totalPages: number;
 };
 
 export function ResultsSection({
+    getDetailsHref,
+    getPageHref,
     currentPage,
     errorMessage,
     isLoading,
     items,
-    onItemSelect,
-    onPageChange,
     selectedPokemonId,
     totalPages,
 }: ResultsSectionProps) {
+    const t = useTranslations('ResultsSection');
     const showPagination = !isLoading && errorMessage === '' && items.length > 0 && totalPages > 1;
 
     return (
         <section className="results-section" aria-labelledby="results-title">
             <div className="results-section__header">
                 <h2 id="results-title" className="results-section__title">
-                    Results
+                    {t('title')}
                 </h2>
                 <p className="results-section__description">
-                    Open a row to view details or use the checkbox to manage selections.
+                    {t('description')}
                 </p>
             </div>
 
@@ -47,8 +48,8 @@ export function ResultsSection({
                 {!isLoading && errorMessage === '' && items.length > 0 ? (
                     <ResultsTableBody
                         currentPage={currentPage}
+                        getDetailsHref={getDetailsHref}
                         items={items}
-                        onItemSelect={onItemSelect}
                         selectedPokemonId={selectedPokemonId}
                     />
                 ) : null}
@@ -60,7 +61,7 @@ export function ResultsSection({
             {showPagination ? (
                 <Pagination
                     currentPage={currentPage}
-                    onPageChange={onPageChange}
+                    getPageHref={getPageHref}
                     totalPages={totalPages}
                 />
             ) : null}

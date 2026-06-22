@@ -36,18 +36,13 @@ export async function downloadSelectedPokemonCsv(
     }),
   );
   const csvContent = buildSelectedPokemonCsv(itemsForDownload);
-  const csvBlob = new Blob([csvContent], { type: 'text/csv;charset=utf-8' });
-  const downloadUrl = URL.createObjectURL(csvBlob);
-  const downloadLink = document.createElement('a');
 
-  downloadLink.href = downloadUrl;
-  downloadLink.download = getSelectedPokemonCsvFileName(
-    itemsForDownload.length,
-  );
-  document.body.append(downloadLink);
-  downloadLink.click();
-  downloadLink.remove();
-  URL.revokeObjectURL(downloadUrl);
+  return new Response(csvContent, {
+    headers: {
+      'Content-Disposition': `attachment; filename="${getSelectedPokemonCsvFileName(itemsForDownload.length)}"`,
+      'Content-Type': 'text/csv;charset=utf-8',
+    },
+  });
 }
 
 export function buildSelectedPokemonCsv(items: SelectedPokemonItem[]) {

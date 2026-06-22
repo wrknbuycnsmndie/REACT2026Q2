@@ -32,24 +32,7 @@ describe('downloadSelectedPokemonCsv', () => {
     expect(getSelectedPokemonCsvFileName(15)).toBe('15_items.csv');
   });
 
-  it('loads pokemon details and downloads the csv with native browser apis', async () => {
-    const appendSpy = vi.spyOn(document.body, 'append');
-    const revokeObjectUrlSpy = vi
-      .spyOn(URL, 'revokeObjectURL')
-      .mockImplementation(() => {});
-    const createObjectUrlSpy = vi
-      .spyOn(URL, 'createObjectURL')
-      .mockReturnValue('blob:download-url');
-    const clickSpy = vi.fn();
-    const removeSpy = vi.fn();
-    const createElementSpy = vi
-      .spyOn(document, 'createElement')
-      .mockReturnValue({
-        click: clickSpy,
-        download: '',
-        href: '',
-        remove: removeSpy,
-      } as unknown as HTMLAnchorElement);
+  it('loads pokemon details and returns a csv response', async () => {
     const loadPokemonDetails = vi.fn().mockResolvedValue({
       description: 'Mouse Pokemon',
       height: 4,
@@ -60,7 +43,7 @@ describe('downloadSelectedPokemonCsv', () => {
       weight: 60,
     });
 
-    await downloadSelectedPokemonCsv(
+    const response = await downloadSelectedPokemonCsv(
       [
         {
           detailsRoute: '/?page=1&details=25',
@@ -73,11 +56,9 @@ describe('downloadSelectedPokemonCsv', () => {
     );
 
     expect(loadPokemonDetails).toHaveBeenCalledWith('25');
-    expect(createElementSpy).toHaveBeenCalledWith('a');
-    expect(createObjectUrlSpy).toHaveBeenCalledOnce();
-    expect(appendSpy).toHaveBeenCalledOnce();
-    expect(clickSpy).toHaveBeenCalledOnce();
-    expect(removeSpy).toHaveBeenCalledOnce();
-    expect(revokeObjectUrlSpy).toHaveBeenCalledWith('blob:download-url');
+    expect(response.headers.get('content-disposition')).toBe(
+      'attachment; filename="1_items.csv"',
+    );
+    await expect(response.text()).resolves.toContain('Mouse Pokemon');
   });
 });

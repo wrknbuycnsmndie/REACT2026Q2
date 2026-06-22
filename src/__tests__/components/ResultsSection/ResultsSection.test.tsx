@@ -1,8 +1,8 @@
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { vi } from 'vitest';
 import { ResultsSection } from '../../../components/ResultsSection/ResultsSection';
 import { resetSelectedPokemonStore } from '../../../store/selectedPokemonStore';
+import { renderWithIntl } from '../../testUtils/renderWithIntl';
 
 describe('ResultsSection', () => {
   beforeEach(() => {
@@ -10,14 +10,14 @@ describe('ResultsSection', () => {
   });
 
   it('renders the empty state when there are no results', () => {
-    render(
+    renderWithIntl(
       <ResultsSection
+        getDetailsHref={(detailsId) => `/?page=1&details=${detailsId ?? ''}`}
+        getPageHref={(page) => `/?page=${page}`}
         currentPage={1}
         errorMessage=""
         isLoading={false}
         items={[]}
-        onItemSelect={vi.fn()}
-        onPageChange={vi.fn()}
         selectedPokemonId={null}
         totalPages={1}
       />,
@@ -33,14 +33,14 @@ describe('ResultsSection', () => {
   });
 
   it('renders the loading state while data is being fetched', () => {
-    render(
+    renderWithIntl(
       <ResultsSection
+        getDetailsHref={(detailsId) => `/?page=1&details=${detailsId ?? ''}`}
+        getPageHref={(page) => `/?page=${page}`}
         currentPage={1}
         errorMessage=""
         isLoading
         items={[]}
-        onItemSelect={vi.fn()}
-        onPageChange={vi.fn()}
         selectedPokemonId={null}
         totalPages={1}
       />,
@@ -50,14 +50,14 @@ describe('ResultsSection', () => {
   });
 
   it('renders the error state when a request fails', () => {
-    render(
+    renderWithIntl(
       <ResultsSection
+        getDetailsHref={(detailsId) => `/?page=1&details=${detailsId ?? ''}`}
+        getPageHref={(page) => `/?page=${page}`}
         currentPage={1}
         errorMessage="Unable to load Pokemon data."
         isLoading={false}
         items={[]}
-        onItemSelect={vi.fn()}
-        onPageChange={vi.fn()}
         selectedPokemonId={null}
         totalPages={1}
       />,
@@ -68,8 +68,10 @@ describe('ResultsSection', () => {
   });
 
   it('renders a row for each item when results are available', () => {
-    render(
+    renderWithIntl(
       <ResultsSection
+        getDetailsHref={(detailsId) => `/?page=2&details=${detailsId ?? ''}`}
+        getPageHref={(page) => `/?page=${page}`}
         currentPage={2}
         errorMessage=""
         isLoading={false}
@@ -85,8 +87,6 @@ describe('ResultsSection', () => {
             url: 'https://pokeapi.co/api/v2/pokemon/4/',
           },
         ]}
-        onItemSelect={vi.fn()}
-        onPageChange={vi.fn()}
         selectedPokemonId={null}
         totalPages={3}
       />,
@@ -94,6 +94,10 @@ describe('ResultsSection', () => {
 
     expect(screen.getByLabelText('bulbasaur')).toBeInTheDocument();
     expect(screen.getByLabelText('charmander')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'bulbasaur' })).toHaveAttribute(
+      'href',
+      '/en?page=2&details=1',
+    );
     expect(screen.getAllByRole('listitem')).toHaveLength(2);
     expect(screen.getByText('Page 2 of 3')).toBeInTheDocument();
     expect(screen.getAllByRole('checkbox')).toHaveLength(2);
@@ -101,8 +105,6 @@ describe('ResultsSection', () => {
 
   it('keeps selection checked when items reappear after page navigation', async () => {
     const user = userEvent.setup();
-    const onItemSelect = vi.fn();
-    const onPageChange = vi.fn();
     const selectedItem = {
       id: '25',
       name: 'pikachu',
@@ -113,14 +115,14 @@ describe('ResultsSection', () => {
       name: 'eevee',
       url: 'https://pokeapi.co/api/v2/pokemon/133/',
     };
-    const { rerender } = render(
+    const { rerender } = renderWithIntl(
       <ResultsSection
+        getDetailsHref={(detailsId) => `/?page=1&details=${detailsId ?? ''}`}
+        getPageHref={(page) => `/?page=${page}`}
         currentPage={1}
         errorMessage=""
         isLoading={false}
         items={[selectedItem]}
-        onItemSelect={onItemSelect}
-        onPageChange={onPageChange}
         selectedPokemonId={null}
         totalPages={2}
       />,
@@ -131,12 +133,12 @@ describe('ResultsSection', () => {
 
     rerender(
       <ResultsSection
+        getDetailsHref={(detailsId) => `/?page=2&details=${detailsId ?? ''}`}
+        getPageHref={(page) => `/?page=${page}`}
         currentPage={2}
         errorMessage=""
         isLoading={false}
         items={[otherItem]}
-        onItemSelect={onItemSelect}
-        onPageChange={onPageChange}
         selectedPokemonId={null}
         totalPages={2}
       />,
@@ -144,12 +146,12 @@ describe('ResultsSection', () => {
 
     rerender(
       <ResultsSection
+        getDetailsHref={(detailsId) => `/?page=1&details=${detailsId ?? ''}`}
+        getPageHref={(page) => `/?page=${page}`}
         currentPage={1}
         errorMessage=""
         isLoading={false}
         items={[selectedItem]}
-        onItemSelect={onItemSelect}
-        onPageChange={onPageChange}
         selectedPokemonId={null}
         totalPages={2}
       />,

@@ -1,0 +1,79 @@
+{
+  "Header": {
+    "eyebrow": "React Functional Components",
+    "theme": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "title": "Pokemon Search",
+    "subtitle": "Search Pokemon, review details, and manage your selected list.",
+    "primaryNav": "Primary",
+    "home": "Home",
+    "about": "About",
+    "language": "Language",
+    "english": "English",
+    "russian": "Russian"
+  },
+  "AboutPage": {
+    "eyebrow": "About The App",
+    "title": "Pokemon Search Workshop",
+    "description": "An RS School student application translated from Vite to Next.js with search, pagination, and master-detail navigation.",
+    "author": "Author",
+    "authorName": "Anton Chapala",
+    "course": "Course",
+    "courseName": "RS School React Course"
+  },
+  "NotFoundPage": {
+    "eyebrow": "404 Error",
+    "title": "Pikachu used Thunder Shock on this route",
+    "description": "The page you requested vanished into the tall grass. Head back to the Pokedex and keep your search moving.",
+    "returnToSearch": "Return to Pokemon Search"
+  },
+  "SearchSection": {
+    "title": "Search",
+    "description": "Search by name or browse the Pokemon list page by page.",
+    "pokemonName": "Pokemon name",
+    "submit": "Search",
+    "refreshResults": "Refresh Results",
+    "triggerError": "Trigger Error"
+  },
+  "ResultsSection": {
+    "title": "Results",
+    "description": "Open a row to view details or use the checkbox to manage selections.",
+    "empty": "No results to display yet.",
+    "requestFailed": "Request failed",
+    "loading": "Loading results...",
+    "select": "Select",
+    "pokemonName": "Pokemon Name",
+    "selectPokemon": "Select {name}"
+  },
+  "Pagination": {
+    "label": "Pagination",
+    "previous": "Previous page",
+    "next": "Next page",
+    "status": "Page {currentPage} of {totalPages}"
+  },
+  "PokemonDetails": {
+    "title": "Details",
+    "refresh": "Refresh",
+    "close": "Close",
+    "loading": "Loading details...",
+    "unableToLoad": "Unable to load details.",
+    "id": "ID",
+    "height": "Height",
+    "weight": "Weight",
+    "types": "Types"
+  },
+  "SelectedPokemonFlyout": {
+    "label": "Selected Pokemon",
+    "summary": "{count} selected",
+    "unselectAll": "Unselect all",
+    "preparing": "Preparing...",
+    "download": "Download"
+  },
+  "ErrorBoundary": {
+    "label": "Application error",
+    "title": "Something went wrong.",
+    "message": "The interface hit an unexpected problem and switched to a safe fallback view.",
+    "reset": "Remove Error"
+  }
+}

@@ -1,8 +1,10 @@
 import {
+    getCurrentSearchTerm,
     getCurrentDetailsId,
     getCurrentPage,
     getSearchParamsWithDetails,
     getSearchParamsWithPage,
+    getSearchParamsWithSearchTerm,
     hasValidPageParam,
 } from '../../helpers/searchParams';
 
@@ -23,6 +25,23 @@ describe('searchParams helpers', () => {
         );
 
         expect(nextParams.toString()).toBe('page=1&details=25');
+    });
+
+    it('reads and updates the search query parameter', () => {
+        expect(getCurrentSearchTerm(new URLSearchParams('page=1'))).toBe('');
+        expect(getCurrentSearchTerm(new URLSearchParams('query=  pikachu  '))).toBe('pikachu');
+
+        const withSearchTerm = getSearchParamsWithSearchTerm(
+            new URLSearchParams('page=2&details=25'),
+            '  eevee  ',
+        );
+        expect(withSearchTerm.toString()).toBe('page=2&details=25&query=eevee');
+
+        const withoutSearchTerm = getSearchParamsWithSearchTerm(
+            withSearchTerm,
+            '   ',
+        );
+        expect(withoutSearchTerm.toString()).toBe('page=2&details=25');
     });
 
     it('reads and updates the details parameter', () => {

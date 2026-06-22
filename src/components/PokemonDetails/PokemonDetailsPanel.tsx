@@ -1,67 +1,54 @@
+import { Link } from '../../i18n/navigation';
+import { PokemonDetailsRefreshButton } from './PokemonDetailsRefreshButton';
+import { useTranslations } from 'next-intl';
 import { PokemonDetailsContent } from './PokemonDetailsContent';
 import { PokemonDetailsState } from './PokemonDetailsState';
 import type { PokemonDetails } from '../../types/pokemon';
-import './PokemonDetailsPanel.css';
 
 type PokemonDetailsPanelProps = {
+  closeHref: string;
   details: PokemonDetails | null;
   errorMessage: string;
   isLoading: boolean;
-  onClose: () => void;
-  onRefresh: () => void;
 };
 
 export function PokemonDetailsPanel({
+  closeHref,
   details,
   errorMessage,
   isLoading,
-  onClose,
-  onRefresh,
 }: PokemonDetailsPanelProps) {
-  return (
-    <aside className='pokemon-details' onClick={onClose}>
-      <div
-        className='pokemon-details__dialog'
-        aria-labelledby='pokemon-details-title'
-        aria-modal='false'
-        role='dialog'
-        onClick={(event) => {
-          event.stopPropagation();
-        }}
-      >
-        <div className='pokemon-details__header'>
-          <h2 id='pokemon-details-title' className='pokemon-details__title'>
-            Details
-          </h2>
-          <div className='pokemon-details__actions'>
-            <button
-              className='pokemon-details__close'
-              type='button'
-              onClick={onRefresh}
-            >
-              Refresh
-            </button>
-            <button
-              className='pokemon-details__close'
-              type='button'
-              onClick={onClose}
-            >
-              Close
-            </button>
-          </div>
-        </div>
+  const t = useTranslations('PokemonDetails');
 
-        {isLoading ? <PokemonDetailsState message='Loading details...' /> : null}
-        {!isLoading && errorMessage ? (
-          <PokemonDetailsState message={errorMessage} />
-        ) : null}
-        {!isLoading && !errorMessage && !details ? (
-          <PokemonDetailsState message='Unable to load details.' />
-        ) : null}
-        {!isLoading && !errorMessage && details ? (
-          <PokemonDetailsContent details={details} />
-        ) : null}
+  return (
+    <aside
+      className='pokemon-details'
+      aria-labelledby='pokemon-details-title'
+      aria-modal='false'
+      role='dialog'
+    >
+      <div className='pokemon-details__header'>
+        <h2 id='pokemon-details-title' className='pokemon-details__title'>
+          {t('title')}
+        </h2>
+        <div className='pokemon-details__actions'>
+          <PokemonDetailsRefreshButton label={t('refresh')} />
+          <Link className='pokemon-details__close' href={closeHref}>
+            {t('close')}
+          </Link>
+        </div>
       </div>
+
+      {isLoading ? <PokemonDetailsState message={t('loading')} /> : null}
+      {!isLoading && errorMessage ? (
+        <PokemonDetailsState message={errorMessage} />
+      ) : null}
+      {!isLoading && !errorMessage && !details ? (
+        <PokemonDetailsState message={t('unableToLoad')} />
+      ) : null}
+      {!isLoading && !errorMessage && details ? (
+        <PokemonDetailsContent details={details} />
+      ) : null}
     </aside>
   );
 }

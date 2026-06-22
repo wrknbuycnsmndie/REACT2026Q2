@@ -1,60 +1,52 @@
-import type { ChangeEvent, SyntheticEvent } from 'react';
-import './SearchSection.css';
+import { useTranslations } from 'next-intl';
+import type { ChangeEvent } from 'react';
 
 type SearchSectionProps = {
     onSearchTermChange: (value: string) => void;
     onRefresh: () => void;
-    onSubmit: () => void;
-    onTestError: () => void;
     searchTerm: string;
 };
 
 export function SearchSection({
     onSearchTermChange,
     onRefresh,
-    onSubmit,
-    onTestError,
     searchTerm,
 }: SearchSectionProps) {
+    const t = useTranslations('SearchSection');
+
     const handleSearchTermChange = (event: ChangeEvent<HTMLInputElement>) => {
         onSearchTermChange(event.target.value);
-    };
-
-    const handleSubmit = (event: SyntheticEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        onSubmit();
     };
 
     return (
         <section className="search-section" aria-labelledby="search-title">
             <div className="search-section__header">
                 <h2 id="search-title" className="search-section__title">
-                    Search
+                    {t('title')}
                 </h2>
                 <p className="search-section__description">
-                    Search by name or browse the Pokemon list page by page.
+                    {t('description')}
                 </p>
             </div>
 
-            <form className="search-section__form" onSubmit={handleSubmit}>
+            <form className="search-section__form" method="get">
+                <input type="hidden" name="page" value="1" />
                 <input
                     className="search-section__input"
                     type="search"
+                    name="query"
                     placeholder="pikachu"
-                    aria-label="Pokemon name"
+                    aria-label={t('pokemonName')}
                     value={searchTerm}
                     onChange={handleSearchTermChange}
                 />
                 <button className="search-section__button" type="submit">
-                    Search
+                    {t('submit')}
                 </button>
             </form>
 
             <button className="search-section__error-button" type="button" onClick={onRefresh}>
-                Refresh Results
-            </button>
-            <button className="search-section__error-button" type="button" onClick={onTestError}>
-                Trigger Error
+                {t('refreshResults')}
             </button>
         </section>
     );

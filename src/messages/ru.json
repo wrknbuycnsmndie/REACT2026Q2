@@ -1,0 +1,79 @@
+{
+  "Header": {
+    "eyebrow": "React Functional Components",
+    "theme": "Тема",
+    "light": "Светлая",
+    "dark": "Темная",
+    "title": "Поиск Покемонов",
+    "subtitle": "Ищите Покемонов, разбирайте детали и управляйте выбранным списком.",
+    "primaryNav": "Основная навигация",
+    "home": "Главная",
+    "about": "О проекте",
+    "language": "Язык",
+    "english": "Английский",
+    "russian": "Русский"
+  },
+  "AboutPage": {
+    "eyebrow": "О проекте",
+    "title": "Лабаратория поиска Покемонов",
+    "description": "Приложение студента RS School переведенное с Vite на Next.js с поиском, пагинацией и master-detail навигацией.",
+    "author": "Автор",
+    "authorName": "Антон Чапала",
+    "course": "Курс",
+    "courseName": "RS School React Course"
+  },
+  "NotFoundPage": {
+    "eyebrow": "Ошибка 404",
+    "title": "Пикачу использовал Thunder Shock на этой странице",
+    "description": "Запрошенная страница исчезла в высокой траве. Вернитесь к Pokedex и продолжайте поиск.",
+    "returnToSearch": "Вернуться к поиску Покемонов"
+  },
+  "SearchSection": {
+    "title": "Поиск",
+    "description": "Ищите по имени или просматривайте список Покемонов постранично.",
+    "pokemonName": "Имя Покемона",
+    "submit": "Искать",
+    "refreshResults": "Обновить результаты",
+    "triggerError": "Вызвать ошибку"
+  },
+  "ResultsSection": {
+    "title": "Результаты",
+    "description": "Откройте строку, чтобы увидеть детали, или используйте чекбокс для выбора.",
+    "empty": "Пока нет результатов.",
+    "requestFailed": "Запрос не выполнен",
+    "loading": "Загрузка результатов...",
+    "select": "Выбор",
+    "pokemonName": "Имя Покемона",
+    "selectPokemon": "Выбрать {name}"
+  },
+  "Pagination": {
+    "label": "Пагинация",
+    "previous": "Предыдущая страница",
+    "next": "Следующая страница",
+    "status": "Страница {currentPage} из {totalPages}"
+  },
+  "PokemonDetails": {
+    "title": "Детали",
+    "refresh": "Обновить",
+    "close": "Закрыть",
+    "loading": "Загрузка деталей...",
+    "unableToLoad": "Не удалось загрузить детали.",
+    "id": "ID",
+    "height": "Рост",
+    "weight": "Вес",
+    "types": "Типы"
+  },
+  "SelectedPokemonFlyout": {
+    "label": "Выбранные Покемоны",
+    "summary": "Выбрано: {count}",
+    "unselectAll": "Снять выбор",
+    "preparing": "Подготовка...",
+    "download": "Скачать"
+  },
+  "ErrorBoundary": {
+    "label": "Ошибка приложения",
+    "title": "Что-то пошло не так.",
+    "message": "Интерфейс столкнулся с неожиданной проблемой и переключился на резервный вид.",
+    "reset": "Убрать ошибку"
+  }
+}

@@ -1,19 +1,18 @@
-import './AboutPage.css';
+import { useTranslations } from 'next-intl';
 
 export function AboutPage() {
+  const t = useTranslations('AboutPage');
+
   return (
     <section className='about-page' aria-labelledby='about-page-title'>
-      <p className='about-page__eyebrow'>About The App</p>
+      <p className='about-page__eyebrow'>{t('eyebrow')}</p>
       <h2 id='about-page-title' className='about-page__title'>
-        Pokemon Search Workshop
+        {t('title')}
       </h2>
-      <p className='about-page__text'>
-        Built by an RS School student as a React Router exercise around search,
-        pagination, and master-detail navigation patterns.
-      </p>
+      <p className='about-page__text'>{t('description')}</p>
       <dl className='about-page__facts'>
         <div className='about-page__fact'>
-          <dt>Author</dt>
+          <dt>{t('author')}</dt>
           <dd>
             <a
               className='about-page__link'
@@ -21,12 +20,12 @@ export function AboutPage() {
               rel='noreferrer'
               target='_blank'
             >
-              Anton Chapala
+              {t('authorName')}
             </a>
           </dd>
         </div>
         <div className='about-page__fact'>
-          <dt>Course</dt>
+          <dt>{t('course')}</dt>
           <dd>
             <a
               className='about-page__link'
@@ -34,7 +33,7 @@ export function AboutPage() {
               rel='noreferrer'
               target='_blank'
             >
-              RS School React Course
+              {t('courseName')}
             </a>
           </dd>
         </div>

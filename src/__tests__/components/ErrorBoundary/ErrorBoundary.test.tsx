@@ -1,8 +1,9 @@
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Component } from 'react';
 import { vi } from 'vitest';
 import { ErrorBoundary } from '../../../components/ErrorBoundary/ErrorBoundary';
+import { renderWithIntl } from '../../testUtils/renderWithIntl';
 
 class ThrowingChild extends Component<{ shouldThrow: boolean }> {
     public render() {
@@ -18,7 +19,7 @@ describe('ErrorBoundary', () => {
     it('renders fallback UI and logs when a child throws', () => {
         const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-        render(
+        renderWithIntl(
             <ErrorBoundary onReset={vi.fn()}>
                 <ThrowingChild shouldThrow />
             </ErrorBoundary>,
@@ -41,7 +42,7 @@ describe('ErrorBoundary', () => {
         const onReset = vi.fn();
         const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-        const { rerender } = render(
+        const { rerender } = renderWithIntl(
             <ErrorBoundary onReset={onReset}>
                 <ThrowingChild shouldThrow />
             </ErrorBoundary>,

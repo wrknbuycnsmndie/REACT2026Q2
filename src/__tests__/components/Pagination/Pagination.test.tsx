@@ -1,37 +1,54 @@
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { vi } from 'vitest';
 import { Pagination } from '../../../components/Pagination/Pagination';
+import { getMockUrl } from '../../testUtils/nextMocks';
+import { renderWithIntl } from '../../testUtils/renderWithIntl';
 
 describe('Pagination', () => {
-    it('disables the previous button on the first page and advances to the next page', async () => {
+    it('renders previous and next links and advances to the next page', async () => {
         const user = userEvent.setup();
-        const onPageChange = vi.fn();
 
-        render(
-            <Pagination currentPage={1} totalPages={3} onPageChange={onPageChange} />,
+        renderWithIntl(
+            <Pagination
+                currentPage={1}
+                totalPages={3}
+                getPageHref={(page) => `/?page=${page}`}
+            />,
         );
 
-        expect(screen.getByRole('button', { name: 'Previous page' })).toBeDisabled();
+        expect(screen.getByRole('link', { name: 'Previous page' })).toHaveAttribute(
+            'href',
+            '/en?page=0',
+        );
+        expect(screen.getByRole('link', { name: 'Previous page' })).toHaveAttribute(
+            'aria-disabled',
+            'true',
+        );
         expect(screen.getByText('Page 1 of 3')).toBeInTheDocument();
 
-        await user.click(screen.getByRole('button', { name: 'Next page' }));
+        await user.click(screen.getByRole('link', { name: 'Next page' }));
 
-        expect(onPageChange).toHaveBeenCalledWith(2);
+        expect(getMockUrl()).toBe('/en?page=2');
     });
 
-    it('disables the next button on the last page and goes back to the previous page', async () => {
+    it('marks the next link disabled on the last page and still links back', async () => {
         const user = userEvent.setup();
-        const onPageChange = vi.fn();
 
-        render(
-            <Pagination currentPage={3} totalPages={3} onPageChange={onPageChange} />,
+        renderWithIntl(
+            <Pagination
+                currentPage={3}
+                totalPages={3}
+                getPageHref={(page) => `/?page=${page}`}
+            />,
         );
 
-        expect(screen.getByRole('button', { name: 'Next page' })).toBeDisabled();
+        expect(screen.getByRole('link', { name: 'Next page' })).toHaveAttribute(
+            'aria-disabled',
+            'true',
+        );
 
-        await user.click(screen.getByRole('button', { name: 'Previous page' }));
+        await user.click(screen.getByRole('link', { name: 'Previous page' }));
 
-        expect(onPageChange).toHaveBeenCalledWith(2);
+        expect(getMockUrl()).toBe('/en?page=2');
     });
 });
